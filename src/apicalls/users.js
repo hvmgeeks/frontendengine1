@@ -30,18 +30,6 @@ export const registerUser = async (payload) => {
         }
     }
 }
-In the code above, axiosInstance is assumed to be an instance of Axios that you have configured. It's used to send HTTP requests to your API server.
-
-2. Using the registerUser and loginUser Functions:
-Below is an example of how you can use these functions in your component or wherever you need to call them. It includes error handling to ensure that your application can gracefully handle and display errors to the user.
-
-javascript
-Copy code
-// ExampleComponent.js
-import React, { useState } from 'react';
-import { loginUser, registerUser }
-
-
 
 // export const registerUser = async (payload) => {
 //     try {
