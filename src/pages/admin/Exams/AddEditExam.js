@@ -172,6 +172,7 @@ function AddEditExam() {
                       <option value="English">English</option>
                       <option value="Sst">Sst</option>
                       <option value="Cme">Cme</option>
+                      <option value="Religion">Religion</option>
                       <option value="Physics">Physics</option>
                       <option value="Biology">Biology</option>
                       <option value="Chemistry">Chemistry</option>
