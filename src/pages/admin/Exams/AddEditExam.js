@@ -173,9 +173,6 @@ function AddEditExam() {
                       <option value="Sst">Sst</option>
                       <option value="Cme">Cme</option>
                       <option value="Religion">Religion</option>
-                      <option value="Physics">Physics</option>
-                      <option value="Biology">Biology</option>
-                      <option value="Chemistry">Chemistry</option>
                       <option value="Kiswahili">Kiswahili</option>
                     </select>
                   </Form.Item>
