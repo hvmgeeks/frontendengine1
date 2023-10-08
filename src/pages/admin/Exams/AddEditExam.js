@@ -169,7 +169,7 @@ function AddEditExam() {
                       <option value="">Select Category</option>
                       <option value="Mathematics">Mathematics</option>
                       <option value="RELIGION">Religion</option>
-                      <option value="Science">Science</option>
+                      <option value="SCIENCE">Science</option>
                       <option value="English">English</option>
                       <option value="Sst">SST</option>
                       <option value="Cme">CME</option>
