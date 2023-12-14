@@ -1,0 +1,59 @@
+.study-material {
+    height: fit-content;
+    padding-bottom: 40px;
+}
+.study-material .content {
+    margin-top: 10px;
+}
+
+.study-material .content select {
+    margin-left: 10px;
+}
+
+.study-material .class {
+    margin-top: 10px;
+}
+
+.study-material .class select {
+    margin-left: 10px;
+}
+
+.study-material .subject {
+    margin-top: 10px;
+}
+
+.study-material .subject select {
+    margin-left: 10px;
+}
+
+.study-material .common {
+    margin-top: 40px;
+}
+
+.study-material .common .title {
+    margin-bottom: 7px;
+}
+
+.study-material .common .year {
+    margin-bottom: 7px;
+}
+
+.study-material .common .btn {
+    border: 2px solid rgb(58, 58, 58);
+    border-radius: 5px;
+    background: linear-gradient(to left, white 50%, black 50%) right;
+    background-size: 200% 100%;
+    transition: .3s ease-out;
+    padding: 2px 15px;
+}
+
+.study-material .common .btn:hover {
+    background-position: left;
+    color: white;
+    cursor: pointer;
+}
+
+.study-material .not-found {
+    margin-top: 20px;
+    font-weight: 700;
+}

@@ -33,6 +33,13 @@ function ProtectedRoute({ children }) {
       onClick: () => navigate("/profile"),
     },
     {
+      title: "Study Material",
+      paths: ["/user/study-material"],
+      icon: <i className="ri-book-open-line"></i>,
+      onClick: () => navigate("/user/study-material"),
+    },
+
+    {
       title: "Logout",
       paths: ["/logout"],
       icon: <i className="ri-logout-box-line"></i>,
