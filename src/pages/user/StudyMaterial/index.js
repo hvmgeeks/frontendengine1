@@ -11,7 +11,7 @@ function StudyMaterial() {
   const [pastPapers, setPastPapers] = useState('');
   const [videos, setVideos] = useState('');
   const [showVideoID, setShowVideoID] = useState('');
-  const classesList = ['Class 3', 'Class 4', 'Class 5', 'Class 6','Class 7', 'Form 1', 'Form 2', 'Form 3', 'Form 4', 'Form 5', 'Form 6'];
+  const classesList = ['Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Form 1', 'Form 2', 'Form 3', 'Form 4', 'Form 5', 'Form 6'];
   const subjectsList = ['Mathematics', 'Science', 'Kiswahili', 'English', 'SocialStudies', 'Civic&Moral', 'Religion', 'VS'];
 
   const opts = {
