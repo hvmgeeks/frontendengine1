@@ -12,13 +12,14 @@
 }
 
 .loader-parent {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.638);
   z-index: 10000;
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100%;
 }
 
 .loader {
@@ -71,6 +72,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }

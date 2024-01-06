@@ -21,7 +21,7 @@ function WriteExam() {
   const [timeUp, setTimeUp] = useState(false);
   const [intervalId, setIntervalId] = useState(null);
   const { user } = useSelector((state) => state.users);
-
+  const [isMobile, setIsMobile] = useState(false);
 
   const getExamData = async () => {
     try {
@@ -106,6 +106,9 @@ function WriteExam() {
   }, [timeUp]);
 
   useEffect(() => {
+    if (window.innerWidth < 768) {
+      setIsMobile(true);
+    }
     if (params.id) {
       getExamData();
     }
@@ -114,7 +117,7 @@ function WriteExam() {
     examData && (
       <div className="mt-2">
         <div className="divider"></div>
-        <h1 className="text-center">{examData.name}</h1>
+        <h1 className={`text-center ${isMobile ? 'text-xl' : ''}`}>{examData.name}</h1>
         <div className="divider"></div>
 
         {view === "instructions" && (
@@ -125,17 +128,17 @@ function WriteExam() {
           />
         )}
 
-        
-{view === "questions" && (
+
+        {view === "questions" && (
           <div className="flex flex-col gap-2">
             <div className="flex justify-between">
-              <h1 className="text-2xl">
+              <h1 className={isMobile ? 'text-lg' : 'text-2xl'}>
                 {selectedQuestionIndex + 1} :{" "}
                 {questions[selectedQuestionIndex].name}
               </h1>
 
               <div className="timer">
-                <span className="text-2xl">{secondsLeft}</span>
+                <span className={isMobile ? 'text-lg' : 'text-2xl'}>{secondsLeft}</span>
               </div>
             </div>
 
@@ -144,11 +147,10 @@ function WriteExam() {
                 (option, index) => {
                   return (
                     <div
-                      className={`flex gap-2 flex-col ${
-                        selectedOptions[selectedQuestionIndex] === option
-                          ? "selected-option"
-                          : "option"
-                      }`}
+                      className={`flex gap-2 flex-col ${selectedOptions[selectedQuestionIndex] === option
+                        ? "selected-option"
+                        : "option"
+                        }`}
                       key={index}
                       onClick={() => {
                         setSelectedOptions({
@@ -157,7 +159,7 @@ function WriteExam() {
                         });
                       }}
                     >
-                      <h1 className="text-xl">
+                      <h1 className={isMobile ? 'text-md' : 'text-xl'}>
                         {option} :{" "}
                         {questions[selectedQuestionIndex].options[option]}
                       </h1>
@@ -194,9 +196,9 @@ function WriteExam() {
                 <button
                   className="primary-contained-btn"
                   onClick={() => {
-                    clearInterval(intervalId);
+                    // clearInterval(intervalId);
                     setTimeUp(true);
-                  
+
                   }}
                 >
                   Submit
@@ -206,50 +208,52 @@ function WriteExam() {
           </div>
         )}
 
-      {view === "result" && (
-      
-      <div className="flex items-center mt-2 justify-center ">
-           <div className="flex flex-col gap-2 result">
-            
-           <h1 className="text-2xl"> RESULT</h1>
-             <div className="marks">
-                   <h1 className="text-md">
-                         Total Marks : {examData.totalMarks}
-                   </h1>
-                       <h1 className="text-md">
-                        obtained Marks :
-                        {result.correctAnswers.length}
-                        </h1>
-                        <h1 className="text-md">
-                            Wrong Answers : {result.wrongAnswers.length} 
-                        </h1>
-                        <h1 className="text-md">passing Marks : {examData.passingMarks}</h1>
-                        <h1 className="text-md"> VERDICT :
-                        {result.verdict}</h1>
+        {view === "result" && (
 
-                        <div className="flex gap-2 mt-2">
-                           <button
-                            className="primary-outline-btn"
-                            onClick={() => {
-                              setView("instractions");
-                              setSelectedQuestionIndex(0);
-                              setSelectedOptions({});
-                              setSecondsLeft(examData.duration);
-                            }}
-                            >
-                              Retake Exam
-                            </button>
-                            <button className="primary-contained-btn"
-                            onClick={()=>{
-                              setView("review");
-                            }}>
-                              Review Answers
-                            </button>
-                        </div>
-             </div>
-           </div>
-             <div className="lottie-animation">
-             {result.verdict === "Pass" && (
+          <div className="flex items-center mt-2 justify-center ">
+            <div className="flex flex-col gap-2 result">
+
+              <h1 className={isMobile ? 'text-lg' : 'text-2xl'}> RESULT</h1>
+              <div className="marks">
+                <h1 className="text-md">
+                  Total Marks : {examData.totalMarks}
+                </h1>
+                <h1 className="text-md">
+                  obtained Marks :
+                  {result.correctAnswers.length}
+                </h1>
+                <h1 className="text-md">
+                  Wrong Answers : {result.wrongAnswers.length}
+                </h1>
+                <h1 className="text-md">passing Marks : {examData.passingMarks}</h1>
+                <h1 className="text-md"> VERDICT :
+                  {result.verdict}</h1>
+
+                <div className="flex gap-2 mt-2">
+                  <button
+                    className={`primary-outline-btn ${isMobile ? 'mobile-btn' : ''}`}
+                    onClick={() => {
+                      setView("instructions");
+                      setSelectedQuestionIndex(0);
+                      setSelectedOptions({});
+                      setSecondsLeft(examData.duration);
+                      setTimeUp(false);
+                    }}
+                  >
+                    Retake Exam
+                  </button>
+                  <button
+                    className={`primary-contained-btn ${isMobile ? 'mobile-btn' : ''}`}
+                    onClick={() => {
+                      setView("review");
+                    }}>
+                    Review Answers
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="lottie-animation">
+              {result.verdict === "Pass" && (
                 <lottie-player
                   src="https://assets2.lottiefiles.com/packages/lf20_ya4ycrti.json"
                   background="transparent"
@@ -259,8 +263,8 @@ function WriteExam() {
                 ></lottie-player>
               )}
 
-              
-                  {result.verdict === "Fail" && (
+
+              {result.verdict === "Fail" && (
                 <lottie-player
                   src="https://assets4.lottiefiles.com/packages/lf20_qp1spzqv.json"
                   background="transparent"
@@ -268,13 +272,13 @@ function WriteExam() {
                   loop
                   autoplay
                 ></lottie-player>
-                )}
-             </div>
-           </div>
-           )}
+              )}
+            </div>
+          </div>
+        )}
 
 
-{view === "review" && (
+        {view === "review" && (
           <div className="flex flex-col gap-2">
             {questions.map((question, index) => {
               const isCorrect =
@@ -282,19 +286,19 @@ function WriteExam() {
               return (
                 <div
                   className={`
-                  flex flex-col gap-1 p-2 ${
-                    isCorrect ? "bg-success" : "bg-error"
-                  }
+                  flex flex-col gap-1 p-2 ${isCorrect ? "bg-success" : "bg-error"
+                    }
                 `}
+                  key={index}
                 >
-                  <h1 className="text-xl">
+                  <h1 className={isMobile ? 'text-md' : 'text-xl'}>
                     {index + 1} : {question.name}
                   </h1>
-                  <h1 className="text-md">
+                  <h1 className={isMobile ? 'text-sm' : 'text-md'}>
                     Submitted Answer : {selectedOptions[index]} -{" "}
                     {question.options[selectedOptions[index]]}
                   </h1>
-                  <h1 className="text-md">
+                  <h1 className={isMobile ? 'text-sm' : 'text-md'}>
                     Correct Answer : {question.correctOption} -{" "}
                     {question.options[question.correctOption]}
                   </h1>
@@ -318,6 +322,7 @@ function WriteExam() {
                   setSelectedQuestionIndex(0);
                   setSelectedOptions({});
                   setSecondsLeft(examData.duration);
+                  setTimeUp(false);
                 }}
               >
                 Retake Exam
@@ -325,7 +330,7 @@ function WriteExam() {
             </div>
           </div>
         )}
-      </div> 
+      </div>
     )
   );
 }

@@ -1,5 +1,6 @@
 import { Form, message } from "antd";
 import React from "react";
+import './index.css';
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { loginUser } from "../../../apicalls/users";
@@ -27,18 +28,18 @@ function Login() {
 
   return (
     <div className="flex justify-center items-center h-screen w-screen bg-primary">
-      <div className="card w-400 p-3 bg-white">
+      <div className="card p-3 bg-white">
         <div className="flex flex-col">
           <div className="flex">
-            <h1 className="text-2xl">ST JOSEPH THE WORKER KIBADA QUIZ ENGINE - LOGIN <i class="ri-login-circle-line"></i></h1>
+            <h1 className="text-2xl">ST JOSEPH THE WORKER KIBADA QUIZ ENGINE - LOGIN <i className="ri-login-circle-line"></i></h1>
             
           </div>
           <div className="divider"></div>
           <Form layout="vertical" className="mt-2" onFinish={onFinish}>
-            <Form.Item name="email" label="Email">
+            <Form.Item name="email" label="Email" initialValue="">
               <input type="text" />
             </Form.Item>
-            <Form.Item name="password" label="Password">
+            <Form.Item name="password" label="Password" initialValue="">
               <input type="password" />
             </Form.Item>
 

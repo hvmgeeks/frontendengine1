@@ -13,12 +13,12 @@ export const addReport = async (payload) => {
 // get all reports
 export const getAllReports = async (filters) => {
     try {
-        const response = await axiosInstance.post("/api/reports/get-all-reports" , filters);
+        const response = await axiosInstance.post("/api/reports/get-all-reports", filters);
         return response.data;
     } catch (error) {
         return error.response.data;
     }
-} 
+}
 
 // get all reports by user
 export const getAllReportsByUser = async () => {
@@ -29,3 +29,13 @@ export const getAllReportsByUser = async () => {
         return error.response.data;
     }
 }
+
+// get all reports for ranking
+export const getAllReportsForRanking = async (filters) => {
+    try {
+        const response = await axiosInstance.get("/api/reports/get-all-reports-for-ranking");
+        return response.data;
+    } catch (error) {
+        return error.response.data;
+    }
+} 

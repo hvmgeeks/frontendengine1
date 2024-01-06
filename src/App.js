@@ -17,6 +17,9 @@ import WriteExam from "./pages/user/WriteExam";
 import UserReports from "./pages/user/UserReports";
 import AdminReports from "./pages/admin/AdminReports";
 import StudyMaterial from "./pages/user/StudyMaterial";
+import Ranking from "./pages/user/Ranking";
+import Profile from "./pages/common/Profile";
+import { useState } from "react";
 
 function App() {
   const { loading } = useSelector((state) => state.loader);
@@ -35,6 +38,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             }
           />
@@ -62,7 +73,14 @@ function App() {
               </ProtectedRoute>
             }
           />
-
+          <Route
+            path="/user/ranking"
+            element={
+              <ProtectedRoute>
+                <Ranking />
+              </ProtectedRoute>
+            }
+          />
           {/* Admin Routes */}
           <Route
             path="/admin/exams"

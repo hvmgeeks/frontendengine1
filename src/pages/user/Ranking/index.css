@@ -1,0 +1,94 @@
+.ranking-table-container {
+    width: fit-content;
+    max-height: 65vh;
+    overflow-y: scroll;
+    border: 1px solid #aaaaaa;
+
+}
+
+.ranking-table {
+    background-color: whitesmoke;
+    border: 1px solid #aaaaaa;
+    border-collapse: collapse;
+}
+
+.ranking-table .head .head-row {
+    color: white;
+}
+
+.ranking-table .head .head-row th {
+    padding: 10px;
+    text-align: center;
+    border-right: 1px solid #aaaaaa;
+    background-color: brown;
+    position: sticky;
+    top: 0;
+}
+
+.ranking-table .body .body-row {
+    border-bottom: 1px solid #aaaaaa;
+    cursor: pointer;
+}
+
+.ranking-table .body .no-highlight:hover {
+    background-color: aliceblue;
+}
+
+.ranking-table .body .highlight-row {
+    background-color: wheat;
+}
+
+.ranking-table .body .body-row td {
+    text-align: center;
+    padding: 10px;
+    border-right: 1px solid #aaaaaa;
+}
+
+.ranking-table .body .fixed-row {
+    border-bottom: 1px solid #aaaaaa;
+    cursor: pointer;
+    color: white;
+}
+
+.ranking-table .body .fixed-row td {
+    text-align: center;
+    padding: 12px 10px;
+    border-right: 1px solid #aaaaaa;
+    background-color: rgb(83, 146, 202);
+    position: sticky;
+    bottom: 0;
+}
+
+@media only screen and (min-width: 375px) and (max-width: 768px) {
+    .ranking-table .head .head-row th {
+        padding: 5px;
+        font-size: 9px;
+    }
+
+    .ranking-table .body .body-row td {
+        padding: 5px;
+        font-size: 9px;
+    }
+
+    .ranking-table .body .fixed-row td {
+        padding: 7px 5px;
+        font-size: 9px;
+    }
+}
+
+@media only screen and (max-width: 375px) {
+    .ranking-table .head .head-row th {
+        padding: 3px;
+        font-size: 8px;
+    }
+
+    .ranking-table .body .body-row td {
+        padding: 3px;
+        font-size: 8px;
+    }
+
+    .ranking-table .body .fixed-row td {
+        padding: 5px 3px;
+        font-size: 8px;
+    }
+}

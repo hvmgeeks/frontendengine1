@@ -10,9 +10,9 @@ function ProtectedRoute({ children }) {
   const { user } = useSelector((state) => state.users);
   const [menu, setMenu] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const userMenu = [
     {
       title: "Home",
@@ -27,10 +27,10 @@ function ProtectedRoute({ children }) {
       onClick: () => navigate("/user/reports"),
     },
     {
-      title: "Profile",
-      paths: ["/profile"],
-      icon: <i className="ri-user-line"></i>,
-      onClick: () => navigate("/profile"),
+      title: "Ranking",
+      paths: ["/user/ranking"],
+      icon: <i className="ri-trophy-line"></i>,
+      onClick: () => navigate("/user/ranking"),
     },
     {
       title: "Study Material",
@@ -38,7 +38,12 @@ function ProtectedRoute({ children }) {
       icon: <i className="ri-book-open-line"></i>,
       onClick: () => navigate("/user/study-material"),
     },
-
+    {
+      title: "Profile",
+      paths: ["/profile"],
+      icon: <i className="ri-user-line"></i>,
+      onClick: () => navigate("/profile"),
+    },
     {
       title: "Logout",
       paths: ["/logout"],
@@ -100,6 +105,7 @@ function ProtectedRoute({ children }) {
         }
       } else {
         message.error(response.message);
+        navigate("/login");
       }
     } catch (error) {
       navigate("/login");
@@ -109,6 +115,10 @@ function ProtectedRoute({ children }) {
   };
 
   useEffect(() => {
+    if (window.innerWidth < 768) {
+      setIsMobile(true);
+      setCollapsed(true);
+    }
     if (localStorage.getItem("token")) {
       getUserData();
     } else {
@@ -140,15 +150,14 @@ function ProtectedRoute({ children }) {
 
   return (
     <div className="layout">
-      <div className="flex gap-2 w-full h-full h-100">
-        <div className="sidebar">
+      <div className="flex gap-1 w-full h-full h-100">
+        <div className={`sidebar ${isMobile && 'mobile-sidebar'}`}>
           <div className="menu">
             {menu.map((item, index) => {
               return (
                 <div
-                  className={`menu-item ${
-                    getIsActiveOrNot(item.paths) && "active-menu-item"
-                  }`}
+                  className={`menu-item ${getIsActiveOrNot(item.paths) && "active-menu-item"
+                    }`}
                   key={index}
                   onClick={item.onClick}
                 >
@@ -159,7 +168,7 @@ function ProtectedRoute({ children }) {
             })}
           </div>
         </div>
-        <div className="body">
+        <div className={`body ${collapsed ? isMobile ? 'mobile-collapsed-body' : 'collapsed-body' : 'no-collapse-body'}`}>
           <div className="header flex justify-between">
             {!collapsed && (
               <i
@@ -167,18 +176,20 @@ function ProtectedRoute({ children }) {
                 onClick={() => setCollapsed(true)}
               ></i>
             )}
-            {collapsed && (
+            {(collapsed && !isMobile) && (
               <i
                 className="ri-menu-line"
                 onClick={() => setCollapsed(false)}
               ></i>
             )}
-            <h1 className="text-2xl text-white">ST JOSEPH THE WORKER QUIZ ENGINE</h1>
+            <h1 className={`text-white ${isMobile ? 'text-xs' : 'text-2xl'}`}>ST JOSEPH THE WORKER QUIZ ENGINE</h1>
             <div>
               <div className="flex gap-1 items-center">
-                <h1 className="text-md text-white">{user?.name}</h1>
+                <h1 className={`text-white ${isMobile ? 'text-xs' : 'text-md'}`}>{user?.name}</h1>
               </div>
-              <span>Role : {user?.isAdmin ? "Admin" : "User"}</span>
+              {!isMobile &&
+                <span>Role : {user?.isAdmin ? "Admin" : "User"}</span>
+              }
             </div>
           </div>
           <div className="content">{children}</div>

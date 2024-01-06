@@ -36,8 +36,8 @@ function Home() {
         <PageTitle title={`Hi ${user.name}, Welcome its time to study!!`} />
         <div className="divider"></div>
         <Row gutter={[16, 16]}>
-          {exams.map((exam) => (
-            <Col span={6}>
+          {exams.map((exam, index) => (
+            <Col xs={24} sm={12} md={8} lg={6} key={index}>
               <div className="card-lg flex flex-col gap-1 p-2">
                 <h1 className="text-2xl">{exam?.name}</h1>
 

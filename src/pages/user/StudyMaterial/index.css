@@ -57,3 +57,23 @@
     margin-top: 20px;
     font-weight: 700;
 }
+
+.study-material .books .thumbnail-container {
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.study-material .books .thumbnail-container .thumbnail {
+    width: 250px;
+    height: 250px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    transition: transform 0.3s ease;
+}
+
+.study-material .books .thumbnail-container .thumbnail:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+}

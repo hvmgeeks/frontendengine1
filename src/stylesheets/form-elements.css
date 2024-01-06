@@ -1,10 +1,22 @@
-input{
-  height: 20px; 
+input {
+  height: 20px;
   padding: 10px 20px;
   border: 2px solid #ccc;
   width: 89%;
-  
 }
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
 .ant-form-item {
   margin-bottom: 5px !important;
 }
@@ -13,10 +25,17 @@ button {
   padding: 0px 25px;
   border-radius: 2px;
   height: 40px !important;
+  cursor: pointer;
 }
+
 .primary-contained-btn {
   background-color: var(--primary);
   color: white;
+}
+
+.mobile-btn {
+  padding: 0px 10px;
+  font-size: small;
 }
 
 .primary-outlined-btn {

@@ -1,0 +1,93 @@
+.Profile {
+    display: flex;
+    flex-direction: column;
+}
+
+.Profile .input-container {
+    margin-bottom: 20px;
+}
+
+.Profile .label {
+    font-weight: bolder;
+}
+
+.Profile .input {
+    padding: 7px 5px;
+    width: 90%;
+    border-radius: 5px;
+    border: 2px solid grey;
+    margin-top: 5px;
+    cursor: text;
+}
+
+.Profile .btn {
+    border-radius: 5px;
+    padding: 0px 25px;
+    background-color: whitesmoke;
+}
+.Profile .btn-mt {
+    margin-top: 20px;
+}
+
+.Profile .btn:hover {
+    cursor: pointer;
+    background-color: rgb(204, 204, 204);
+}
+
+.Profile .btns-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.Profile .profile-picture-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.Profile .profile-picture {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    border: 1px solid gray;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.Profile .profile-picture img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.Profile .profile-picture span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #333;
+    font-weight: bold;
+}
+
+.Profile .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.Profile .overlay:hover {
+    background: rgba(0, 0, 0, 0.7);
+}

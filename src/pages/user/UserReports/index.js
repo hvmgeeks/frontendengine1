@@ -1,4 +1,5 @@
 import React from "react";
+import './index.css';
 import PageTitle from "../../../components/PageTitle";
 import { message, Modal, Table } from "antd";
 import { useDispatch } from "react-redux";
@@ -66,10 +67,15 @@ function UserReports() {
   }, []);
 
   return (
-    <div>
+    <div className="reports-container">
       <PageTitle title="Reports" />
       <div className="divider"></div>
-      <Table columns={columns} dataSource={reportsData} />
+      <Table 
+      columns={columns} 
+      dataSource={reportsData} 
+      rowKey={(record) => record._id} 
+      scroll={{ x: true }} 
+      />
     </div>
   );
 }
