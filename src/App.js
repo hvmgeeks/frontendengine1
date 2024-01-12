@@ -17,7 +17,6 @@ import WriteExam from "./pages/user/WriteExam";
 import UserReports from "./pages/user/UserReports";
 import AdminReports from "./pages/admin/AdminReports";
 import StudyMaterial from "./pages/user/StudyMaterial";
-import Pricing from "./pages/user/Pricing";
 import Ranking from "./pages/user/Ranking";
 import Profile from "./pages/common/Profile";
 import { useState } from "react";
