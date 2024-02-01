@@ -16,9 +16,9 @@ function ProtectedRoute({ children }) {
   const userMenu = [
     {
       title: "Quiz",
-      paths: ["/user/quiz", "/user/write-exam"],
+      paths: ["/", "/user/write-exam"],
       icon: <i className="ri-pencil-line"></i>,
-      onClick: () => navigate("/user/quiz"),
+      onClick: () => navigate("/"),
     },
     {
       title: "Reports",
