@@ -59,7 +59,7 @@ function Register() {
   }
 
   return (
-    <div className="flex justify-center items-center h-screen w-screen bg-primary">
+    <div className="flex justify-center items-center h-screen w-screen bg-primary main">
       <div className="card p-3 bg-white">
         {verification ?
           <div>
@@ -87,12 +87,15 @@ function Register() {
               - REGISTER<i className="ri-user-add-line"></i>
             </h1>
             <div className="divider"></div>
-            <Form layout="vertical" className="mt-2" onFinish={generateOTP}>
-              {/* <Form layout="vertical" className="mt-2" onFinish={onFinish}> */}
+            {/* <Form layout="vertical" className="mt-2" onFinish={generateOTP}> */}
+              <Form layout="vertical" className="mt-2" onFinish={onFinish}>
               <Form.Item name="name" label="Name" initialValue="">
                 <input type="text" />
               </Form.Item>
               <Form.Item name="school" label="School" initialValue="">
+                <input type="text" />
+              </Form.Item>
+              <Form.Item name="class" label="Class" initialValue="">
                 <input type="text" />
               </Form.Item>
               <Form.Item name="email" label="Email" initialValue="">

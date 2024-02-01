@@ -6,7 +6,11 @@
 .Profile .input-container {
     margin-bottom: 20px;
 }
-
+.Profile .flex-row {
+    justify-content: space-evenly;
+    padding: 10px 0px;
+    margin-bottom: 40px;
+}
 .Profile .label {
     font-weight: bolder;
 }

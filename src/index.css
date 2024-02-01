@@ -3,3 +3,8 @@
 * {
   font-family: "Montserrat", sans-serif !important;
 }
+
+body{
+  padding: 0;
+  margin: 0;
+}

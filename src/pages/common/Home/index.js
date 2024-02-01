@@ -1,65 +1,68 @@
-import { Col, message, Row } from "antd";
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getAllExams } from "../../../apicalls/exams";
-import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
-import PageTitle from "../../../components/PageTitle";
-import { useNavigate } from "react-router-dom";
-function Home() {
-  const [exams, setExams] = React.useState([]);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.users);
-  const getExams = async () => {
-    try {
-      dispatch(ShowLoading());
-      const response = await getAllExams();
-      if (response.success) {
-        setExams(response.data);
-      } else {
-        message.error(response.message);
-      }
-      dispatch(HideLoading());
-    } catch (error) {
-      dispatch(HideLoading());
-      message.error(error.message);
-    }
-  };
+import React from "react";
+import './index.css';
+import { Link } from "react-router-dom";
+import { TbArrowBigRightLinesFilled } from "react-icons/tb";
+import { AiOutlinePlus } from "react-icons/ai";
+import Image1 from "../../../assets/collage-1.png";
+import Image2 from "../../../assets/collage-2.png";
 
-  useEffect(() => {
-    getExams();
-  }, []);
-
-  return (
-    user && (
-      <div>
-        <PageTitle title={`Hi ${user.name}, Welcome its time to study!!`} />
-        <div className="divider"></div>
-        <Row gutter={[16, 16]}>
-          {exams.map((exam, index) => (
-            <Col xs={24} sm={12} md={8} lg={6} key={index}>
-              <div className="card-lg flex flex-col gap-1 p-2">
-                <h1 className="text-2xl">{exam?.name}</h1>
-
-                <h1 className="text-md">Category : {exam.category}</h1>
-
-                <h1 className="text-md">Total Marks : {exam.totalMarks}</h1>
-                <h1 className="text-md">Passing Marks : {exam.passingMarks}</h1>
-                <h1 className="text-md">Duration : {exam.duration}</h1>
-
-                <button
-                  className="primary-outlined-btn"
-                  onClick={() => navigate(`/user/write-exam/${exam._id}`)}
-                >
-                  Start Exam
-                </button>
-              </div>
-            </Col>
-          ))}
-        </Row>
-      </div>
+const Home = () => {
+    return (
+        <div className="Home">
+            <section className="section-1">
+                <div className="content-1">
+                    <div className="title">Fueling Bright Futures with <br /><span className="colored-title"><TbArrowBigRightLinesFilled />Education.</span></div>
+                    <p className="para">Solutions and flexible online study, you can study anywhere through this platform.</p>
+                    <div className="btns-container">
+                        <Link to='/login' className="btn btn-1">Login</Link>
+                        <Link to='/register' className="btn btn-2">Sign up</Link>
+                    </div>
+                </div>
+                <div className="content-2">
+                    <img src={Image1} alt="Collage-1" className="collage" />
+                </div>
+            </section>
+            <section className="section-2">
+                <div className="flex-col">
+                    <div className="number">7K+</div>
+                    <div className="text">Success Stories</div>
+                </div>
+                <div className="flex-col">
+                    <AiOutlinePlus className="plus-icon"/>
+                </div>
+                <div className="flex-col">
+                    <div className="number">300+</div>
+                    <div className="text">Expert Mentors</div>
+                </div>
+                <div className="flex-col">
+                    <AiOutlinePlus className="plus-icon"/>
+                </div>
+                <div className="flex-col">
+                    <div className="number">15K+</div>
+                    <div className="text">Students Joined</div>
+                </div>
+                <div className="flex-col">
+                    <AiOutlinePlus className="plus-icon" />
+                </div>
+                <div className="flex-col">
+                    <div className="number">250+</div>
+                    <div className="text">Trendy Courses</div>
+                </div>
+            </section>
+            <section className="section-3">
+                <div className="content-1">
+                    <div className="title">Discover knowledge in limitless realms.</div>
+                    <p className="para">Education serve as the cornerstone of personal and societal development. It is a dynamic process that empowers individuals with knowledge, skills, and critical thinking abilities essential.</p>
+                    <div className="btn-container">
+                        <Link className="btn btn-1">Learn More</Link>
+                    </div>
+                </div>
+                <div className="content-2">
+                    <img src={Image2} alt="Collage-1" className="collage" />
+                </div>
+            </section>
+        </div>
     )
-  );
-}
+};
 
 export default Home;

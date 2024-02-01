@@ -15,10 +15,10 @@ function ProtectedRoute({ children }) {
   const navigate = useNavigate();
   const userMenu = [
     {
-      title: "Home",
-      paths: ["/", "/user/write-exam"],
-      icon: <i className="ri-home-line"></i>,
-      onClick: () => navigate("/"),
+      title: "Quiz",
+      paths: ["/user/quiz", "/user/write-exam"],
+      icon: <i className="ri-pencil-line"></i>,
+      onClick: () => navigate("/user/quiz"),
     },
     {
       title: "Reports",
@@ -37,6 +37,18 @@ function ProtectedRoute({ children }) {
       paths: ["/user/study-material"],
       icon: <i className="ri-book-open-line"></i>,
       onClick: () => navigate("/user/study-material"),
+    },
+    {
+      title: "About Us",
+      paths: ["/user/about-us"],
+      icon: <i className="ri-information-line"></i>,
+      onClick: () => navigate("/user/about-us"),
+    },
+    {
+      title: "Forum",
+      paths: ["/user/forum"],
+      icon: <i className="ri-discuss-line"></i>,
+      onClick: () => navigate("/user/forum"),
     },
     {
       title: "Profile",

@@ -6,6 +6,13 @@ import { getExamById } from "../../../apicalls/exams";
 import { addReport } from "../../../apicalls/reports";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
 import Instructions from "./Instructions";
+import Pass from '../../../assets/pass.gif';
+import Fail from '../../../assets/fail.gif';
+import Confetti from "react-confetti";
+import useWindowSize from "react-use/lib/useWindowSize";
+import PassSound from '../../../assets/pass.mp3';
+import FailSound from '../../../assets/fail.mp3';
+
 
 function WriteExam() {
   const [examData, setExamData] = React.useState(null);
@@ -22,6 +29,7 @@ function WriteExam() {
   const [intervalId, setIntervalId] = useState(null);
   const { user } = useSelector((state) => state.users);
   const [isMobile, setIsMobile] = useState(false);
+  const { width, height } = useWindowSize();
 
   const getExamData = async () => {
     try {
@@ -76,6 +84,8 @@ function WriteExam() {
       dispatch(HideLoading());
       if (response.success) {
         setView("result");
+        window.scrollTo(0, 0);
+        new Audio(verdict === "Pass" ? PassSound : FailSound).play();
       } else {
         message.error(response.message);
       }
@@ -209,72 +219,77 @@ function WriteExam() {
         )}
 
         {view === "result" && (
+          <>
+            {result.verdict === "Pass" && <Confetti width={width} height={height} recycle={false} numberOfPieces={400} />}
+            <div style={{ display: 'flex', justifyContent: 'center' }} >
+              <img src={result.verdict !== "Pass" ? Fail : Pass} width={isMobile ? '250' : '550'} height={isMobile ? '200' : '270'} alt="Verdict Gif" />
+            </div>
+            <div className="flex items-center mt-2 justify-center ">
+              <div className="flex flex-col gap-2 result">
 
-          <div className="flex items-center mt-2 justify-center ">
-            <div className="flex flex-col gap-2 result">
+                <h1 className={isMobile ? 'text-lg' : 'text-2xl'}> RESULT</h1>
+                <div className="marks">
+                  <h1 className="text-md">
+                    Total Marks : {examData.totalMarks}
+                  </h1>
+                  <h1 className="text-md">
+                    obtained Marks :
+                    {result.correctAnswers.length}
+                  </h1>
+                  <h1 className="text-md">
+                    Wrong Answers : {result.wrongAnswers.length}
+                  </h1>
+                  <h1 className="text-md">passing Marks : {examData.passingMarks}</h1>
+                  <h1 className="text-md"> VERDICT :
+                    {result.verdict}</h1>
 
-              <h1 className={isMobile ? 'text-lg' : 'text-2xl'}> RESULT</h1>
-              <div className="marks">
-                <h1 className="text-md">
-                  Total Marks : {examData.totalMarks}
-                </h1>
-                <h1 className="text-md">
-                  obtained Marks :
-                  {result.correctAnswers.length}
-                </h1>
-                <h1 className="text-md">
-                  Wrong Answers : {result.wrongAnswers.length}
-                </h1>
-                <h1 className="text-md">passing Marks : {examData.passingMarks}</h1>
-                <h1 className="text-md"> VERDICT :
-                  {result.verdict}</h1>
-
-                <div className="flex gap-2 mt-2">
-                  <button
-                    className={`primary-outline-btn ${isMobile ? 'mobile-btn' : ''}`}
-                    onClick={() => {
-                      setView("instructions");
-                      setSelectedQuestionIndex(0);
-                      setSelectedOptions({});
-                      setSecondsLeft(examData.duration);
-                      setTimeUp(false);
-                    }}
-                  >
-                    Retake Exam
-                  </button>
-                  <button
-                    className={`primary-contained-btn ${isMobile ? 'mobile-btn' : ''}`}
-                    onClick={() => {
-                      setView("review");
-                    }}>
-                    Review Answers
-                  </button>
+                  <div className="flex gap-2 mt-2">
+                    <button
+                      className={`primary-outline-btn ${isMobile ? 'mobile-btn' : ''}`}
+                      onClick={() => {
+                        setView("instructions");
+                        setSelectedQuestionIndex(0);
+                        setSelectedOptions({});
+                        setSecondsLeft(examData.duration);
+                        setTimeUp(false);
+                      }}
+                    >
+                      Retake Exam
+                    </button>
+                    <button
+                      className={`primary-contained-btn ${isMobile ? 'mobile-btn' : ''}`}
+                      onClick={() => {
+                        setView("review");
+                      }}>
+                      Review Answers
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="lottie-animation">
-              {result.verdict === "Pass" && (
-                <lottie-player
-                  src="https://assets2.lottiefiles.com/packages/lf20_ya4ycrti.json"
-                  background="transparent"
-                  speed="1"
-                  loop
-                  autoplay
-                ></lottie-player>
-              )}
+              <div className="lottie-animation">
+                {result.verdict === "Pass" && (
+                  <lottie-player
+                    src="https://assets2.lottiefiles.com/packages/lf20_ya4ycrti.json"
+                    background="transparent"
+                    speed="1"
+                    loop
+                    autoplay
+                  ></lottie-player>
+                )}
 
 
-              {result.verdict === "Fail" && (
-                <lottie-player
-                  src="https://assets4.lottiefiles.com/packages/lf20_qp1spzqv.json"
-                  background="transparent"
-                  speed="1"
-                  loop
-                  autoplay
-                ></lottie-player>
-              )}
+                {result.verdict === "Fail" && (
+                  <lottie-player
+                    src="https://assets4.lottiefiles.com/packages/lf20_qp1spzqv.json"
+                    background="transparent"
+                    speed="1"
+                    loop
+                    autoplay
+                  ></lottie-player>
+                )}
+              </div>
             </div>
-          </div>
+          </>
         )}
 
 

@@ -5,17 +5,52 @@ import { getUserInfo, updateUserInfo, updateUserPhoto, sendOTP } from "../../../
 import { Form, message } from "antd";
 import { useDispatch } from "react-redux";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
+import { getAllReportsForRanking } from "../../../apicalls/reports";
 
 const Profile = () => {
     const [userDetails, setUserDetails] = useState('');
+    const [rankingData, setRankingData] = useState('');
+    const [userRanking, setUserRanking] = useState('');
     const [edit, setEdit] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
-        email: ''
+        email: '',
+        school: '',
+        class_: ''
     });
     const [profileImage, setProfileImage] = useState(null);
     const [serverGeneratedOTP, setServerGeneratedOTP] = useState(null);
     const dispatch = useDispatch();
+
+    const fetchReports = async () => {
+        try {
+            const response = await getAllReportsForRanking();
+            if (response.success) {
+                setRankingData(response.data);
+            } else {
+                message.error(response.message);
+            }
+            dispatch(HideLoading());
+        } catch (error) {
+            message.error(error.message);
+        }
+    }
+
+    const getUserStats = () => {
+        const Ranking = rankingData
+            .map((user, index) => ({
+                user,
+                ranking: index + 1,
+            }))
+            .filter((item) => item.user.userId.includes(userDetails._id));
+        setUserRanking(Ranking);
+    }
+
+    useEffect(() => {
+        if (rankingData) {
+            getUserStats();
+        }
+    }, [rankingData]);
 
     const getUserData = async () => {
         dispatch(ShowLoading());
@@ -26,8 +61,11 @@ const Profile = () => {
                 setFormData({
                     ...formData,
                     name: response.data.name,
-                    email: response.data.email
+                    email: response.data.email,
+                    school: response.data.school,
+                    class_: response.data.class
                 });
+                fetchReports();
                 if (response.data.profileImage) {
                     setProfileImage(response.data.profileImage);
                 }
@@ -57,7 +95,9 @@ const Profile = () => {
         setFormData({
             ...formData,
             name: userDetails.name,
-            email: userDetails.email
+            email: userDetails.email,
+            school: userDetails.school,
+            class_: userDetails.class
         })
         setEdit(false);
     };
@@ -82,7 +122,7 @@ const Profile = () => {
     };
 
     const handleUpdate = async ({ skipOTP }) => {
-        if (formData.name === userDetails.name && formData.email === userDetails.email) {
+        if (formData.name === userDetails.name && formData.email === userDetails.email && formData.school === userDetails.school && formData.class_ === userDetails.class) {
             return;
         }
         if (!skipOTP && formData.email !== userDetails.email) {
@@ -114,6 +154,7 @@ const Profile = () => {
     const handleImageUpload = async () => {
         const formData = new FormData();
         formData.append('profileImage', profileImage);
+        dispatch(ShowLoading());
         try {
             const response = await updateUserPhoto(formData);
             if (response.success) {
@@ -187,6 +228,12 @@ const Profile = () => {
                             </button>
                         )}
                     </div>
+                    {userRanking &&
+                        <div className="flex flex-row">
+                            <h1>Position: {userRanking[0]?.ranking ? `#${userRanking[0].ranking}` : 'Not Ranked'}</h1>
+                            <h1>Score: {userRanking[0]?.user.score ? userRanking[0].user.score : '0'}</h1>
+                        </div>
+                    }
                     <div className="input-container">
                         <label htmlFor="name" className="label">
                             User Name
@@ -198,6 +245,36 @@ const Profile = () => {
                             name="name"
                             className="input"
                             value={formData.name}
+                            onChange={handleChange}
+                            disabled={!edit}
+                        />
+                    </div>
+                    <div className="input-container">
+                        <label htmlFor="school" className="label">
+                            School
+                        </label>
+                        <br />
+                        <input
+                            type="text"
+                            id="school"
+                            name="school"
+                            className="input"
+                            value={formData.school ? formData.school : ''}
+                            onChange={handleChange}
+                            disabled={!edit}
+                        />
+                    </div>
+                    <div className="input-container">
+                        <label htmlFor="name" className="label">
+                            Class
+                        </label>
+                        <br />
+                        <input
+                            type="text"
+                            id="class"
+                            name="class_"
+                            className="input"
+                            value={formData.class_ ? formData.class_ : ''}
                             onChange={handleChange}
                             disabled={!edit}
                         />
