@@ -7,6 +7,8 @@ import PageTitle from "../../../components/PageTitle";
 import { useDispatch } from "react-redux";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
 import image from '../../../assets/person.png';
+import { IoPersonCircleOutline } from "react-icons/io5";
+import { FaTrophy } from "react-icons/fa6";
 
 const Ranking = () => {
     const [rankingData, setRankingData] = useState('');
@@ -24,7 +26,6 @@ const Ranking = () => {
             } else {
                 message.error(response.message);
             }
-            dispatch(HideLoading());
         } catch (error) {
             message.error(error.message);
         }
@@ -39,7 +40,8 @@ const Ranking = () => {
                 } else {
                     setIsAdmin(false);
                     setUserData(response.data);
-                    fetchReports();
+                    await fetchReports();
+                    dispatch(HideLoading());
                 }
             } else {
                 message.error(response.message);
@@ -86,64 +88,37 @@ const Ranking = () => {
     };
 
     return (
-        <div>
+        <div className="Ranking">
             {!isAdmin &&
                 <>
                     <PageTitle title="Ranking" />
                     <div className="divider"></div>
                     {rankingData ?
-                        <>
-                            <div className="ranking-table-container">
-                                <table className="ranking-table">
-                                    <thead className="head">
-                                        <tr className="head-row">
-                                            <th>Position</th>
-                                            <th>Name</th>
-                                            <th>School</th>
-                                            <th>Class</th>
-                                            <th>Score</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="body">
-                                        {rankingData.map((user, index) => (
-                                            <tr key={index} className={`body-row ${user.userId === userData._id ? 'highlight-row' : 'no-highlight'}`}>
-                                                <td>#{index + 1}</td>
-                                                <td><div className="profile-row"><img className="profile" src={user.userPhoto ? user.userPhoto : image} alt="profile" onError={(e) => { e.target.src = image }} /><p>{user.userName}</p></div></td>
-                                                <td>{user.userSchool ? user.userSchool : 'Not Enrolled'}</td>
-                                                <td>{user.userClass ? user.userClass : 'Not Enrolled'}</td>
-                                                <td>{user.score}</td>
-                                            </tr>
-                                        ))
-                                        }
-                                        {userRanking && userRanking.length > 0 ?
-                                            <tr className={`fixed-row`}>
-                                                <td>#{userRanking[0].ranking}</td>
-                                                <td><div className="profile-row"><img className="profile" src={userRanking[0].user.userPhoto ? userRanking[0].user.userPhoto : image} alt="profile" onError={(e) => { e.target.src = image }} /><p>{userRanking[0].user.userName}</p></div></td>
-                                                <td>{userRanking[0].user.userSchool ? userRanking[0].user.userSchool : 'Not Enrolled'}</td>
-                                                <td>{userRanking[0].user.userClass ? userRanking[0].user.userClass : 'Not Enrolled'}</td>
-                                                <td>{userRanking[0].user.score}</td>
-                                            </tr>
-                                            :
-                                            <tr className={`fixed-row`}>
-                                                <td>Unranked</td>
-                                                <td><div className="profile-row"><img className="profile" src={userData.profileImage ? userData.profileImage : image} alt="profile" onError={(e) => { e.target.src = image }} /><p>{userData.name}</p></div></td>
-                                                <td>{userData.school ? userData.school : 'Not Enrolled'}</td>
-                                                <td>{userData.class ? userData.class : 'Not Enrolled'}</td>
-                                                <td>0</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div>
-                                <table className="ranking-table">
+                        <fieldset className="leaderboard">
+                            <legend className="legend"><FaTrophy className="trophy" />LEADERBOARD</legend>
+                            <div className="data">
+                                {rankingData.map((user, index) => (
+                                    <div key={index} className="row">
+                                        <div className={`position ${(index === 0 || index === 1 || index === 2) ? 'medal' : 'number'}`}>{index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}</div>
+                                        <div>
+                                            {user.userPhoto ?
+                                                <img className="profile" src={user.userPhoto ? user.userPhoto : image} alt="profile" onError={(e) => { e.target.src = image }} />
+                                                :
+                                                <IoPersonCircleOutline className="profile-icon" />
+                                            }
+                                        </div>
+                                        <div className="flex">
+                                            <div className="name">{user.userName}</div>
+                                            <div className="school">{user.userSchool ? user.userSchool : 'Not Enrolled'}</div>
+                                            <div className="class">{user.userClass ? user.userClass : 'Not Enrolled'}</div>
+                                            <div className="score">{user.score}</div>
+                                        </div>
+                                    </div>
+                                ))
+                                }
 
-                                    <tbody className="body">
-
-                                    </tbody>
-                                </table>
                             </div>
-                        </>
+                        </fieldset>
                         :
                         <div>No Ranking yet.</div>
                     }

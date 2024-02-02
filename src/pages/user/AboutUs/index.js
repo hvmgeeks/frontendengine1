@@ -12,6 +12,7 @@ const AboutUs = () => {
     const [isAdmin, setIsAdmin] = useState(false);
     const [userData, setUserData] = useState('');
     const [userRating, setUserRating] = useState('');
+    const [userText, setUserText] = useState('');
     const [reviews, setReviews] = useState('');
     const dispatch = useDispatch();
 
@@ -19,7 +20,7 @@ const AboutUs = () => {
         try {
             const response = await getAllReviews();
             if (response.success) {
-                setReviews(response.data);
+                setReviews(response.data.reverse());
             } else {
                 message.error(response.message);
             }
@@ -60,11 +61,15 @@ const AboutUs = () => {
     };
 
     const handleSubmit = async () => {
-        if (userRating === '' || userRating === 0) {
+        if (userRating === '' || userRating === 0 || userText === '') {
             return;
         }
         try {
-            const response = await addReview({ rating: userRating });
+            const data = {
+                rating: userRating,
+                text: userText
+            }
+            const response = await addReview(data);
             if (response.success) {
                 message.success(response.message);
                 getReviews();
@@ -113,6 +118,14 @@ const AboutUs = () => {
                             <div className="rating">
                                 <div>
                                     <Rate defaultValue={0} onChange={handleRatingChange} />
+                                    <br />
+                                    <textarea
+                                        className="rating-text"
+                                        placeholder="Share your thoughts..."
+                                        rows={4}
+                                        value={userText}
+                                        onChange={(e) => setUserText(e.target.value)}
+                                    />
                                 </div>
                                 <button onClick={handleSubmit}>Submit</button>
                             </div>
@@ -121,13 +134,15 @@ const AboutUs = () => {
                     <h1>Previous Reviews</h1>
                     {reviews ?
                         <div className="p-ratings">
-                            {reviews.reverse().map((review, index) => (
+                            {reviews.map((review, index) => (
                                 <div key={index} className="p-rating-div">
                                     <div className="profile-row">
                                         <img className="profile" src={review.user.profileImage ? review.user.profileImage : image} alt="profile" onError={(e) => { e.target.src = image }} />
                                         <p>{review.user.name}</p>
                                     </div>
                                     <Rate defaultValue={review.rating} className="rate" disabled={true} />
+                                    <br />
+                                    <div className="text">{review.text}</div>
                                 </div>
                             ))
                             }

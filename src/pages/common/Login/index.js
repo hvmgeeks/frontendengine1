@@ -16,7 +16,7 @@ function Login() {
       if (response.success) {
         message.success(response.message);
         localStorage.setItem("token", response.data);
-        window.location.href = "/";
+        window.location.href = "/user/quiz";
       } else {
         message.error(response.message);
       }

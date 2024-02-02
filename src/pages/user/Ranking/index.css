@@ -1,117 +1,159 @@
-.ranking-table-container {
-    width: fit-content;
-    max-height: 65vh;
-    overflow-y: scroll;
-    border: 1px solid #aaaaaa;
+.Ranking {
+    padding-bottom: 40px;
 
-}
-
-.ranking-table {
-    background-color: whitesmoke;
-    border: 1px solid #aaaaaa;
-    border-collapse: collapse;
-}
-
-.ranking-table .head .head-row {
-    color: white;
-}
-
-.ranking-table .head .head-row th {
-    padding: 10px;
-    text-align: center;
-    border-right: 1px solid #aaaaaa;
-    background-color: brown;
-    position: sticky;
-    top: 0;
-}
-
-.ranking-table .body .body-row {
-    border-bottom: 1px solid #aaaaaa;
-    cursor: pointer;
-}
-
-.ranking-table .body .profile-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.ranking-table .body .profile {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-}
-
-.ranking-table .body .no-highlight:hover {
-    background-color: aliceblue;
-}
-
-.ranking-table .body .highlight-row {
-    background-color: wheat;
-}
-
-.ranking-table .body .body-row td {
-    text-align: center;
-    padding: 10px;
-    border-right: 1px solid #aaaaaa;
-}
-
-.ranking-table .body .fixed-row {
-    border-bottom: 1px solid #aaaaaa;
-    cursor: pointer;
-    color: white;
-}
-
-.ranking-table .body .fixed-row td {
-    text-align: center;
-    padding: 12px 10px;
-    border-right: 1px solid #aaaaaa;
-    background-color: rgb(83, 146, 202);
-    position: sticky;
-    bottom: 0;
-}
-
-@media only screen and (min-width: 375px) and (max-width: 768px) {
-    .ranking-table .head .head-row th {
-        padding: 5px;
-        font-size: 9px;
+    .leaderboard {
+        border: 4px solid #6cb1fb;
+        border-radius: 10px;
+        padding: 50px 20px 20px 70px;
+        background-color: #162858eb;
+        color: white;
     }
 
-    .ranking-table .body .body-row td {
-        padding: 5px;
-        font-size: 9px;
+    .legend {
+        background-color: #162858eb;
+        border: 4px solid #5168f1;
+        padding: 8px 20px;
+        border-radius: 15px;
+        font-size: 30px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
     }
 
-    .ranking-table .body .fixed-row td {
-        padding: 7px 5px;
-        font-size: 9px;
+    .legend .trophy {
+        padding-right: 20px;
+        color: #FFD700;
     }
 
-    .ranking-table .body .profile {
-        width: 35px;
-        height: 35px;
+    .data {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
     }
+
+    .row {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .position {
+        width: 100px;
+    }
+
+    .medal {
+        font-size: 40px;
+        text-align: center;
+    }
+
+    .number {
+        font-size: 20px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .profile {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+    }
+
+    .profile-icon {
+        width: 50px;
+        height: 50px;
+    }
+
+    .flex {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: linear-gradient(90deg, #3264e9, #2349b1);
+        padding: 8px 12px;
+        border-radius: 8px;
+        width: 100%;
+    }
+
+    .name {
+        width: 30%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .school {
+        width: 25%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .class {
+        width: 25%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+    }
+
 }
 
-@media only screen and (max-width: 375px) {
-    .ranking-table .head .head-row th {
-        padding: 3px;
-        font-size: 8px;
-    }
+@media only screen and (max-width: 768px) {
+    .Ranking {
+        width: 75.5vw;
+        overflow-x: scroll;
+        .leaderboard {
+            padding: 30px 6px;
+        }
 
-    .ranking-table .body .body-row td {
-        padding: 3px;
-        font-size: 8px;
-    }
+        .legend {
+            font-size: 12px;
+            padding: 8px 4px;
+        }
 
-    .ranking-table .body .fixed-row td {
-        padding: 5px 3px;
-        font-size: 8px;
-    }
+        .legend .trophy {
+            padding-right: 5px;
+        }
 
-    .ranking-table .body .profile {
-        width: 35px;
-        height: 35px;
-    }
+        .row {
+            gap: 5px;
+        }
 
+        .position {
+            width: 40px;
+        }
+
+        .medal {
+            font-size: 22px;
+        }
+
+        .number {
+            font-size: 14px;
+        }
+
+        .profile {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+        }
+
+        .profile-icon {
+            width: 25px;
+            height: 25px;
+        }
+
+        .flex {
+            padding: 8px 4px;
+        }
+
+        .name,
+        .school,
+        .class {
+            font-size: 9px;
+        }
+
+        .score {
+            font-size: 10px;
+        }
+
+    }
 }

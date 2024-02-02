@@ -9,7 +9,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/common/Login";
 import Register from "./pages/common/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Home from "./pages/common/Home";
+import Quiz from "./pages/user/Quiz";
 import Exams from "./pages/admin/Exams";
 import AddEditExam from "./pages/admin/Exams/AddEditExam";
 import Loader from "./components/Loader";
@@ -22,7 +22,7 @@ import Ranking from "./pages/user/Ranking";
 import Profile from "./pages/common/Profile";
 import AboutUs from "./pages/user/AboutUs";
 import Forum from "./pages/user/Forum";
-
+import Home from "./pages/common/Home";
 
 function App() {
   const { loading } = useSelector((state) => state.loader);
@@ -34,21 +34,22 @@ function App() {
           {/* Common Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/" element={<Home />} />
 
           {/* User Routes */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            }
-          />
           <Route
             path="/profile"
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user/quiz"
+            element={
+              <ProtectedRoute>
+                <Quiz />
               </ProtectedRoute>
             }
           />

@@ -154,6 +154,7 @@ const Profile = () => {
     const handleImageUpload = async () => {
         const formData = new FormData();
         formData.append('profileImage', profileImage);
+        dispatch(ShowLoading());
         try {
             const response = await updateUserPhoto(formData);
             if (response.success) {
