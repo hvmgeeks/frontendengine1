@@ -54,7 +54,7 @@ function Quiz() {
   return (
     user && (
       <div>
-        <PageTitle title={`Hi ${user.name}, Welcome its time to study!!`} />
+        <PageTitle title={`Hi ${user.name}, Welcome to online studying!!`} />
         <div className="divider"></div>
         <Row gutter={[16, 16]}>
           {exams.map((exam, index) => (
