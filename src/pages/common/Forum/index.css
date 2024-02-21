@@ -1,0 +1,146 @@
+/* Update your existing CSS styles */
+.Forum {
+    .forum-question-container {
+        border: 1px solid #e0e0e0;
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .question {
+        margin-bottom: 15px;
+    }
+
+    .profile-row {
+        padding-bottom: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+    }
+
+    .profile-details {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .icons {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .icons * {
+        cursor: pointer;
+    }
+
+    .profile {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 1px solid #ddd;
+    }
+
+    .title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .body {
+        font-size: 1rem;
+        color: #555;
+        margin-bottom: 10px;
+    }
+
+    .replies {
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    .reply {
+        margin-bottom: 15px;
+        padding: 5px 0px;
+        position: relative;
+    }
+
+    .text {
+        font-size: 1rem;
+        color: #333;
+        padding-left: 60px;
+    }
+
+    .admin-reply {
+        background-color: #dff0d8;
+        border-left: 5px solid #3c763d;
+    }
+
+    .admin-reply:hover::after {
+        content: "Admin's reply";
+        position: absolute;
+        left: 0;
+        top: 0;
+        background-color: #333;
+        color: #fff;
+        padding: 5px;
+        border-radius: 5px;
+        z-index: 1;
+    }
+
+    .admin-reply .text {
+        font-weight: bold;
+        color: #3c763d;
+    }
+
+    .verification-btn {
+        padding: 5px 15px;
+        margin-top: 10px;
+
+        &:hover {
+            background-color: gainsboro;
+        }
+    }
+
+    .verified-reply {
+        background-color: #d9edf7;
+        border-left: 5px solid #31708f;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .verified-reply:hover::after {
+        content: "This reply is verified by admin";
+        position: absolute;
+        left: 0;
+        top: 0;
+        background-color: #333;
+        color: #fff;
+        padding: 5px;
+        border-radius: 5px;
+        z-index: 1;
+    }
+
+    .verified-reply .text {
+        font-weight: bold;
+        color: #31708f;
+        flex: 1;
+    }
+
+}
+
+@media only screen and (max-width: 768px) {
+    .Forum {
+        .replies {
+            padding: 3px;
+        }
+
+        .verified-reply {
+            flex-direction: column-reverse;
+        }
+    }
+}

@@ -46,7 +46,7 @@ const Home = () => {
         <div className="Home">
             <nav className="nav">
                 <div className="nav-body">
-                    <Link to='/' className="title"><div><span className="colored-title">St.JosephSchool</span>KibadaOnline</div></Link>
+                    <Link to='/' className="title"><div><span className="colored-title">Smart</span>Ed</div></Link>
                     <div className="nav-links">
                         <div onClick={() => scrollToSection(homeSectionRef)} className="link">Home</div>
                         <div onClick={() => scrollToSection(aboutUsSectionRef)} className="link">About Us</div>

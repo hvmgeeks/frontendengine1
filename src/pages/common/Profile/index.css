@@ -6,11 +6,13 @@
 .Profile .input-container {
     margin-bottom: 20px;
 }
+
 .Profile .flex-row {
     justify-content: space-evenly;
     padding: 10px 0px;
     margin-bottom: 40px;
 }
+
 .Profile .label {
     font-weight: bolder;
 }
@@ -29,6 +31,7 @@
     padding: 0px 25px;
     background-color: whitesmoke;
 }
+
 .Profile .btn-mt {
     margin-top: 20px;
 }
@@ -94,4 +97,10 @@
 
 .Profile .overlay:hover {
     background: rgba(0, 0, 0, 0.7);
+}
+
+@media only screen and (max-width: 768px) {
+    .Profile .ranking-data {
+        font-size: 18px;
+    }
 }

@@ -325,7 +325,7 @@ function WriteExam() {
               <button
                 className="primary-outlined-btn"
                 onClick={() => {
-                  navigate("/");
+                  navigate("/user/quiz");
                 }}
               >
                 Close

@@ -31,7 +31,7 @@ function Login() {
       <div className="card p-3 bg-white">
         <div className="flex flex-col">
           <div className="flex">
-            <h1 className="text-2xl">ST JOSEPH SCHOOL KIBADA ONLINE - LOGIN <i className="ri-login-circle-line"></i></h1>
+            <h1 className="text-2xl">ST JOSEPH THE WORKER KIBADA QUIZ ENGINE - LOGIN <i className="ri-login-circle-line"></i></h1>
             
           </div>
           <div className="divider"></div>

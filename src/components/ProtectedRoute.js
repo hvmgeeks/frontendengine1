@@ -46,9 +46,9 @@ function ProtectedRoute({ children }) {
     },
     {
       title: "Forum",
-      paths: ["/user/forum"],
+      paths: ["/forum"],
       icon: <i className="ri-discuss-line"></i>,
-      onClick: () => navigate("/user/forum"),
+      onClick: () => navigate("/forum"),
     },
     {
       title: "Profile",
@@ -85,6 +85,12 @@ function ProtectedRoute({ children }) {
       paths: ["/admin/reports"],
       icon: <i className="ri-bar-chart-line"></i>,
       onClick: () => navigate("/admin/reports"),
+    },
+    {
+      title: "Forum",
+      paths: ["/forum"],
+      icon: <i className="ri-discuss-line"></i>,
+      onClick: () => navigate("/forum"),
     },
     {
       title: "Profile",

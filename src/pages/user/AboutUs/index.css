@@ -68,4 +68,8 @@
     .AboutUs .p-rating-div {
         width: 100%;
     }
+
+    .AboutUs .text {
+        margin-right: 5px;
+    }
 }

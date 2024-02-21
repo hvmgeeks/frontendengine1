@@ -16,7 +16,7 @@ function Quiz() {
       dispatch(ShowLoading());
       const response = await getAllExams();
       if (response.success) {
-        setExams(response.data);
+        setExams(response.data.reverse());
       } else {
         message.error(response.message);
       }
@@ -37,7 +37,7 @@ function Quiz() {
       const response = await getAllReportsByUser();
       const retakeCount = response.data.filter(item => item.exam && item.exam._id === exam._id).length;
       console.log(retakeCount);
-      if (retakeCount >= 20) {
+      if (retakeCount >= 3) {
         message.error('Max attempts reached');
         dispatch(HideLoading());
         return;
@@ -54,7 +54,7 @@ function Quiz() {
   return (
     user && (
       <div>
-        <PageTitle title={`Hi ${user.name}, Welcome to online studying!!`} />
+        <PageTitle title={`Hi ${user.name}, Welcome its time to study!!`} />
         <div className="divider"></div>
         <Row gutter={[16, 16]}>
           {exams.map((exam, index) => (

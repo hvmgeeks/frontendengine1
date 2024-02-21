@@ -177,6 +177,8 @@ const Profile = () => {
         }
     }
 
+    console.log('Det...', userDetails);
+
     return (
         <div className="Profile">
             <PageTitle title="Profile" />
@@ -228,10 +230,10 @@ const Profile = () => {
                             </button>
                         )}
                     </div>
-                    {userRanking &&
+                    {(userRanking && !userDetails.isAdmin) &&
                         <div className="flex flex-row">
-                            <h1>Position: {userRanking[0]?.ranking ? `#${userRanking[0].ranking}` : 'Not Ranked'}</h1>
-                            <h1>Score: {userRanking[0]?.user.score ? userRanking[0].user.score : '0'}</h1>
+                            <h1 className="ranking-data">Position: {userRanking[0]?.ranking ? `#${userRanking[0].ranking}` : 'Not Ranked'}</h1>
+                            <h1 className="ranking-data">Score: {userRanking[0]?.user.score ? userRanking[0].user.score : '0'}</h1>
                         </div>
                     }
                     <div className="input-container">

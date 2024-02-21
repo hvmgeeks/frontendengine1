@@ -21,7 +21,7 @@ import StudyMaterial from "./pages/user/StudyMaterial";
 import Ranking from "./pages/user/Ranking";
 import Profile from "./pages/common/Profile";
 import AboutUs from "./pages/user/AboutUs";
-import Forum from "./pages/user/Forum";
+import Forum from "./pages/common/Forum";
 import Home from "./pages/common/Home";
 
 function App() {
@@ -35,6 +35,14 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/" element={<Home />} />
+          <Route
+            path="/forum"
+            element={
+              <ProtectedRoute>
+                <Forum />
+              </ProtectedRoute>
+            }
+          />
 
           {/* User Routes */}
           <Route
@@ -90,14 +98,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <AboutUs />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/user/forum"
-            element={
-              <ProtectedRoute>
-                <Forum />
               </ProtectedRoute>
             }
           />
