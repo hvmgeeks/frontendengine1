@@ -40,7 +40,7 @@ function Quiz() {
       const response = await getAllReportsByUser();
       const retakeCount = response.data.filter(item => item.exam && item.exam._id === exam._id).length;
       console.log(retakeCount);
-      if (retakeCount >= 3) {
+      if (retakeCount >= 20) {
         message.error('Max attempts reached');
         dispatch(HideLoading());
         return;
