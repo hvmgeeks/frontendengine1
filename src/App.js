@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import "./stylesheets/theme.css";
 import "./stylesheets/alignments.css";
 import "./stylesheets/textelements.css";
@@ -12,6 +12,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Quiz from "./pages/user/Quiz";
 import Exams from "./pages/admin/Exams";
 import AddEditExam from "./pages/admin/Exams/AddEditExam";
+import Users from "./pages/admin/Users";
 import Loader from "./components/Loader";
 import { useSelector } from "react-redux";
 import WriteExam from "./pages/user/WriteExam";
@@ -23,6 +24,8 @@ import Profile from "./pages/common/Profile";
 import AboutUs from "./pages/user/AboutUs";
 import Forum from "./pages/common/Forum";
 import Home from "./pages/common/Home";
+import Test from "./pages/user/Test";
+// const LazyComponent = lazy(() => import('./pages/user/Test'));
 
 function App() {
   const { loading } = useSelector((state) => state.loader);
@@ -35,6 +38,11 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/" element={<Home />} />
+          <Route path="/test" element={
+            <Suspense fallback={<div>Loading(App.js)...</div>}>
+              <Test />
+            </Suspense>
+          } />
           <Route
             path="/forum"
             element={
@@ -103,6 +111,14 @@ function App() {
           />
 
           {/* Admin Routes */}
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute>
+                <Users />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/admin/exams"
             element={

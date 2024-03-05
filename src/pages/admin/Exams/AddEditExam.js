@@ -180,6 +180,19 @@ function AddEditExam() {
                   </Form.Item>
                 </Col>
                 <Col span={8}>
+                  <Form.Item label="Class" name="class">
+                    <select name="" id="">
+                      <option value="">Select Class</option>
+                      <option value="Class1">Class 1</option>
+                      <option value="Class2">Class 2</option>
+                      <option value="Class3">Class 3</option>
+                      <option value="Class4">Class 4</option>
+                      <option value="Class5">Class 5</option>
+                      <option value="Class6">Class 6</option>
+                    </select>
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
                   <Form.Item label="Total Marks" name="totalMarks">
                     <input type="number" />
                   </Form.Item>

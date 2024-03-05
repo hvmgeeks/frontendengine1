@@ -75,6 +75,12 @@ function ProtectedRoute({ children }) {
       onClick: () => navigate("/"),
     },
     {
+      title: "Users",
+      paths: ["/admin/users", "/admin/users/add"],
+      icon: <i className="ri-file-list-line"></i>,
+      onClick: () => navigate("/admin/users"),
+    },
+    {
       title: "Exams",
       paths: ["/admin/exams", "/admin/exams/add"],
       icon: <i className="ri-file-list-line"></i>,
@@ -200,7 +206,7 @@ function ProtectedRoute({ children }) {
                 onClick={() => setCollapsed(false)}
               ></i>
             )}
-            <h1 className={`text-white ${isMobile ? 'text-xs' : 'text-2xl'}`}>ST JOSEPH THE WORKER QUIZ ENGINE</h1>
+            <h1 className={`text-white ${isMobile ? 'text-xs' : 'text-2xl'}`}>ST JOSEPH KIBADA ONLINE STUDY APP</h1>
             <div>
               <div className="flex gap-1 items-center">
                 <h1 className={`text-white ${isMobile ? 'text-xs' : 'text-md'}`}>{user?.name}</h1>

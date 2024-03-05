@@ -55,6 +55,10 @@ function Exams() {
       dataIndex: "duration",
     },
     {
+      title: "Class",
+      dataIndex: "class",
+    },
+    {
       title: "Category",
       dataIndex: "category",
     },

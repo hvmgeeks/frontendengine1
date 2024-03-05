@@ -8,13 +8,13 @@
         position: fixed;
         width: 100%;
         background-color: #F8F8F8;
+        z-index: 999;
 
         .nav-body {
             display: flex;
             align-items: center;
             gap: 25%;
             padding: 25px 40px 20px;
-            z-index: 999;
 
             .title {
                 font-size: 24px;

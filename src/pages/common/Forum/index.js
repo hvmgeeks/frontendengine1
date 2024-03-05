@@ -29,6 +29,7 @@ const Forum = () => {
         try {
             const response = await getAllQuestions();
             if (response.success) {
+                console.log(response.data);
                 setQuestions(response.data.reverse());
             } else {
                 message.error(response.message);
@@ -237,6 +238,7 @@ const Forum = () => {
                                 <div className="profile-details">
                                     <Avatar src={question.user.profileImage ? question.user.profileImage : image} alt="profile" size={50} />
                                     <p>{question.user.name}</p>
+                                    <p className="date">{new Date(question.createdAt).toLocaleString(undefined, { minute: 'numeric', hour: 'numeric', day: 'numeric', month: 'numeric', year: 'numeric' })}</p>
                                 </div>
                                 {(userData._id === question.user._id || userData.isAdmin) &&
                                     <div className="icons">
@@ -281,6 +283,7 @@ const Forum = () => {
                                             <div className="profile-details">
                                                 <Avatar src={reply.user.profileImage ? reply.user.profileImage : image} alt="profile" size={50} />
                                                 <p>{reply.user.name}</p>
+                                                <p className="date">{new Date(question.createdAt).toLocaleString(undefined, { minute: 'numeric', hour: 'numeric', day: 'numeric', month: 'numeric', year: 'numeric' })}</p>
                                             </div>
                                             <div className="text">{reply.text}</div>
                                             {(isAdmin && !reply.user.isAdmin) &&
