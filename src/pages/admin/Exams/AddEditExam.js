@@ -170,6 +170,7 @@ function AddEditExam() {
                       <option value="Mathematics">MATH</option>
                       <option value="Science">SCIE</option>
                       <option value="English">ENG</option>
+                      <option value="Kiswahili">KISW</option>
                       <option value="SocialStudies">SST</option>
                       <option value="Civics&Moral">CME</option>
                       <option value="Religion">REL</option>
