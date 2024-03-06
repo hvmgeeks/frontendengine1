@@ -167,15 +167,13 @@ function AddEditExam() {
                   <Form.Item label="Category" name="category">
                     <select name="" id="">
                       <option value="">Select Category</option>
-                      <option value="Mathematics">Mathematics</option>
-                      <option value="Science">Science</option>
-                      <option value="English">English</option>
-                      <option value="Sst">SST</option>
-                      <option value="Cme">CME</option>
-                      <option value="Physics">Physics</option>
-                      <option value="Biology">Biology</option>
-                      <option value="Chemistry">Chemistry</option>
-                      <option value="Kiswahili">Kiswahili</option>
+                      <option value="Mathematics">MATH</option>
+                      <option value="Science">SCIE</option>
+                      <option value="English">ENG</option>
+                      <option value="SocialStudies">SST</option>
+                      <option value="Civics&Moral">CME</option>
+                      <option value="Religion">REL</option>
+                      <option value="Vocational Skills">VS</option>
                     </select>
                   </Form.Item>
                 </Col>
@@ -189,6 +187,7 @@ function AddEditExam() {
                       <option value="Class4">Class 4</option>
                       <option value="Class5">Class 5</option>
                       <option value="Class6">Class 6</option>
+                      <option value="Class7">Class 7</option>
                     </select>
                   </Form.Item>
                 </Col>
