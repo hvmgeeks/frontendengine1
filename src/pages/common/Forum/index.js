@@ -25,7 +25,6 @@ const Forum = () => {
     const [replyRefs, setReplyRefs] = useState({});
 
     const fetchQuestions = async () => {
-        dispatch(ShowLoading());
         try {
             const response = await getAllQuestions();
             if (response.success) {
@@ -37,21 +36,23 @@ const Forum = () => {
         } catch (error) {
             message.error(error.message);
         }
+        console.log('Data Fetched');
         dispatch(HideLoading());
     };
 
     const getUserData = async () => {
+        dispatch(ShowLoading());
         try {
             const response = await getUserInfo();
             if (response.success) {
                 if (response.data.isAdmin) {
                     setIsAdmin(true);
                     setUserData(response.data);
-                    fetchQuestions();
+                    await fetchQuestions();
                 } else {
                     setIsAdmin(false);
                     setUserData(response.data);
-                    fetchQuestions();
+                    await fetchQuestions();
                 }
             } else {
                 message.error(response.message);
@@ -230,6 +231,10 @@ const Forum = () => {
                         </Form.Item>
                     </Form>
                 )}
+
+                {questions.length === 0 &&
+                    <div>Loading...</div>
+                }
 
                 {questions.map((question) => (
                     <div key={question._id} className="forum-question-container">
