@@ -186,69 +186,75 @@ function StudyMaterial() {
       }
       {notes &&
         <>
-          {notes !== 'empty' ?
+          {notes !== 'empty' && (
             <div className="flex gap-5">
               {notes.map((note, index) => (
                 <div className="note common" key={index}>
                   <div className="title"><b>Title: </b>{note.title}</div>
-                  <button className="btn" onClick={(e) => handleDocumentDownload(note.documentID)}>Download PDF</button>
+                  <div className="button-container">
+                    <button className="btn" onClick={(e) => handleDocumentPreview(note.documentID)}>View PDF</button>
+                    <button className="btn" onClick={(e) => handleDocumentDownload(note.documentID)}>Download PDF</button>
+                  </div>
                 </div>
-              ))
-              }
+              ))}
             </div>
-            :
+          )}
+          {notes === 'empty' && (
             <div className="not-found">
               Notes Not Found!
             </div>
-          }
+          )}
         </>
       }
       {pastPapers &&
         <>
-          {pastPapers !== 'empty' ?
+          {pastPapers !== 'empty' && (
             <div className="flex gap-5">
               {pastPapers.map((paper, index) => (
                 <div className="paper common" key={index}>
                   <div className="title"><b>Title: </b>{paper.title}</div>
                   <div className="year"><b>Year: </b>{paper.year}</div>
-                  <button className="btn" onClick={(e) => handleDocumentDownload(paper.documentID)}>Download PDF</button>
+                  <div className="button-container">
+                    <button className="btn" onClick={(e) => handleDocumentPreview(paper.documentID)}>View PDF</button>
+                    <button className="btn" onClick={(e) => handleDocumentDownload(paper.documentID)}>Download PDF</button>
+                  </div>
                 </div>
-              ))
-              }
+              ))}
             </div>
-            :
+          )}
+          {pastPapers === 'empty' && (
             <div className="not-found">
               Past Papers Not Found!
             </div>
-          }
+          )}
         </>
       }
       {videos &&
         <>
-          {videos !== 'empty' ?
+          {videos !== 'empty' && (
             <div className="">
               {videos.map((video, index) => (
                 <div className="video common" key={index}>
                   <div className="title"><b>Title: </b>{video.title}</div>
-                  {showVideoID !== video.videoID ?
+                  {showVideoID !== video.videoID ? (
                     <button className="btn" onClick={(e) => handleWatchVideo(video.videoID)}>Watch Video</button>
-                    :
+                  ) : (
                     <YouTube videoId={video.videoID} opts={opts} />
-                  }
+                  )}
                 </div>
-              ))
-              }
+              ))}
             </div>
-            :
+          )}
+          {videos === 'empty' && (
             <div className="not-found">
               Videos Not Found!
             </div>
-          }
+          )}
         </>
       }
       {books &&
         <>
-          {books !== 'empty' ?
+          {books !== 'empty' && (
             <div className="flex gap-5">
               {books.map((book, index) => (
                 <div className="books common" key={index}>
@@ -256,17 +262,20 @@ function StudyMaterial() {
                   <div className="year"><b>Year: </b>{book.year}</div>
                   <div className="thumbnail-container">
                     <img className="thumbnail" onClick={(e) => handleDocumentPreview(book.documentID)} src={book.thumbnail} />
-                    <button className="btn" onClick={(e) => handleDocumentDownload(book.documentID)}>Download PDF</button>
+                    <div className="button-container">
+                      <button className="btn" onClick={(e) => handleDocumentPreview(book.documentID)}>View PDF</button>
+                      <button className="btn" onClick={(e) => handleDocumentDownload(book.documentID)}>Download PDF</button>
+                    </div>
                   </div>
                 </div>
-              ))
-              }
+              ))}
             </div>
-            :
+          )}
+          {books === 'empty' && (
             <div className="not-found">
               Books Not Found!
             </div>
-          }
+          )}
         </>
       }
 
