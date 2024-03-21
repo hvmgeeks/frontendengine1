@@ -15,7 +15,7 @@ function StudyMaterial() {
   const [videos, setVideos] = useState('');
   const [books, setBooks] = useState('');
   const [showVideoID, setShowVideoID] = useState('');
-  const classesList = ['Class 3', 'Class 4', 'Class 5', 'Class 6', 'Form 1', 'Form 2', 'Form 3', 'Form 4', 'Form 5', 'Form 6'];
+  const classesList = ['Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7',];
   const subjectsList = ['Mathematics', 'Science', 'Kiswahili', 'English', 'SocialStudies', 'Civic&Moral', 'Religion', 'VS'];
   const dispatch = useDispatch();
 
@@ -201,7 +201,7 @@ function StudyMaterial() {
           )}
           {notes === 'empty' && (
             <div className="not-found">
-              Notes Not Found!
+              Notes Are Uploading Now!
             </div>
           )}
         </>
@@ -224,7 +224,7 @@ function StudyMaterial() {
           )}
           {pastPapers === 'empty' && (
             <div className="not-found">
-              Past Papers Not Found!
+              Past Papers Are Uploading!
             </div>
           )}
         </>
@@ -247,7 +247,7 @@ function StudyMaterial() {
           )}
           {videos === 'empty' && (
             <div className="not-found">
-              Videos Not Found!
+              Videos Are Uploading Now!
             </div>
           )}
         </>
@@ -273,7 +273,7 @@ function StudyMaterial() {
           )}
           {books === 'empty' && (
             <div className="not-found">
-              Books Not Found!
+              Books Are uploading Now!
             </div>
           )}
         </>
