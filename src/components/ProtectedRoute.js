@@ -203,7 +203,7 @@ function ProtectedRoute({ children }) {
                 onClick={() => setCollapsed(false)}
               ></i>
             )}
-            <h1 className={`text-white ${isMobile ? 'text-xs' : 'text-2xl'}`}>ST JOSEPH KIBADA ONLINE STUDY APP</h1>
+            <h1 className={`text-white ${isMobile ? 'text-xs' : 'text-2xl'}`}>PLUTONIUM 📚🖊</h1>
             <div>
               <div className="flex gap-1 items-center">
                 <h1 className={`text-white ${isMobile ? 'text-xs' : 'text-md'}`}>{user?.name}</h1>
