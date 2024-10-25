@@ -31,7 +31,7 @@ function Login() {
       <div className="card p-3 bg-white">
         <div className="flex flex-col">
           <div className="flex">
-            <h1 className="text-2xl">   PLUTONIUM 📚🖊   login <i className="ri-login-circle-line"></i></h1>
+            <h1 className="text-2xl">BRAINWAVE<i className="ri-login-circle-line"></i></h1>
             
           </div>
           <div className="divider"></div>
