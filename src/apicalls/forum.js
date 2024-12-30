@@ -21,9 +21,9 @@ export const addReply = async (payload) => {
 }
 
 // get all questions
-export const getAllQuestions = async () => {
+export const getAllQuestions = async ({ page, limit }) => {
     try {
-        const response = await axiosInstance.get("/api/forum/get-all-questions");
+        const response = await axiosInstance.get(`/api/forum/get-all-questions?page=${page}&limit=${limit}`);
         return response.data;
     } catch (error) {
         return error.response.data;

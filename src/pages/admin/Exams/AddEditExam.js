@@ -1,5 +1,5 @@
 import { Col, Form, message, Row, Select, Table } from "antd";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   addExam,
   deleteQuestionById,
@@ -18,11 +18,15 @@ const { TabPane } = Tabs;
 function AddEditExam() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [examData, setExamData] = React.useState(null);
-  const [showAddEditQuestionModal, setShowAddEditQuestionModal] =
-    React.useState(false);
-  const [selectedQuestion, setSelectedQuestion] = React.useState(null);
+  const [examData, setExamData] = useState(null);
+  const [schoolType, setSchoolType] = useState('');
+  const [showAddEditQuestionModal, setShowAddEditQuestionModal] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const [classValue, setClassValue] = useState(''); 
   const params = useParams();
+
+  console.log(examData?.questions,"examData?.questions")
+
   const onFinish = async (values) => {
     try {
       dispatch(ShowLoading());
@@ -55,6 +59,8 @@ function AddEditExam() {
       const response = await getExamById({
         examId: params.id,
       });
+      setClassValue(response?.data?.class);
+      setSchoolType(response?.data?.schoolType);
       dispatch(HideLoading());
       if (response.success) {
         setExamData(response.data);
@@ -78,7 +84,7 @@ function AddEditExam() {
       dispatch(ShowLoading());
       const response = await deleteQuestionById({
         questionId,
-        examId : params.id
+        examId: params.id
       });
       dispatch(HideLoading());
       if (response.success) {
@@ -102,22 +108,30 @@ function AddEditExam() {
       title: "Options",
       dataIndex: "options",
       render: (text, record) => {
-        return Object.keys(record.options).map((key) => {
-          return (
-            <div>
-              {key} : {record.options[key]}
+        if (record?.options && typeof record.options === 'object' && Object.keys(record.options).length > 0) {
+          return Object.keys(record.options).map((key) => (
+            <div key={key}>
+              {key}: {record.options[key]}
             </div>
-          );
-        });
+          ));
+        } else {
+          return <div>No options available for this question.</div>;
+        }
       },
     },
     {
-      title: "Correct Option",
+      title: "Correct Answer",
       dataIndex: "correctOption",
       render: (text, record) => {
-        return ` ${record.correctOption} : ${
-          record.options[record.correctOption]
-        }`;
+        if (record.answerType === "Free Text") {
+          return <div>{record.correctOption}</div>;
+        } else {
+          return (
+            <div>
+              {record.correctOption}: {record.options[record.correctOption]}
+            </div>
+          );
+        }
       },
     },
     {
@@ -143,6 +157,15 @@ function AddEditExam() {
     },
   ];
 
+  const handleSchoolTypeChange = (e) => {
+    setSchoolType(e.target.value);
+    setClassValue(""); // Reset class
+  };
+
+  console.log(classValue,"classValue")
+  
+  
+
   return (
     <div>
       <PageTitle title={params.id ? "Edit Exam" : "Add Exam"} />
@@ -167,28 +190,61 @@ function AddEditExam() {
                   <Form.Item label="Category" name="category">
                     <select name="" id="">
                       <option value="">Select Category</option>
-                      <option value="Mathematics">MATH</option>
-                      <option value="Science">SCIE</option>
-                      <option value="English">ENG</option>
-                      <option value="Kiswahili">KISW</option>
-                      <option value="SocialStudies">SST</option>
-                      <option value="Civics&Moral">CME</option>
-                      <option value="Religion">REL</option>
-                      <option value="Vocational Skills">VS</option>
+                      <option value="Mathematics">Mathematics</option>
+                      <option value="Science">Science</option>
+                      <option value="English">English</option>
+                      <option value="Sst">SST</option>
+                      <option value="Cme">CME</option>
+                      <option value="Physics">Physics</option>
+                      <option value="Biology">Biology</option>
+                      <option value="Chemistry">Chemistry</option>
+                      <option value="Kiswahili">Kiswahili</option>
                     </select>
                   </Form.Item>
                 </Col>
+
+
                 <Col span={8}>
-                  <Form.Item label="Class" name="class">
-                    <select name="" id="">
-                      <option value="">Select Class</option>
-                      <option value="Class1">Class 1</option>
-                      <option value="Class2">Class 2</option>
-                      <option value="Class3">Class 3</option>
-                      <option value="Class4">Class 4</option>
-                      <option value="Class5">Class 5</option>
-                      <option value="Class6">Class 6</option>
-                      <option value="Class7">Class 7</option>
+                  <Form.Item name="schoolType" label="School Type" initialValue="">
+                    <select  value={schoolType} onChange={ handleSchoolTypeChange}   >
+                      <option value="" disabled >
+                        Select School Type
+                      </option>
+                      <option value="primary">Primary</option>
+                      <option value="secondary">Secondary</option>
+                    </select>
+                  </Form.Item>
+                </Col>
+
+                <Col span={8}>
+
+
+                  <Form.Item name="class" label="Class" initialValue="" required>
+                    <select value={classValue} onChange={(e) => setClassValue(e.target.value)}>
+                      <option value=""  >
+                        Select Class
+                      </option>
+                      {schoolType === "primary" && (
+                        <>
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                          <option value="4">4</option>
+                          <option value="5">5</option>
+                          <option value="6">6</option>
+                          <option value="7">7</option>
+                        </>
+                      )}
+                      {schoolType === "secondary" && (
+                        <>
+                          <option value="Form-1">Form-1</option>
+                          <option value="Form-2">Form-2</option>
+                          <option value="Form-3">Form-3</option>
+                          <option value="Form-4">Form-4</option>
+                          <option value="Form-5">Form-5</option>
+                          <option value="Form-6">Form-6</option>
+                        </>
+                      )}
                     </select>
                   </Form.Item>
                 </Col>

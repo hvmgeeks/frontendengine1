@@ -1,12 +1,14 @@
 import { Form, message } from "antd";
 import React from "react";
 import './index.css';
+import Logo from '../../../assets/logo.png';
 import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../../../apicalls/users";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
 
 function Login() {
+  const navigate = useNavigate()
   const dispatch = useDispatch();
   const onFinish = async (values) => {
     try {
@@ -14,9 +16,19 @@ function Login() {
       const response = await loginUser(values);
       dispatch(HideLoading());
       if (response.success) {
+
         message.success(response.message);
         localStorage.setItem("token", response.data);
-        window.location.href = "/user/quiz";
+
+        if (response.response.isAdmin) {
+          window.location.href = "/admin/users";
+        }
+
+        if (!response.response.isAdmin) {
+          window.location.href = "/user/quiz";
+
+        }
+
       } else {
         message.error(response.message);
       }
@@ -30,9 +42,8 @@ function Login() {
     <div className="flex justify-center items-center h-screen w-screen bg-primary">
       <div className="card p-3 bg-white">
         <div className="flex flex-col">
-          <div className="flex">
-            <h1 className="text-2xl">BRAINWAVE<i className="ri-login-circle-line"></i></h1>
-            
+          <div className="flex justify-center">
+            <img src={Logo} alt="brainwave-logo" className="login-logo"/>
           </div>
           <div className="divider"></div>
           <Form layout="vertical" className="mt-2" onFinish={onFinish}>

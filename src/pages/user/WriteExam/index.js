@@ -6,13 +6,13 @@ import { getExamById } from "../../../apicalls/exams";
 import { addReport } from "../../../apicalls/reports";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
 import Instructions from "./Instructions";
-import Pass from '../../../assets/pass.gif';
-import Fail from '../../../assets/fail.gif';
+import Pass from "../../../assets/pass.gif";
+import Fail from "../../../assets/fail.gif";
 import Confetti from "react-confetti";
 import useWindowSize from "react-use/lib/useWindowSize";
-import PassSound from '../../../assets/pass.mp3';
-import FailSound from '../../../assets/fail.mp3';
-
+import PassSound from "../../../assets/pass.mp3";
+import FailSound from "../../../assets/fail.mp3";
+import TextArea from "antd/es/input/TextArea";
 
 function WriteExam() {
   const [examData, setExamData] = React.useState(null);
@@ -57,7 +57,7 @@ function WriteExam() {
       let wrongAnswers = [];
 
       questions.forEach((question, index) => {
-        if (question.correctOption === selectedOptions[index]) {
+        if (question?.correctOption === selectedOptions[index]) {
           correctAnswers.push(question);
         } else {
           wrongAnswers.push(question);
@@ -123,11 +123,16 @@ function WriteExam() {
       getExamData();
     }
   }, []);
+  
+
+  console.log(questions, "questions");
   return (
     examData && (
       <div className="mt-2">
         <div className="divider"></div>
-        <h1 className={`text-center ${isMobile ? 'text-xl' : ''}`}>{examData.name}</h1>
+        <h1 className={`text-center ${isMobile ? "text-xl" : ""}`}>
+          {examData.name}
+        </h1>
         <div className="divider"></div>
 
         {view === "instructions" && (
@@ -138,44 +143,70 @@ function WriteExam() {
           />
         )}
 
-
         {view === "questions" && (
           <div className="flex flex-col gap-2">
             <div className="flex justify-between">
-              <h1 className={isMobile ? 'text-lg' : 'text-2xl'}>
+              <h1 className={isMobile ? "text-lg" : "text-2xl"}>
                 {selectedQuestionIndex + 1} :{" "}
                 {questions[selectedQuestionIndex].name}
               </h1>
 
               <div className="timer">
-                <span className={isMobile ? 'text-lg' : 'text-2xl'}>{secondsLeft}</span>
+                <span className={isMobile ? "text-lg" : "text-2xl"}>
+                  {secondsLeft}
+                </span>
               </div>
             </div>
 
+            <div style={{ width: "100px", height: "auto" }}>
+              {questions[selectedQuestionIndex].image && (
+                <img
+                  src={questions[selectedQuestionIndex].image}
+                  alt="Question image"
+                  style={{ height: "200px"}}
+                />
+              )}
+            </div>
+
             <div className="flex flex-col gap-2">
-              {Object.keys(questions[selectedQuestionIndex].options).map(
-                (option, index) => {
-                  return (
-                    <div
-                      className={`flex gap-2 flex-col ${selectedOptions[selectedQuestionIndex] === option
+              {questions[selectedQuestionIndex]?.answerType === "Free Text" ? (
+                // Show textarea if the question type is "text"
+                <TextArea
+                  className="text-area "
+                  placeholder="Enter your answer here"
+                  value={selectedOptions[selectedQuestionIndex] || ""}
+                  onChange={(e) => {
+                    setSelectedOptions({
+                      ...selectedOptions,
+                      [selectedQuestionIndex]: e.target.value,
+                    });
+                  }}
+                />
+              ) : (
+                // Show options if the question type is not "text"
+                Object?.keys(
+                  questions[selectedQuestionIndex]?.options || {}
+                ).map((option, index) => (
+                  <div
+                    className={`flex gap-2 flex-col ${
+                      selectedOptions[selectedQuestionIndex] === option
                         ? "selected-option"
                         : "option"
-                        }`}
-                      key={index}
-                      onClick={() => {
-                        setSelectedOptions({
-                          ...selectedOptions,
-                          [selectedQuestionIndex]: option,
-                        });
-                      }}
-                    >
-                      <h1 className={isMobile ? 'text-md' : 'text-xl'}>
-                        {option} :{" "}
-                        {questions[selectedQuestionIndex].options[option]}
-                      </h1>
-                    </div>
-                  );
-                }
+                    }`}
+                    key={index}
+                    onClick={() => {
+                      setSelectedOptions({
+                        ...selectedOptions,
+                        [selectedQuestionIndex]: option,
+                      });
+                    }}
+                  >
+                    <h1 className={isMobile ? "text-md" : "text-xl"}>
+                      {option} :{" "}
+                      {questions[selectedQuestionIndex]?.options[option]}
+                    </h1>
+                  </div>
+                ))
               )}
             </div>
 
@@ -208,7 +239,6 @@ function WriteExam() {
                   onClick={() => {
                     // clearInterval(intervalId);
                     setTimeUp(true);
-
                   }}
                 >
                   Submit
@@ -220,32 +250,45 @@ function WriteExam() {
 
         {view === "result" && (
           <>
-            {result.verdict === "Pass" && <Confetti width={width} height={height} recycle={false} numberOfPieces={400} />}
-            <div style={{ display: 'flex', justifyContent: 'center' }} >
-              <img src={result.verdict !== "Pass" ? Fail : Pass} width={isMobile ? '250' : '550'} height={isMobile ? '200' : '270'} alt="Verdict Gif" />
+            {result.verdict === "Pass" && (
+              <Confetti
+                width={width}
+                height={height}
+                recycle={false}
+                numberOfPieces={400}
+              />
+            )}
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <img
+                src={result.verdict !== "Pass" ? Fail : Pass}
+                width={isMobile ? "250" : "550"}
+                height={isMobile ? "200" : "270"}
+                alt="Verdict Gif"
+              />
             </div>
             <div className="flex items-center mt-2 justify-center ">
               <div className="flex flex-col gap-2 result">
-
-                <h1 className={isMobile ? 'text-lg' : 'text-2xl'}> RESULT</h1>
+                <h1 className={isMobile ? "text-lg" : "text-2xl"}> RESULT</h1>
                 <div className="marks">
                   <h1 className="text-md">
                     Total Marks : {examData.totalMarks}
                   </h1>
                   <h1 className="text-md">
-                    obtained Marks :
-                    {result.correctAnswers.length}
+                    obtained Marks :{result.correctAnswers.length}
                   </h1>
                   <h1 className="text-md">
                     Wrong Answers : {result.wrongAnswers.length}
                   </h1>
-                  <h1 className="text-md">passing Marks : {examData.passingMarks}</h1>
-                  <h1 className="text-md"> VERDICT :
-                    {result.verdict}</h1>
+                  <h1 className="text-md">
+                    passing Marks : {examData.passingMarks}
+                  </h1>
+                  <h1 className="text-md"> VERDICT :{result.verdict}</h1>
 
                   <div className="flex gap-2 mt-2">
                     <button
-                      className={`primary-outline-btn ${isMobile ? 'mobile-btn' : ''}`}
+                      className={`primary-outline-btn ${
+                        isMobile ? "mobile-btn" : ""
+                      }`}
                       onClick={() => {
                         setView("instructions");
                         setSelectedQuestionIndex(0);
@@ -257,10 +300,13 @@ function WriteExam() {
                       Retake Exam
                     </button>
                     <button
-                      className={`primary-contained-btn ${isMobile ? 'mobile-btn' : ''}`}
+                      className={`primary-contained-btn ${
+                        isMobile ? "mobile-btn" : ""
+                      }`}
                       onClick={() => {
                         setView("review");
-                      }}>
+                      }}
+                    >
                       Review Answers
                     </button>
                   </div>
@@ -277,7 +323,6 @@ function WriteExam() {
                   ></lottie-player>
                 )}
 
-
                 {result.verdict === "Fail" && (
                   <lottie-player
                     src="https://assets4.lottiefiles.com/packages/lf20_qp1spzqv.json"
@@ -292,30 +337,30 @@ function WriteExam() {
           </>
         )}
 
-
         {view === "review" && (
           <div className="flex flex-col gap-2">
             {questions.map((question, index) => {
               const isCorrect =
-                question.correctOption === selectedOptions[index];
+                question?.correctOption === selectedOptions[index];
               return (
                 <div
                   className={`
-                  flex flex-col gap-1 p-2 ${isCorrect ? "bg-success" : "bg-error"
-                    }
+                  flex flex-col gap-1 p-2 ${
+                    isCorrect ? "bg-success" : "bg-error"
+                  }
                 `}
                   key={index}
                 >
-                  <h1 className={isMobile ? 'text-md' : 'text-xl'}>
-                    {index + 1} : {question.name}
+                  <h1 className={isMobile ? "text-md" : "text-xl"}>
+                    {index + 1} : {question?.name}
                   </h1>
-                  <h1 className={isMobile ? 'text-sm' : 'text-md'}>
+                  <h1 className={isMobile ? "text-sm" : "text-md"}>
                     Submitted Answer : {selectedOptions[index]} -{" "}
-                    {question.options[selectedOptions[index]]}
+                    {question?.options && question?.options[selectedOptions[index]]}
                   </h1>
-                  <h1 className={isMobile ? 'text-sm' : 'text-md'}>
-                    Correct Answer : {question.correctOption} -{" "}
-                    {question.options[question.correctOption]}
+                  <h1 className={isMobile ? "text-sm" : "text-md"}>
+                    Correct Answer : {question?.correctOption} -{" "}
+                    {question?.options && question?.options[question?.correctOption]}
                   </h1>
                 </div>
               );

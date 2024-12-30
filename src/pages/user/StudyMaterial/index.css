@@ -9,10 +9,13 @@
 
 .study-material .content {
     margin-top: 10px;
+
 }
 
 .study-material .content select {
-    margin-left: 10px;
+    /* margin-left: 10px; */
+    width:80% ;
+    display: block;
 }
 
 .study-material .class {
@@ -20,7 +23,10 @@
 }
 
 .study-material .class select {
-    margin-left: 10px;
+    /* margin-left: 10px; */
+    width:80% ;
+    display: block;
+
 }
 
 .study-material .subject {
@@ -28,7 +34,9 @@
 }
 
 .study-material .subject select {
-    margin-left: 10px;
+    /* margin-left: 10px; */
+    width:80% ;
+display: block;
 }
 
 .study-material .common {

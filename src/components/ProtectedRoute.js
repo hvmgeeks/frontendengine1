@@ -1,5 +1,6 @@
 import { message } from "antd";
 import React, { useEffect, useState } from "react";
+import Flag from '../assets/tanzania-flag.png';
 import { getUserInfo } from "../apicalls/users";
 import { useDispatch, useSelector } from "react-redux";
 import { SetUser } from "../redux/usersSlice.js";
@@ -20,6 +21,7 @@ function ProtectedRoute({ children }) {
       icon: <i className="ri-pencil-line"></i>,
       onClick: () => navigate("/user/quiz"),
     },
+
     {
       title: "Reports",
       paths: ["/user/reports"],
@@ -45,6 +47,12 @@ function ProtectedRoute({ children }) {
       onClick: () => navigate("/user/about-us"),
     },
     {
+      title: "AI Chat",
+      paths: ["/user/chat"],
+      icon: <i className="ri-chat-smile-2-line"></i>,
+      onClick: () => navigate("/user/chat"),
+    },
+    {
       title: "Forum",
       paths: ["/forum"],
       icon: <i className="ri-discuss-line"></i>,
@@ -68,12 +76,7 @@ function ProtectedRoute({ children }) {
   ];
 
   const adminMenu = [
-    {
-      title: "Home",
-      paths: ["/", "/user/write-exam"],
-      icon: <i className="ri-home-line"></i>,
-      onClick: () => navigate("/"),
-    },
+
     {
       title: "Users",
       paths: ["/admin/users", "/admin/users/add"],
@@ -203,7 +206,10 @@ function ProtectedRoute({ children }) {
                 onClick={() => setCollapsed(false)}
               ></i>
             )}
-            <h1 className={`text-white ${isMobile ? 'text-xs' : 'text-2xl'}`}>WELCOME TO PLUTONIUM 📚🖊</h1>
+            <div className="flex items-center gap-1">
+              <div className={`text-white ${isMobile ? 'text-xs' : 'text-2xl'}`}>BRAINWAVE</div>
+              <img src={Flag} alt="tanzania-flag" style={{ width: '30px', height: '30px' }} />
+            </div>
             <div>
               <div className="flex gap-1 items-center">
                 <h1 className={`text-white ${isMobile ? 'text-xs' : 'text-md'}`}>{user?.name}</h1>

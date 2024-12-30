@@ -9,11 +9,17 @@ import moment from "moment";
 
 function AdminReports() {
   const [reportsData, setReportsData] = React.useState([]);
+  const [pagination, setPagination] = React.useState({
+    current: 1,
+    pageSize: 10,
+    total: 0, // total number of records
+  });
   const dispatch = useDispatch();
   const [filters, setFilters] = React.useState({
     examName: "",
     userName: "",
   });
+
   const columns = [
     {
       title: "Exam Name",
@@ -54,12 +60,21 @@ function AdminReports() {
     },
   ];
 
-  const getData = async (tempFilters) => {
+  const getData = async (tempFilters, page = 1, limit = 10) => {
     try {
       dispatch(ShowLoading());
-      const response = await getAllReports(tempFilters);
+      const response = await getAllReports({
+        ...tempFilters,
+        page,
+        limit,
+      });
       if (response.success) {
         setReportsData(response.data);
+        setPagination({
+          ...pagination,
+          current: page,
+          total: response.pagination.totalReports,
+        });
       } else {
         message.error(response.message);
       }
@@ -71,8 +86,12 @@ function AdminReports() {
   };
 
   useEffect(() => {
-    getData(filters);
-  }, []);
+    getData(filters, pagination.current, pagination.pageSize);
+  }, [filters, pagination.current]);
+
+  const handleTableChange = (pagination) => {
+    getData(filters, pagination.current, pagination.pageSize);
+  };
 
   return (
     <div>
@@ -104,13 +123,33 @@ function AdminReports() {
             });
           }}
         >
-          Clear 
+          Clear
         </button>
-        <button className="primary-contained-btn" onClick={() => getData(filters)}>
+        <button
+          className="primary-contained-btn"
+          onClick={() => getData(filters, 1, pagination.pageSize)}
+        >
           Search
         </button>
       </div>
-      <Table columns={columns} dataSource={reportsData} className="mt-2" />
+      <Table
+  columns={columns}
+  dataSource={reportsData}
+  className="mt-2"
+  pagination={{
+    current: pagination.current,
+    total: pagination.total,
+    showSizeChanger: false, // Disables size changer as per your request
+    onChange: (page) => {
+      setPagination({
+        ...pagination,
+        current: page,
+      });
+      getData(filters, page); // Pass the page, no need to pass pageSize
+    },
+  }}
+/>
+
     </div>
   );
 }

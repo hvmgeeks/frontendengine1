@@ -18,6 +18,7 @@ function Exams() {
       dispatch(HideLoading());
       if (response.success) {
         setExams(response.data);
+        console.log(response, "exam");
       } else {
         message.error(response.message);
       }
