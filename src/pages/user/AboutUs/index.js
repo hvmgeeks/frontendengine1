@@ -14,6 +14,7 @@ const AboutUs = () => {
     const [userRating, setUserRating] = useState('');
     const [userText, setUserText] = useState('');
     const [reviews, setReviews] = useState('');
+    const [userOldReview, setUserOldReview] = useState(null);
     const dispatch = useDispatch();
 
     const getReviews = async () => {
@@ -82,13 +83,12 @@ const AboutUs = () => {
         }
     };
 
-    const isUserInReviews = () => {
+    useEffect(() => {
         if (reviews) {
-            const userInReviews = reviews.find(review => review.user._id === userData._id);
-            return !!userInReviews;
+            const userInReview = reviews.find(review => review.user._id === userData._id);
+            setUserOldReview(userInReview);
         }
-        return false;
-    };
+    }, [reviews, userData]);
 
     return (
         <div className="AboutUs">
@@ -107,7 +107,7 @@ const AboutUs = () => {
                         Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
                         Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
                     </p>
-                    {!isUserInReviews() &&
+                    {!userOldReview ?
                         <>
                             <h1>Feedback</h1>
                             <p>
@@ -130,19 +130,36 @@ const AboutUs = () => {
                                 <button onClick={handleSubmit}>Submit</button>
                             </div>
                         </>
+                        :
+                        <>
+                            <h2>Your Feedback</h2>
+                            <div className="p-rating-div">
+                                <div className="profile-row">
+                                    <img className="profile" src={userOldReview.user.profileImage ? userOldReview.user.profileImage : image} alt="profile" onError={(e) => { e.target.src = image }} />
+                                    <p>{userOldReview.user.name}</p>
+                                </div>
+                                <Rate defaultValue={userOldReview.rating} className="rate" disabled={true} />
+                                <br />
+                                <div className="text">{userOldReview.text}</div>
+                            </div>
+                        </>
                     }
-                    <h1>Previous Reviews</h1>
+                    <h2>Previous Reviews</h2>
                     {reviews ?
                         <div className="p-ratings">
                             {reviews.map((review, index) => (
-                                <div key={index} className="p-rating-div">
-                                    <div className="profile-row">
-                                        <img className="profile" src={review.user.profileImage ? review.user.profileImage : image} alt="profile" onError={(e) => { e.target.src = image }} />
-                                        <p>{review.user.name}</p>
-                                    </div>
-                                    <Rate defaultValue={review.rating} className="rate" disabled={true} />
-                                    <br />
-                                    <div className="text">{review.text}</div>
+                                <div key={index}>
+                                    {userOldReview?.user._id !== review.user?._id && review.user?._id &&
+                                        <div className="p-rating-div">
+                                            <div className="profile-row">
+                                                <img className="profile" src={review.user.profileImage ? review.user.profileImage : image} alt="profile" onError={(e) => { e.target.src = image }} />
+                                                <p>{review.user.name}</p>
+                                            </div>
+                                            <Rate defaultValue={review.rating} className="rate" disabled={true} />
+                                            <br />
+                                            <div className="text">{review.text}</div>
+                                        </div>
+                                    }
                                 </div>
                             ))
                             }

@@ -1,108 +1,141 @@
 /* Chat container styling */
 .chat-container {
-    display: flex;
-    flex-direction: column;
-    height: 86vh;
-    background-color: #f8f9fa;
-  }
-  
-  /* Chat messages section */
-  .chat-messages {
-    flex: 1;
-    padding: 16px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  /* User message styling */
-  .user-message {
-    align-self: flex-end;
-    background-color: #0F3460;
-    color: white;
-    padding: 10px 15px;
-    border-radius: 15px 15px 0 15px;
-    max-width: 70%;
-    word-wrap: break-word;
-  }
-  
-  /* Assistant (API response) message styling */
-  .assistant-message {
-    align-self: flex-start;
-    background-color: #e9ecef;
-    color: black;
-    padding: 10px 15px;
-    border-radius: 15px 15px 15px 0;
-    max-width: 70%;
-    word-wrap: break-word;
-  }
-  
-  /* Chat input container */
-  .chat-input-container {
-    display: flex;
-    align-items: center;
-    padding: 16px;
-    border-top: 1px solid #dee2e6;
-    background-color: white;
-  }
-  
-  /* Chat input field */
-  .chat-input {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ced4da;
-    border-radius: 10px;
-    resize: none;
-    outline: none;
-    font-size: 16px;
-    margin-right: 8px;
-  }
-  
-  /* Send button */
-  .send-button {
-    background-color: #0F3460;
-    color: white;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  
-  .send-button:hover {
-    background-color: #0056b3;
-  }
-  
-  /* Loading indicator for assistant response */
-  .loading-indicator {
-    display: flex;
-    gap: 5px;
-  }
-  
-  .loading-indicator span {
-    width: 8px;
-    height: 8px;
-    background-color: #6c757d;
-    border-radius: 50%;
-    animation: bounce 1.5s infinite;
-  }
-  
-  .loading-indicator span:nth-child(2) {
-    animation-delay: 0.2s;
-  }
-  
-  .loading-indicator span:nth-child(3) {
-    animation-delay: 0.4s;
-  }
-  
-  /* Bounce animation for loading dots */
-  @keyframes bounce {
-    0%, 80%, 100% {
+  display: flex;
+  flex-direction: column;
+  height: 85vh;
+  background-color: #f8f9fa;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+/* Chat messages section */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: calc(100vh - 160px);
+}
+
+/* User message styling */
+.user-message {
+  align-self: flex-end;
+  background-color: #0F3460;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 15px 15px 0 15px;
+  max-width: 70%;
+  word-wrap: break-word;
+}
+
+/* Assistant (API response) message styling */
+.assistant-message {
+  align-self: flex-start;
+  background-color: #e9ecef;
+  color: black;
+  padding: 10px 15px;
+  border-radius: 15px 15px 15px 0;
+  max-width: 70%;
+  word-wrap: break-word;
+}
+
+/* Chat input container */
+.chat-input-container {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-top: 1px solid #dee2e6;
+  background-color: white;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Chat input field */
+.chat-input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 10px;
+  resize: none;
+  outline: none;
+  font-size: 16px;
+  margin-right: 8px;
+  min-width: 200px;
+}
+
+/* Send button */
+.send-button {
+  background-color: #0F3460;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.send-button:hover {
+  background-color: #0056b3;
+}
+
+/* File input */
+input[type="file"] {
+  padding: 5px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  background-color: white;
+  cursor: pointer;
+}
+
+/* Loading indicator for assistant response */
+.loading-indicator {
+  display: flex;
+  gap: 5px;
+}
+
+.loading-indicator span {
+  width: 8px;
+  height: 8px;
+  background-color: #6c757d;
+  border-radius: 50%;
+  animation: bounce 1.5s infinite;
+}
+
+.loading-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Bounce animation for loading dots */
+@keyframes bounce {
+  0%, 80%, 100% {
       transform: scale(0);
-    }
-    40% {
-      transform: scale(1);
-    }
   }
-  
+  40% {
+      transform: scale(1);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .chat-messages {
+      max-height: calc(100vh - 220px);
+  }
+
+  .chat-input-container {
+      flex-direction: column;
+  }
+
+  .chat-input {
+      margin-right: 0;
+      margin-bottom: 8px;
+  }
+
+  .send-button {
+      width: 100%;
+  }
+}

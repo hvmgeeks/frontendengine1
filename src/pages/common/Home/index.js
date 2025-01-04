@@ -117,7 +117,7 @@ const Home = () => {
                                 <Rate defaultValue={review.rating} className="rate" disabled={true} />
                                 <div className="text">"{review.text}"</div>
                                 <div className="seperator"></div>
-                                <div className="name">{review.user.name}</div>
+                                <div className="name">{review.user?.name}</div>
                             </div>
                         ))
                         :

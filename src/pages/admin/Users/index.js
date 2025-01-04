@@ -2,9 +2,14 @@ import { message, Table } from "antd";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getAllUsers,blockUserById } from "../../../apicalls/users";
+import {
+  getAllUsers,
+  blockUserById,
+  deleteUserById,
+} from "../../../apicalls/users";
 import PageTitle from "../../../components/PageTitle";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
+import { MdDelete } from "react-icons/md";
 
 function Users() {
   const navigate = useNavigate();
@@ -18,7 +23,7 @@ function Users() {
       dispatch(HideLoading());
       if (response.success) {
         setUsers(response.users);
-        console.log('users',response)
+        console.log("users", response);
       } else {
         message.error(response.message);
       }
@@ -46,7 +51,23 @@ function Users() {
     }
   };
 
- 
+  const deleteUser = async (studentId) => {
+    try {
+      dispatch(ShowLoading());
+      const response = await deleteUserById({ studentId });
+      dispatch(HideLoading());
+      if (response.success) {
+        message.success("User deleted successfully");
+        getUsersData();
+      } else {
+        message.error(response.message);
+      }
+    } catch (error) {
+      dispatch(HideLoading());
+      message.error(error.message);
+    }
+  };
+
   const columns = [
     {
       title: "Name",
@@ -68,10 +89,24 @@ function Users() {
       title: "Action",
       dataIndex: "action",
       render: (text, record) => (
-        <div className="flex gap-2">
+        <div className="flex items-center justify-between ">
           <button onClick={() => blockUser(record.studentId)}>
             {record.isBlocked ? "Unblock" : "Block"}
           </button>
+
+          <span
+            onClick={() => {
+              if (
+                window.confirm("Are you sure you want to delete this user?")
+              ) {
+                deleteUser(record.studentId);
+              }
+            }}
+            style={{ color: "red", cursor: "pointer" }}
+            className="cursor-pointer"
+          >
+            <MdDelete fontSize={20} />
+          </span>
         </div>
       ),
     },
@@ -86,7 +121,11 @@ function Users() {
       </div>
       <div className="divider"></div>
 
-      <Table columns={columns} dataSource={users} rowKey={(record) => record.studentId} />
+      <Table
+        columns={columns}
+        dataSource={users}
+        rowKey={(record) => record.studentId}
+      />
     </div>
   );
 }

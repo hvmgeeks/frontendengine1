@@ -47,7 +47,7 @@ function ProtectedRoute({ children }) {
       onClick: () => navigate("/user/about-us"),
     },
     {
-      title: "AI Chat",
+      title: "Ask AI",
       paths: ["/user/chat"],
       icon: <i className="ri-chat-smile-2-line"></i>,
       onClick: () => navigate("/user/chat"),
@@ -192,7 +192,7 @@ function ProtectedRoute({ children }) {
             })}
           </div>
         </div>
-        <div className={`body ${collapsed ? isMobile ? 'mobile-collapsed-body' : 'collapsed-body' : 'no-collapse-body'}`}>
+        <div className={`body flex flex-col h-screen ${collapsed ? isMobile ? 'mobile-collapsed-body' : 'collapsed-body' : 'no-collapse-body'}`}>
           <div className="header flex justify-between">
             {!collapsed && (
               <i
