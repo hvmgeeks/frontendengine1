@@ -18,7 +18,7 @@ function StudyMaterial() {
   const [videos, setVideos] = useState("");
   const [books, setBooks] = useState("");
   const [showVideoURL, setShowVideoURL] = useState("");
-  const user = useSelector((state) => state.users.user);
+  const {user} = useSelector((state) => state.user);
   const [showVideoIndices, setShowVideoIndices] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [documentUrl, setDocumentUrl] = useState("");

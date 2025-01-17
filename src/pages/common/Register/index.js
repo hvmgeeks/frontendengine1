@@ -1,16 +1,15 @@
 import { Form, message, Select } from "antd"; // Added Select for dropdown
 import React, { useState } from "react";
-import './index.css';
+import "./index.css";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser, sendOTP } from "../../../apicalls/users";
 
-
 function Register() {
   const [verification, setVerification] = useState(false);
-  const [data, setData] = useState('');
-  const [otp, setOTP] = useState('');
+  const [data, setData] = useState("");
+  const [otp, setOTP] = useState("");
   const [loading, setLoading] = useState(false);
-  const [schoolType, setSchoolType] = useState(''); // State to store selected school type
+  const [schoolType, setSchoolType] = useState(""); // State to store selected school type
   const navigate = useNavigate();
 
   const onFinish = async (values) => {
@@ -18,7 +17,7 @@ function Register() {
       const response = await registerUser(values);
       if (response.success) {
         message.success(response.message);
-        navigate('/login');
+        navigate("/login");
       } else {
         message.error(response.message);
         setVerification(false);
@@ -33,15 +32,14 @@ function Register() {
   const verifyUser = async (values) => {
     if (values.otp === otp) {
       onFinish(data);
-    }
-    else {
-      message.error('Invalid OTP');
+    } else {
+      message.error("Invalid OTP");
     }
   };
 
   const generateOTP = async (formData) => {
     if (!formData.name || !formData.email || !formData.password) {
-      message.error('Please fill all fields!');
+      message.error("Please fill all fields!");
       return;
     }
     setLoading(true);
@@ -66,9 +64,9 @@ function Register() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen w-screen bg-primary main">
+    <div className="flex justify-center items-center bg-primary main">
       <div className="card p-3 bg-white">
-        {verification ?
+        {verification ? (
           <div>
             <h1 className="text-2xl">
               - Verification<i className="ri-user-add-line"></i>
@@ -88,7 +86,7 @@ function Register() {
               </div>
             </Form>
           </div>
-          :
+        ) : (
           <div className="flex flex-col">
             <h1 className="text-2xl">
               - REGISTER<i className="ri-user-add-line"></i>
@@ -103,7 +101,7 @@ function Register() {
               </Form.Item>
 
               <Form.Item name="schoolType" label="School Type" initialValue="">
-                <select onChange={(e) => setSchoolType(e.target.value)}   >
+                <select onChange={(e) => setSchoolType(e.target.value)}>
                   <option value="" disabled selected>
                     Select School Type
                   </option>
@@ -113,7 +111,7 @@ function Register() {
               </Form.Item>
 
               <Form.Item name="class" label="Class" initialValue="">
-                <select >
+                <select>
                   <option value="" disabled selected>
                     Select Class
                   </option>
@@ -144,6 +142,26 @@ function Register() {
               <Form.Item name="email" label="Email" initialValue="">
                 <input type="text" />
               </Form.Item>
+
+              <Form.Item
+                name="phoneNumber"
+                label="Phone Number"
+                initialValue=""
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter your phone number!",
+                  },
+                  {
+                    pattern: /^\d{10}$/,
+                    message: "Phone number must be exactly 10 digits!",
+                  },
+                ]}
+                extra="This phone number will be used for the payment process."
+              >
+                <input type="text" maxLength="10" />
+              </Form.Item>
+
               <Form.Item name="password" label="Password" initialValue="">
                 <input type="password" />
               </Form.Item>
@@ -160,7 +178,7 @@ function Register() {
               </div>
             </Form>
           </div>
-        }
+        )}
       </div>
     </div>
   );

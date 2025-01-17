@@ -24,6 +24,7 @@ const Profile = () => {
     school: "",
     schoolType: "", // New field for school type
     class_: "",
+    phoneNumber: "",
   });
   const [profileImage, setProfileImage] = useState(null);
   const [serverGeneratedOTP, setServerGeneratedOTP] = useState(null);
@@ -65,7 +66,6 @@ const Profile = () => {
       const response = await getUserInfo();
       if (response.success) {
         setUserDetails(response.data);
-        console.log(response, "qqqqqqqqqq");
         setFormData({
           ...formData,
           name: response.data.name,
@@ -73,6 +73,7 @@ const Profile = () => {
           school: response.data.school,
           class_: response.data.class,
           schoolType: response.data.schoolType,
+          phoneNumber:response.data.phoneNumber,
         });
         fetchReports();
         if (response.data.profileImage) {
@@ -93,16 +94,17 @@ const Profile = () => {
     }
   }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+const handleChange = (e) => {
+  const { name, value } = e.target;
 
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-      // Reset class_ if schoolType changes
-      ...(name === "schoolType" ? { class_: "" } : {}),
-    }));
-  };
+  if (name === "phoneNumber" && value.length > 10) return; // Limit to 10 digits
+
+  setFormData((prevFormData) => ({
+    ...prevFormData,
+    [name]: value,
+    ...(name === "schoolType" ? { class_: "" } : {}),
+  }));
+};
 
   const discardChanges = () => {
     setFormData({
@@ -141,6 +143,7 @@ const Profile = () => {
       formData.email === userDetails.email &&
       formData.school === userDetails.school &&
       formData.class_ === userDetails.class &&
+      formData.phoneNumber === userDetails.phoneNumber &&
       formData.schoolType === useDispatch.schoolType
     ) {
       return;
@@ -157,6 +160,7 @@ const Profile = () => {
       formData.email === userDetails.email &&
       formData.school === userDetails.school &&
       formData.class_ === userDetails.class &&
+      formData.phoneNumber === userDetails.phoneNumber &&
       formData.schoolType === userDetails.schoolType
     ) {
       message.info("No changes detected to update.");
@@ -221,10 +225,6 @@ const Profile = () => {
       message.error("Invalid OTP");
     }
   };
-
-  console.log("Det...", formData);
-
-  console.log(profileImage, "profileImage");
 
   return (
     <div className="Profile">
@@ -396,6 +396,21 @@ const Profile = () => {
               name="email"
               className="input"
               value={formData.email}
+              onChange={handleChange}
+              disabled={!edit}
+            />
+          </div>
+          <div className="input-container">
+            <label htmlFor="email" className="label">
+              Phone Number
+            </label>
+            <br />
+            <input
+              type="number"
+              id="phoneNumber"
+              name="phoneNumber"
+              className="input"
+              value={formData.phoneNumber}
               onChange={handleChange}
               disabled={!edit}
             />

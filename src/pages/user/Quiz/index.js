@@ -12,7 +12,8 @@ function Quiz() {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.users);
+  const { user } = useSelector((state) => state.user);
+
 
   const getExams = async () => {
     try {
@@ -30,6 +31,7 @@ function Quiz() {
     }
   };
 
+
   useEffect(() => {
     getExams();
   }, []);
@@ -38,15 +40,17 @@ function Quiz() {
     try {
       dispatch(ShowLoading());
       const response = await getAllReportsByUser();
-      const retakeCount = response.data.filter(item => item.exam && item.exam._id === exam._id).length;
+      const retakeCount = response.data.filter(
+        (item) => item.exam && item.exam._id === exam._id
+      ).length;
       console.log(retakeCount);
-      if (retakeCount >= 20) {
-        message.error('Max attempts reached');
-        dispatch(HideLoading());
-        return;
-      }
+      // if (retakeCount >= 3) {
+      //   message.error("Max attempts reached");
+      //   dispatch(HideLoading());
+      //   return;
+      // }
     } catch (error) {
-      message.error('Unable to verify retake');
+      message.error("Unable to verify retake");
       dispatch(HideLoading());
       return;
     }
@@ -58,12 +62,13 @@ function Quiz() {
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
   };
-// Filter exams based on search query
-const filteredExams = exams.filter((exam) =>
-  (exam.name?.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
-  exam.category?.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
-  exam.class?.toLowerCase().includes(searchQuery.toLowerCase().trim()))
-);
+  // Filter exams based on search query
+  const filteredExams = exams.filter(
+    (exam) =>
+      exam.name?.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
+      exam.category?.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
+      exam.class?.toLowerCase().includes(searchQuery.toLowerCase().trim())
+  );
 
   // Check if the length of filtered exams is less than total exams
   const shouldRenderFilteredExams = filteredExams.length < exams.length;
@@ -86,22 +91,20 @@ const filteredExams = exams.filter((exam) =>
             <span>{`Filtered ${filteredExams.length} out of ${exams.length}`}</span>
           </div>
         )}
-        
-        <Row gutter={[16, 16]}>
+
+        <Row gutter={[16, 16]} style={{margin: 0}}>
           {/* Render filtered exams only if there are fewer filtered exams than total exams */}
           {filteredExams.map((exam, index) => (
             <Col xs={24} sm={12} md={8} lg={6} key={index}>
               <div
-                style={{ backgroundColor: "aliceblue" }}
+                style={{ backgroundColor: "aliceblue", height: '100%', boxSizing: 'border-box' }}
                 className="card-lg flex flex-col gap-1 p-2"
               >
                 <h1 className="text-2xl">{exam?.name}</h1>
                 <h1 className="text-md">Subject : {exam.category}</h1>
                 <h1 className="text-md">Class : {exam.class}</h1>
                 <h1 className="text-md">Total Marks : {exam.totalMarks}</h1>
-                <h1 className="text-md">
-                  Passing Marks : {exam.passingMarks}
-                </h1>
+                <h1 className="text-md">Passing Marks : {exam.passingMarks}</h1>
                 <h1 className="text-md">Duration : {exam.duration}</h1>
                 <button
                   className="primary-outlined-btn"

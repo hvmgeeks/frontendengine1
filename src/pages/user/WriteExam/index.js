@@ -27,7 +27,7 @@ function WriteExam() {
   const [secondsLeft = 0, setSecondsLeft] = useState(0);
   const [timeUp, setTimeUp] = useState(false);
   const [intervalId, setIntervalId] = useState(null);
-  const { user } = useSelector((state) => state.users);
+  const { user } = useSelector((state) => state.user);
   const [isMobile, setIsMobile] = useState(false);
   const { width, height } = useWindowSize();
 

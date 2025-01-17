@@ -1,0 +1,276 @@
+/* Overall Container */
+.plans-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+/* Plan Card */
+.plan-card {
+    position: relative; /* For the "Most Popular" label */
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    background: linear-gradient(145deg, #ffffff, #f8f9fb);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.plan-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Highlight Popular Plan */
+.plan-card.basic {
+    background: linear-gradient(145deg, #f3e8ff, #e9d5ff);
+    border: 1px solid #a78bfa;
+}
+
+/* Most Popular Label */
+.most-popular-label {
+    position: absolute;
+    top: -15px; /* Adjusted to appear above the card */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #213864;
+    color: #fff;
+    font-size: 1.3rem;
+    font-weight: bold;
+    padding: 5px 14px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    width: 200px;
+    text-align: center;
+}
+
+/* Title */
+.plan-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #0F3460;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+/* Prices */
+.plan-actual-price {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #9ca3af;
+    text-decoration: line-through;
+    margin: 6px 0;
+    text-align: center;
+    display: block;
+}
+
+.plan-discounted-price {
+    font-size: 2.25rem;
+    font-weight: bold;
+    color: #283965;
+    margin: 12px 0;
+    text-align: center;
+}
+
+.plan-discount-tag {
+    background-color: #ede9fe;
+    color: #6b46c1;
+    font-size: 0.875rem;
+    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 12px;
+    display: inline-block;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.plan-renewal-info {
+    margin-top: 8px;
+    font-size: 0.875rem;
+    color: #6b7280;
+    text-align: center;
+}
+
+/* Button */
+.plan-button {
+    background: linear-gradient(145deg, #0F3460, #283965);
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    margin: 16px auto 0;
+    display: block;
+    width: 100%;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.plan-button:hover {
+    background: linear-gradient(145deg, #283965, #3a0e78);
+}
+
+/* Features */
+.plan-features {
+    margin-top: 16px;
+    font-size: 0.9rem;
+    color: #4b5563;
+    list-style: none;
+    padding: 0;
+}
+
+.plan-feature {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.plan-feature-icon {
+    color: #10b981;
+    font-size: 1.1rem;
+}
+
+/* Small Screens (Responsive Breakpoints) */
+@media (max-width: 768px) {
+    .plan-card {
+        padding: 16px;
+        border-radius: 12px;
+    }
+
+    .plan-title {
+        font-size: 1.1rem;
+    }
+
+    .plan-discounted-price {
+        font-size: 2rem;
+    }
+
+    .plan-button {
+        font-size: 0.9rem;
+        padding: 10px 14px;
+    }
+
+    .plan-features {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .plans-container {
+        padding: 12px;
+        gap: 16px;
+    }
+
+    .plan-card {
+        padding: 12px;
+    }
+
+    .plan-title {
+        font-size: 1rem;
+    }
+
+    .plan-discounted-price {
+        font-size: 1.75rem;
+    }
+
+    .plan-features {
+        font-size: 0.8rem;
+    }
+
+    .plan-button {
+        font-size: 0.85rem;
+        padding: 8px 12px;
+    }
+}
+
+
+  .subscription-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #f9fafb; /* Light gray background */
+    border: 1px solid #e5e7eb; /* Border with subtle contrast */
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    max-width: 400px;
+    margin: 20px auto;
+    text-align: center;
+  }
+  
+  .plan-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #253864; /* Navy Blue */
+    margin-bottom: 15px;
+  }
+  
+  .plans-container svg {
+    margin: 20px 0;
+  }
+  
+  .plan-description {
+    font-size: 1rem;
+    color: #4b5563; /* Neutral dark gray */
+    margin-bottom: 10px;
+  }
+  
+  .plan-dates {
+    font-size: 0.9rem;
+    color: #6b7280; /* Lighter gray for secondary information */
+    margin: 5px 0;
+  }
+  
+
+  .no-plan-required {
+    background-color: #f9f9f9; /* Light background to differentiate it from other content */
+    border-radius: 8px; /* Rounded corners for a soft, modern look */
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .no-plan-content {
+    max-width: 600px; /* Maximum width for better readability */
+  }
+  .no-plan-required h2 {
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+  
+  .no-plan-required p {
+    font-size: 1rem;
+    color: #34495e;
+    line-height: 1.6;
+  }
+  
+  /* Additional responsive styling */
+  @media (max-width: 768px) {
+    .no-plan-required {
+      padding: 15px;
+    }
+  
+    .no-plan-required h2 {
+      font-size: 1.6rem;
+    }
+  
+    .no-plan-required p {
+      font-size: 0.95rem;
+    }
+  }

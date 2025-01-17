@@ -26,6 +26,7 @@ import Forum from "./pages/common/Forum";
 import Home from "./pages/common/Home";
 import Test from "./pages/user/Test";
 import Chat from "./pages/user/Chat"
+import Plans from "./pages/user/Plans/Plans";
 // const LazyComponent = lazy(() => import('./pages/user/Test'));
 
 function App() {
@@ -68,6 +69,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Chat />
+              </ProtectedRoute>
+            }
+          />
+           <Route
+            path="/user/plans"
+            element={
+              <ProtectedRoute>
+                <Plans />
               </ProtectedRoute>
             }
           />

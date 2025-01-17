@@ -1,19 +1,21 @@
 .layout {
   padding: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .sidebar {
   background-color: var(--primary);
-  padding: 10px;
+  padding: 20px 10px;
   border-radius: 5px;
-  height: 94vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  position: fixed;
+  height: 100vh;
+  /* display: flex; */
+  /* justify-content: center; */
+  /* align-items: center; */
+  overflow-y: auto;
+  box-sizing: border-box;
+  scrollbar-width: thin;
 }
 
 .mobile-sidebar {
@@ -21,9 +23,14 @@
   padding: 5px;
 }
 
+.menu {
+  height: fit-content;
+}
+
 .mobile-sidebar .menu-item {
   padding: 10px 5px;
   margin-bottom: 15px;
+  justify-content: center;
 }
 
 .menu-item {
@@ -43,23 +50,24 @@
 }
 
 .body {
-  width: 100%;
+  overflow: hidden;
+  flex: 1;
 }
 
 .collapsed-body {
-  margin-left: 102px;
+  /* margin-left: 102px; */
 }
 
 .mobile-collapsed-body {
-  margin-left: 20vw;
+  /* margin-left: 20vw; */
 }
 
 .no-collapse-body {
-  margin-left: 230px;
+  /* margin-left: 230px; */
 }
 
 .content {
-  flex: 1;
+  overflow-y: auto;
 }
 
 .header {
@@ -68,4 +76,6 @@
   padding: 15px;
   border-radius: 5px;
   align-items: center !important;
+  box-sizing: border-box;
+  width: 100%;
 }
