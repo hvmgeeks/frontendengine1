@@ -92,7 +92,7 @@ function Quiz() {
           </div>
         )}
 
-        <Row gutter={[16, 16]} style={{margin: 0}}>
+        <Row gutter={[16, 16]} style={{ marginLeft: 0, marginRight: 0 }}>
           {/* Render filtered exams only if there are fewer filtered exams than total exams */}
           {filteredExams.map((exam, index) => (
             <Col xs={24} sm={12} md={8} lg={6} key={index}>
