@@ -34,6 +34,7 @@ const Forum = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [limit] = useState(10);
+  const [totalQuestions, setTotalQuestions] = useState(0);
 
   const fetchQuestions = async (page) => {
     try {
@@ -43,6 +44,7 @@ const Forum = () => {
         console.log(response.data);
         setQuestions(response.data); // No need to reverse as backend will handle order
         // setCurrentPage(page);
+        setTotalQuestions(response.totalQuestions);
         setTotalPages(response.totalPages);
       } else {
         message.error(response.message);
@@ -316,15 +318,16 @@ const Forum = () => {
                   : "Expand Replies"}
               </Button>
               <Button onClick={() => handleReply(question._id)}>Reply</Button>
-              <Button className="ml-auto w-fit " style={{float:"inline-end"}} >
-               <div   style={{ display:"flex" }}>
-                 <span
-                  style={{ padding: "6px",display:"flex" }}
-                >
-                  <MdMessage />
-                </span>
-                <span>{question.replies.length}</span>
-               </div>
+              <Button
+                className="ml-auto w-fit "
+                style={{ float: "inline-end" }}
+              >
+                <div style={{ display: "flex" }}>
+                  <span style={{ padding: "6px", display: "flex" }}>
+                    <MdMessage />
+                  </span>
+                  <span>{question.replies.length}</span>
+                </div>
               </Button>
             </div>
             {editQuestion && editQuestion._id === question._id && (
@@ -462,11 +465,11 @@ const Forum = () => {
 
         <Pagination
           current={currentPage}
-          total={totalPages}
+          total={totalQuestions}
           pageSize={limit}
           onChange={handlePageChange}
           style={{ marginTop: "20px", textAlign: "center" }}
-          showSizeChanger={false} 
+          showSizeChanger={false}
         />
       </div>
     </div>
