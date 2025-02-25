@@ -166,7 +166,7 @@ const AboutUs = () => {
                         </div>
                         :
                         <div>
-                            No reviews yet.
+                            No reviews yet.    
                         </div>
                     }
                 </>

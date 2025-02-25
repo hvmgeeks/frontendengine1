@@ -18,6 +18,15 @@ export const sendOTP = async (payload) => {
     }
 }
 
+export const contactUs = async (payload) => {
+    try {
+        const response = await axiosInstance.post('/api/users/contact-us', payload);
+        return response.data;
+    } catch (error) {
+        return error.response.data;
+    }
+}
+
 
 export const loginUser = async (payload) => {
     try {
