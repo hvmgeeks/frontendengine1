@@ -18,6 +18,7 @@ const Home = () => {
   const contactUsRef = useRef(null);
   const [reviews, setReviews] = useState([]); // Initialize as an array
   const dispatch = useDispatch();
+  const [menuOpen, setMenuOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -46,9 +47,13 @@ const Home = () => {
     getReviews();
   }, []);
 
-  const scrollToSection = (ref) => {
+  const scrollToSection = (ref, offset = 30) => {
     if (ref && ref.current) {
-      ref.current.scrollIntoView({ behavior: "smooth" });
+      const sectionTop = ref.current.offsetTop;
+      window.scrollTo({
+        top: sectionTop - offset,
+        behavior: "smooth"
+      });
     }
   };
 
@@ -88,17 +93,48 @@ const Home = () => {
               <span className="colored-title">Brain</span>Wave
             </div>
           </Link>
-          <div className="nav-links">
-            <div onClick={() => scrollToSection(homeSectionRef)} className="link">
+
+          {/* Hamburger Icon */}
+          <div className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
+            ☰
+          </div>
+
+          {/* Navigation Links */}
+          <div className={`nav-links ${menuOpen ? "open" : ""}`}>
+            <div
+              onClick={() => {
+                scrollToSection(homeSectionRef);
+                setMenuOpen(false);
+              }}
+              className="link"
+            >
               Home
             </div>
-            <div onClick={() => scrollToSection(aboutUsSectionRef)} className="link">
+            <div
+              onClick={() => {
+                scrollToSection(aboutUsSectionRef);
+                setMenuOpen(false);
+              }}
+              className="link"
+            >
               About Us
             </div>
-            <div onClick={() => scrollToSection(reviewsSectionRef)} className="link">
+            <div
+              onClick={() => {
+                scrollToSection(reviewsSectionRef);
+                setMenuOpen(false);
+              }}
+              className="link"
+            >
               Reviews
             </div>
-            <div onClick={() => scrollToSection(contactUsRef)} className="link">
+            <div
+              onClick={() => {
+                scrollToSection(contactUsRef);
+                setMenuOpen(false);
+              }}
+              className="link"
+            >
               Contact Us
             </div>
           </div>
@@ -114,7 +150,8 @@ const Home = () => {
             </span>
           </div>
           <p className="para">
-            Solutions and flexible online study, you can study anywhere through this platform.
+            Solutions and flexible online study, you can study anywhere through
+            this platform.
           </p>
           <div className="btns-container">
             <Link to="/login" className="btn btn-1">
@@ -160,7 +197,10 @@ const Home = () => {
         <div className="content-1">
           <div className="title">Discover knowledge in limitless realms.</div>
           <p className="para">
-            Education serves as the cornerstone of personal and societal development. It is a dynamic process that empowers individuals with the knowledge, skills, and critical thinking abilities essential for success.
+            Education serves as the cornerstone of personal and societal
+            development. It is a dynamic process that empowers individuals with
+            the knowledge, skills, and critical thinking abilities essential for
+            success.
           </p>
           <div className="btn-container">
             <Link to="/user/about-us" className="btn btn-1">
@@ -238,10 +278,16 @@ const Home = () => {
                   required
                 ></textarea>
               </div>
-              <button type="submit" className="contact-submit" disabled={loading}>
+              <button
+                type="submit"
+                className="contact-submit"
+                disabled={loading}
+              >
                 {loading ? "Sending..." : "Send Message"}
               </button>
-              {responseMessage && <p className="response-message">{responseMessage}</p>}
+              {responseMessage && (
+                <p className="response-message">{responseMessage}</p>
+              )}
             </form>
           </div>
         </div>

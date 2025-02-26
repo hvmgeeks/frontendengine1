@@ -163,7 +163,7 @@ function WriteExam() {
                 <img
                   src={questions[selectedQuestionIndex].image}
                   alt="Question image"
-                  style={{ height: "200px"}}
+                  style={{ height: "200px", maxWidth:'200px'}}
                 />
               )}
             </div>

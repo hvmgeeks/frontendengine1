@@ -177,6 +177,7 @@ function Quiz() {
               onChange={handleClassChange}
               placeholder="Select Class"
               styles={{ width: "300px" }}
+              isSearchable={false}
             />
           </div>
         </div>
