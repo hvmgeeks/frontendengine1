@@ -72,7 +72,7 @@ function Register() {
               - Verification<i className="ri-user-add-line"></i>
             </h1>
             <div className="divider"></div>
-            <Form layout="vertical" className="mt-2" onFinish={verifyUser}>
+            <Form layout="vertical" className="mt-2" onFinish={() => onFinish(data)}>
               <Form.Item name="otp" label="OTP" initialValue="">
                 <input type="number" />
               </Form.Item>
