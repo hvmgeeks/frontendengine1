@@ -72,7 +72,7 @@ function Register() {
               - Verification<i className="ri-user-add-line"></i>
             </h1>
             <div className="divider"></div>
-            <Form layout="vertical" className="mt-2" onFinish={() => onFinish(data)}>
+            <Form layout="vertical" className="mt-2" onFinish={verifyUser}>
               <Form.Item name="otp" label="OTP" initialValue="">
                 <input type="number" />
               </Form.Item>
@@ -92,7 +92,7 @@ function Register() {
               - REGISTER<i className="ri-user-add-line"></i>
             </h1>
             <div className="divider"></div>
-            <Form layout="vertical" className="mt-2" onFinish={generateOTP}>
+            <Form layout="vertical" className="mt-2" onFinish={() => onFinish(data)}>
               <Form.Item name="name" label="Name" initialValue="">
                 <input type="text" />
               </Form.Item>
