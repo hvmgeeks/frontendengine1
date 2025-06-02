@@ -92,7 +92,7 @@ function Register() {
               - REGISTER<i className="ri-user-add-line"></i>
             </h1>
             <div className="divider"></div>
-            <Form layout="vertical" className="mt-2" onFinish={() => onFinish(data)}>
+            <Form layout="vertical" className="mt-2" onFinish={onFinish}>
               <Form.Item name="name" label="Name" initialValue="">
                 <input type="text" />
               </Form.Item>
