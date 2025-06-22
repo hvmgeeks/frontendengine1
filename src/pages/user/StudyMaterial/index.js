@@ -8,6 +8,7 @@ import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
 import Modal from "react-modal";
 import PDFModal from "./PDFModal";
 import { FaPlayCircle } from "react-icons/fa";
+import { primarySubjects, secondarySubjects } from "../../../data/Subjects";
 
 function StudyMaterial() {
   const [content, setContent] = useState("default");
@@ -18,7 +19,7 @@ function StudyMaterial() {
   const [videos, setVideos] = useState("");
   const [books, setBooks] = useState("");
   const [showVideoURL, setShowVideoURL] = useState("");
-  const {user} = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.user);
   const [showVideoIndices, setShowVideoIndices] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [documentUrl, setDocumentUrl] = useState("");
@@ -52,16 +53,8 @@ function StudyMaterial() {
   const classesList =
     userSchoolType === "primary" ? primaryClasses : secondaryClasses;
 
-  const subjectsList = [
-    "Mathematics",
-    "Science",
-    "Kiswahili",
-    "English",
-    "SocialStudies",
-    "Civic&Moral",
-    "Religion",
-    "VS",
-  ];
+  const subjectsList = userSchoolType === "primary" ? primarySubjects : secondarySubjects;
+
   const dispatch = useDispatch();
 
   const opts = {

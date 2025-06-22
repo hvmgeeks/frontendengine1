@@ -1,0 +1,55 @@
+.pass {
+    background: #DBF9D7;
+}
+
+.pass-dark {
+    background: #43C46C;
+    color: white !important;
+}
+
+.fail {
+    background: #FFE9E3;
+}
+
+.fail-dark {
+    background: #FE8267;
+    color: white !important;
+}
+
+.no-attempts {
+    background: #EBF5FF;
+}
+
+.no-attempts-dark {
+    background: #0E8FE9;
+    color: white !important;
+}
+
+.card-design {
+    border-radius: 20px;
+}
+
+.box-tags {
+    background-color: white;
+    border-radius: 5px;
+    padding: 10px !important;
+    margin: 0px;
+}
+
+.box-tags-button {
+    border-radius: 5px;
+    padding: 10px !important;
+    margin: 0px;
+    border: none;
+    width: 150px;
+}
+
+.box-tags-icon {
+    margin-right: 5px;
+    border-radius: 5px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

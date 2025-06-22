@@ -20,3 +20,22 @@ export const chatWithChatGPT = async (payload) => {
     return error.response.data;
   }
 };
+
+
+export const chatWithChatGPTToGetAns = async (payload) => {
+  try {
+    const response = await axiosInstance.post("/api/chatgpt/check-answer", payload);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
+export const chatWithChatGPTToExplainAns = async (payload) => {
+  try {
+    const response = await axiosInstance.post("/api/chatgpt/explain-answer", payload);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};

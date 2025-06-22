@@ -1,0 +1,50 @@
+.announce-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.announce-box {
+    width: 90%;
+    max-width: 580px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 2.5rem 1rem 2.5rem;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.announce-close {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.announce-title {
+    margin: 0 0 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.announce-body {
+    font-size: 1rem;
+    min-height: 100px;
+    text-align: center;
+    line-height: 1.4;
+    padding: 0px 25px;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+    font-size: 20px !important;
+}

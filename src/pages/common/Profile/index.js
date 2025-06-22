@@ -73,7 +73,7 @@ const Profile = () => {
           school: response.data.school,
           class_: response.data.class,
           schoolType: response.data.schoolType,
-          phoneNumber:response.data.phoneNumber,
+          phoneNumber: response.data.phoneNumber,
         });
         fetchReports();
         if (response.data.profileImage) {
@@ -94,17 +94,17 @@ const Profile = () => {
     }
   }, []);
 
-const handleChange = (e) => {
-  const { name, value } = e.target;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-  if (name === "phoneNumber" && value.length > 10) return; // Limit to 10 digits
+    if (name === "phoneNumber" && value.length > 10) return; // Limit to 10 digits
 
-  setFormData((prevFormData) => ({
-    ...prevFormData,
-    [name]: value,
-    ...(name === "schoolType" ? { class_: "" } : {}),
-  }));
-};
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+      ...(name === "schoolType" ? { class_: "" } : {}),
+    }));
+  };
 
   const discardChanges = () => {
     setFormData({
@@ -146,6 +146,11 @@ const handleChange = (e) => {
       formData.phoneNumber === userDetails.phoneNumber &&
       formData.schoolType === useDispatch.schoolType
     ) {
+      return;
+    }
+
+    if (!formData.name) {
+      message.error("Please enter your name.");
       return;
     }
 

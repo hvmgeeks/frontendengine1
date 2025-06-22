@@ -145,7 +145,6 @@ const Plans = () => {
                             <p className="plan-dates">Start Date: {subscriptionData.startDate}</p>
                             <p className="plan-dates">End Date: {subscriptionData.endDate}</p>
                         </div>
-
             }
 
             <WaitingModal

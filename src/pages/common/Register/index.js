@@ -92,15 +92,16 @@ function Register() {
               - REGISTER<i className="ri-user-add-line"></i>
             </h1>
             <div className="divider"></div>
-            <Form layout="vertical" className="mt-2" onFinish={onFinish}>
-              <Form.Item name="name" label="Name" initialValue="">
+            <Form layout="vertical" className="mt-2" onFinish={generateOTP}>
+              <Form.Item name="name" label="Name" initialValue="" rules={[{ required: true, message: "Please enter your name!" }]}>
                 <input type="text" />
               </Form.Item>
-              <Form.Item name="school" label="School" initialValue="">
+              <Form.Item name="school" label="School" initialValue="" rules={[{ required: true, message: "Please enter your school!" }]}>
                 <input type="text" />
               </Form.Item>
 
-              <Form.Item name="schoolType" label="School Type" initialValue="">
+              <Form.Item name="schoolType" label="School Type" initialValue="" rules={[{ required: true, message: "Please select your school type!" }]}
+              >
                 <select onChange={(e) => setSchoolType(e.target.value)}>
                   <option value="" disabled selected>
                     Select School Type
@@ -110,7 +111,7 @@ function Register() {
                 </select>
               </Form.Item>
 
-              <Form.Item name="class" label="Class" initialValue="">
+              <Form.Item name="class" label="Class" initialValue="" rules={[{ required: true, message: "Please select your class!" }]}>
                 <select>
                   <option value="" disabled selected>
                     Select Class
@@ -139,7 +140,7 @@ function Register() {
                 </select>
               </Form.Item>
 
-              <Form.Item name="email" label="Email" initialValue="">
+              <Form.Item name="email" label="Email" initialValue="" rules={[{ required: true, message: "Please enter your email!" }]}>
                 <input type="text" />
               </Form.Item>
 
@@ -162,7 +163,7 @@ function Register() {
                 <input type="text" maxLength="10" />
               </Form.Item>
 
-              <Form.Item name="password" label="Password" initialValue="">
+              <Form.Item name="password" label="Password" initialValue="" rules={[{ required: true, message: "Please enter your password!" }]}>
                 <input type="password" />
               </Form.Item>
 

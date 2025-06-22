@@ -7,6 +7,9 @@ import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
 import PageTitle from "../../../components/PageTitle";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
+import "./style.css";
+import { BsBookFill } from "react-icons/bs";
+
 
 const primaryClasses = [
   { value: "1", label: "Class 1" },
@@ -35,6 +38,7 @@ function Quiz() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
+  const [lgSize, setLgSize] = useState(8);
 
   const availableClasses =
     user?.schoolType === "primary" ? primaryClasses : secondaryClasses;
@@ -47,6 +51,23 @@ function Quiz() {
       setSelectedClass(defaultSelectedClass);
     }
   }, [user, availableClasses]);
+
+  useEffect(() => {
+    const updateLgSize = () => {
+      setLgSize(window.innerWidth < 1380 ? 9 : 7);
+    };
+
+    // Set initial lg size
+    updateLgSize();
+
+    // Add event listener for window resize
+    window.addEventListener("resize", updateLgSize);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", updateLgSize);
+    };
+  }, []);
 
   const handleClassChange = (selectedOption) => {
     setSelectedClass(selectedOption);
@@ -144,11 +165,11 @@ function Quiz() {
   };
 
   const shouldRenderFilteredExams = filteredExams.length < exams.length;
-  console.log("user123", user);
+
   return (
     user && (
       <div style={{ minHeight: "80vh", paddingBottom: '20px' }}>
-        <PageTitle title={`Hi ${user.name}, Welcome it's time to study!!`} />
+        <PageTitle title={`Welcome back, ${user.name} Ready to shine today?`} />
         <div className="divider"></div>
 
 
@@ -195,34 +216,71 @@ function Quiz() {
             );
 
             return (
-              <Col xs={24} sm={12} md={8} lg={6} key={index}>
+              <Col xs={24} sm={12} md={9} lg={lgSize} key={index}>
                 <div
                   style={{
-                    backgroundColor:
-                      examReport?.result?.verdict?.toLowerCase() === "fail"
-                        ? "#ffc1b3"
-                        : examReport?.result?.verdict?.toLowerCase() === "pass"
-                          ? "#cfffb3"
-                          : "aliceblue",
                     height: "100%",
                     boxSizing: "border-box",
+                    border: `1px solid ${examReport?.result?.verdict?.toLowerCase() === "fail"
+                      ? "#FE8267"
+                      : examReport?.result?.verdict?.toLowerCase() === "pass"
+                        ? "#43C46C"
+                        : "#0E8FE9"}`
                   }}
-                  className="card-lg flex flex-col gap-1 p-2"
+                  className={`card-lg flex flex-col gap-1 p-2 card-design ${examReport?.result?.verdict?.toLowerCase() === "fail"
+                    ? "fail"
+                    : examReport?.result?.verdict?.toLowerCase() === "pass"
+                      ? "pass"
+                      : "no-attempts"}`}
                 >
-                  <h1 className="text-2xl">{exam?.name}</h1>
-                  <h1 className="text-md">Subject: {exam.category}</h1>
-                  <h1 className="text-md">Class: {exam.class}</h1>
-                  <h1 className="text-md">Total Marks: {exam.totalMarks}</h1>
-                  <h1 className="text-md">
-                    Passing Marks: {exam.passingMarks}
+                  <h1 className="text-2xl flex items-center gap-1">
+                    <span className={`box-tags-icon  ${examReport?.result?.verdict?.toLowerCase() === "fail"
+                      ? "fail-dark"
+                      : examReport?.result?.verdict?.toLowerCase() === "pass"
+                        ? "pass-dark"
+                        : "no-attempts-dark"}`}>
+                      <BsBookFill />
+                    </span>
+                    {exam?.name}
                   </h1>
-                  <h1 className="text-md">Duration: {exam.duration}</h1>
-                  <button
-                    className="primary-outlined-btn"
-                    onClick={() => verifyRetake(exam)}
-                  >
-                    Start Exam
-                  </button>
+
+                  <span style={{
+                    position: 'absolute', top: '20px', right: '30px', fontSize: '14px', fontWeight: 'bold', color: examReport?.result?.verdict?.toLowerCase() === "fail"
+                      ? "#FE8267"
+                      : examReport?.result?.verdict?.toLowerCase() === "pass"
+                        ? "#43C46C"
+                        : "#0E8FE9"
+                  }}>
+                    {examReport?.result?.verdict?.toLowerCase() === "fail"
+                      ? "Failed"
+                      : examReport?.result?.verdict?.toLowerCase() === "pass"
+                        ? "Passed"
+                        : "No Attempts"}
+                  </span>
+
+                  <h1 className="text-xl">Subject: {exam.category}</h1>
+                  <div className="flex justify-between">
+                    <h1 className="text-md box-tags">Total Marks: {exam.totalMarks}</h1>
+
+                    <h1 className="text-md box-tags">
+                      Passing Marks: {exam.passingMarks}
+                    </h1>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <h1 className="text-md box-tags">Duration: {exam.duration}</h1>
+
+                    <button
+                      className={`box-tags-button text-md ${examReport?.result?.verdict?.toLowerCase() === "fail"
+                        ? "fail-dark"
+                        : examReport?.result?.verdict?.toLowerCase() === "pass"
+                          ? "pass-dark"
+                          : "no-attempts-dark"}`}
+                      onClick={() => verifyRetake(exam)}
+                    >
+                      Start Quiz
+                    </button>
+                  </div>
                 </div>
               </Col>
             );

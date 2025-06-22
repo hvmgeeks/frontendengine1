@@ -16,6 +16,9 @@ const Ranking = () => {
     const [userData, setUserData] = useState('');
     const [isAdmin, setIsAdmin] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [activeTab, setActiveTab] = useState("overall"); // "overall" or "class"
+
+
     const dispatch = useDispatch();
 
     const fetchReports = async () => {
@@ -30,6 +33,7 @@ const Ranking = () => {
             message.error(error.message);
         }
     }
+
 
     const getUserData = async () => {
         try {
@@ -91,37 +95,62 @@ const Ranking = () => {
         <div className="Ranking">
             {!isAdmin &&
                 <>
+
                     <PageTitle title="Ranking" />
                     <div className="divider"></div>
-                    {rankingData ?
+                    <div className="tabs">
+                        <button
+                            className={activeTab === "overall" ? "Active_bg" : "Expired_bg"}
+                            onClick={() => setActiveTab("overall")}
+                        >
+                            Overall Ranking
+                        </button>
+                        <button
+                            className={activeTab === "class" ? "Active_bg" : "Expired_bg"}
+                            onClick={() => setActiveTab("class")}
+                        >
+                            Class Ranking
+                        </button>
+                    </div>
+
+                    {rankingData.length > 0 ? (
                         <fieldset className="leaderboard">
                             <legend className="legend"><FaTrophy className="trophy" />LEADERBOARD</legend>
                             <div className="data">
-                                {rankingData.map((user, index) => (
-                                    <div key={index} className="row">
-                                        <div className={`position ${(index === 0 || index === 1 || index === 2) ? 'medal' : 'number'}`}>{index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}</div>
-                                        <div>
-                                            {user.userPhoto ?
-                                                <img className="profile" src={user.userPhoto ? user.userPhoto : image} alt="profile" onError={(e) => { e.target.src = image }} />
-                                                :
-                                                <IoPersonCircleOutline className="profile-icon" />
-                                            }
+                                {(activeTab === "overall"
+                                    ? rankingData
+                                    : rankingData.filter(user => user.userClass === userData?.class)
+                                ).map((user, index) => (
+                                    <div key={user.userId} className="row">
+                                        <div className={`position ${(index === 0 || index === 1 || index === 2) ? 'medal' : 'number'}`}>
+                                            {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}
                                         </div>
-                                        <div className="flex">
+                                        <div>
+                                            {user.userPhoto ? (
+                                                <img
+                                                    className="profile"
+                                                    src={user.userPhoto}
+                                                    alt="profile"
+                                                    onError={(e) => { e.target.src = image }}
+                                                />
+                                            ) : (
+                                                <IoPersonCircleOutline className="profile-icon" />
+                                            )}
+                                        </div>
+                                        <div className={`flex ${user.subscriptionStatus === "active" ? 'Active_bg' : 'Expired_bg'}`}>
                                             <div className="name">{user.userName}</div>
-                                            <div className="school">{user.userSchool ? user.userSchool : 'Not Enrolled'}</div>
-                                            <div className="class">{user.userClass ? user.userClass : 'Not Enrolled'}</div>
+                                            <div className="school">{user.userSchool || 'Not Enrolled'}</div>
+                                            <div className="class">{user.userClass || 'Not Enrolled'}</div>
                                             <div className="score">{user.score}</div>
                                         </div>
                                     </div>
-                                ))
-                                }
-
+                                ))}
                             </div>
                         </fieldset>
-                        :
+                    ) : (
                         <div>No Ranking yet.</div>
-                    }
+                    )}
+
                 </>
             }
         </div>

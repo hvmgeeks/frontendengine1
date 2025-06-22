@@ -24,6 +24,7 @@
     "react-use": "^17.4.3",
     "react-youtube": "^10.1.0",
     "redux": "^4.2.1",
+    "swiper": "^11.2.8",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

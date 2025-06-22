@@ -13,6 +13,7 @@ import { useDispatch } from "react-redux";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
 import { Tabs } from "antd";
 import AddEditQuestion from "./AddEditQuestion";
+import { primarySubjects, secondarySubjects } from "../../../data/Subjects";
 const { TabPane } = Tabs;
 
 function AddEditExam() {
@@ -22,10 +23,10 @@ function AddEditExam() {
   const [schoolType, setSchoolType] = useState('');
   const [showAddEditQuestionModal, setShowAddEditQuestionModal] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
-  const [classValue, setClassValue] = useState(''); 
+  const [classValue, setClassValue] = useState('');
   const params = useParams();
 
-  console.log(examData?.questions,"examData?.questions")
+  console.log(examData?.questions, "examData?.questions")
 
   const onFinish = async (values) => {
     try {
@@ -162,9 +163,9 @@ function AddEditExam() {
     setClassValue(""); // Reset class
   };
 
-  console.log(classValue,"classValue")
-  
-  
+  console.log(classValue, "classValue")
+
+
 
   return (
     <div>
@@ -186,27 +187,12 @@ function AddEditExam() {
                     <input type="number" />
                   </Form.Item>
                 </Col>
-                <Col span={8}>
-                  <Form.Item label="Category" name="category">
-                    <select name="" id="">
-                      <option value="">Select Category</option>
-                      <option value="Mathematics">Mathematics</option>
-                      <option value="Science">Science</option>
-                      <option value="English">English</option>
-                      <option value="Sst">SST</option>
-                      <option value="Cme">CME</option>
-                      <option value="Physics">Physics</option>
-                      <option value="Biology">Biology</option>
-                      <option value="Chemistry">Chemistry</option>
-                      <option value="Kiswahili">Kiswahili</option>
-                    </select>
-                  </Form.Item>
-                </Col>
+
 
 
                 <Col span={8}>
                   <Form.Item name="schoolType" label="School Type" initialValue="">
-                    <select  value={schoolType} onChange={ handleSchoolTypeChange}   >
+                    <select value={schoolType} onChange={handleSchoolTypeChange}   >
                       <option value="" disabled >
                         Select School Type
                       </option>
@@ -217,7 +203,32 @@ function AddEditExam() {
                 </Col>
 
                 <Col span={8}>
+                  <Form.Item label="Category" name="category">
+                    <select name="" id="">
+                      <option value="">Select Category</option>
+                      {schoolType === "primary" && (
+                        <>
+                          {primarySubjects.map((subject, index) => (
+                            <option key={index} value={subject}>
+                              {subject}
+                            </option>
+                          ))}
+                        </>
+                      )}
+                      {schoolType === "secondary" && (
+                        <>
+                          {secondarySubjects.map((subject, index) => (
+                            <option key={index} value={subject}>
+                              {subject}
+                            </option>
+                          ))}
+                        </>
+                      )}
+                    </select>
+                  </Form.Item>
+                </Col>
 
+                <Col span={8}>
 
                   <Form.Item name="class" label="Class" initialValue="" required>
                     <select value={classValue} onChange={(e) => setClassValue(e.target.value)}>

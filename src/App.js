@@ -27,6 +27,8 @@ import Home from "./pages/common/Home";
 import Test from "./pages/user/Test";
 import Chat from "./pages/user/Chat"
 import Plans from "./pages/user/Plans/Plans";
+import AnnouncementModal from "./components/Announcement/AnnouncementModal";
+import Announcement from "./pages/admin/Announcement/Announcement";
 // const LazyComponent = lazy(() => import('./pages/user/Test'));
 
 function App() {
@@ -34,6 +36,7 @@ function App() {
   return (
     <>
       {loading && <Loader />}
+      <AnnouncementModal />
       <BrowserRouter>
         <Routes>
           {/* Common Routes */}
@@ -63,7 +66,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          
+
           <Route
             path="/user/chat"
             element={
@@ -72,7 +75,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-           <Route
+          <Route
             path="/user/plans"
             element={
               <ProtectedRoute>
@@ -169,6 +172,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <AdminReports />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/announcements"
+            element={
+              <ProtectedRoute>
+                <Announcement />
               </ProtectedRoute>
             }
           />

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./index.css"; // Import the custom CSS
 import { chatWithChatGPT, uploadImg } from "../../../apicalls/chat";
-import ContentRenderer from "./ContentRenderer";
+import ContentRenderer from "../../../components/ContentRenderer";
 
 function ChatGPTIntegration() {
   const [messages, setMessages] = useState([]);
@@ -36,12 +36,12 @@ function ChatGPTIntegration() {
       // Step 2: Construct the ChatGPT message payload
       const userMessage = imageUrl
         ? {
-            role: "user",
-            content: [
-              { type: "text", text: prompt },
-              { type: "image_url", image_url: { url: imageUrl } },
-            ],
-          }
+          role: "user",
+          content: [
+            { type: "text", text: prompt },
+            { type: "image_url", image_url: { url: imageUrl } },
+          ],
+        }
         : { role: "user", content: prompt };
 
       const updatedMessages = [...messages, userMessage];
@@ -84,9 +84,8 @@ function ChatGPTIntegration() {
         {messages.map((msg, index) => (
           <div
             key={index}
-            className={`message ${
-              msg.role === "user" ? "user-message" : "assistant-message"
-            }`}
+            className={`message ${msg.role === "user" ? "user-message" : "assistant-message"
+              }`}
           >
             <>
               {msg.role === "assistant" ? (
@@ -102,17 +101,17 @@ function ChatGPTIntegration() {
                   {typeof msg.content === "string"
                     ? msg.content
                     : msg.content.map((item, idx) =>
-                        item.type === "text" ? (
-                          <p key={idx}>{item.text}</p>
-                        ) : (
-                          <img
-                            key={idx}
-                            src={item.image_url.url}
-                            alt="User content"
-                            style={{ height: "100px" }}
-                          />
-                        )
-                      )}
+                      item.type === "text" ? (
+                        <p key={idx}>{item.text}</p>
+                      ) : (
+                        <img
+                          key={idx}
+                          src={item.image_url.url}
+                          alt="User content"
+                          style={{ height: "100px" }}
+                        />
+                      )
+                    )}
                 </>
               )}
             </>

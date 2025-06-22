@@ -42,7 +42,7 @@ function Instructions({ examData, setView, startTimer }) {
             setView("questions");
           }}
         >
-          Start Exam
+          Start Quiz
         </button>
       </div>
     </div>

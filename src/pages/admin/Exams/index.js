@@ -17,7 +17,7 @@ function Exams() {
       const response = await getAllExams();
       dispatch(HideLoading());
       if (response.success) {
-        setExams(response.data);
+        setExams(response.data.reverse());
         console.log(response, "exam");
       } else {
         message.error(response.message);

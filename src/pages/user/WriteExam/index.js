@@ -13,6 +13,8 @@ import useWindowSize from "react-use/lib/useWindowSize";
 import PassSound from "../../../assets/pass.mp3";
 import FailSound from "../../../assets/fail.mp3";
 import TextArea from "antd/es/input/TextArea";
+import ContentRenderer from "../../../components/ContentRenderer";
+import { chatWithChatGPTToExplainAns, chatWithChatGPTToGetAns } from "../../../apicalls/chat";
 
 function WriteExam() {
   const [examData, setExamData] = React.useState(null);
@@ -30,6 +32,7 @@ function WriteExam() {
   const { user } = useSelector((state) => state.user);
   const [isMobile, setIsMobile] = useState(false);
   const { width, height } = useWindowSize();
+  const [explanations, setExplanations] = useState({});
 
   const getExamData = async () => {
     try {
@@ -51,37 +54,101 @@ function WriteExam() {
     }
   };
 
+
+  const checkFreeTextAnswers = async (payload) => {
+    if (!payload.length) return [];
+    const { data } = await chatWithChatGPTToGetAns(payload);
+    return data;
+  };
+
   const calculateResult = async () => {
     try {
-      let correctAnswers = [];
-      let wrongAnswers = [];
+      dispatch(ShowLoading());
 
-      questions.forEach((question, index) => {
-        if (question?.correctOption === selectedOptions[index]) {
-          correctAnswers.push(question);
-        } else {
-          wrongAnswers.push(question);
+      // 1️⃣ Build payload for Free Text questions
+      const freeTextPayload = [];
+      const indexMap = [];
+
+      questions.forEach((q, idx) => {
+        if (q.answerType === "Free Text") {
+          indexMap.push(idx);
+          freeTextPayload.push({
+            question: q.name,
+            expectedAnswer: q.correctOption,
+            userAnswer: selectedOptions[idx] || "",
+          });
         }
       });
 
-      let verdict = "Pass";
-      if (correctAnswers.length < examData.passingMarks) {
-        verdict = "Fail";
-      }
+      // 2️⃣ Get GPT verdicts for free text
+      const gptResults = await checkFreeTextAnswers(freeTextPayload);
+      const gptMap = {};
 
-      const tempResult = {
-        correctAnswers,
-        wrongAnswers,
-        verdict,
-      };
+      gptResults.forEach((r) => {
+        if (r.result && typeof r.result.isCorrect === "boolean") {
+          gptMap[r.question] = r.result;
+        } else if (typeof r.isCorrect === "boolean") {
+          gptMap[r.question] = { isCorrect: r.isCorrect, reason: r.reason || "" };
+        }
+      });
+
+      // 3️⃣ Grade everything
+      const correctAnswers = [];
+      const wrongAnswers = [];
+      const wrongPayload = [];
+
+      questions.forEach((q, idx) => {
+        const userAnswerKey = selectedOptions[idx] || "";
+
+        if (q.answerType === "Free Text") {
+          const { isCorrect = false, reason = "" } = gptMap[q.name] || {};
+          const enriched = { ...q, userAnswer: userAnswerKey, reason };
+
+          if (isCorrect) {
+            correctAnswers.push(enriched);
+          } else {
+            wrongAnswers.push(enriched);
+            wrongPayload.push({
+              question: q.name,
+              expectedAnswer: q.correctOption,
+              userAnswer: userAnswerKey,
+            });
+          }
+
+        } else if (q.answerType === "Options") {
+          const correctKey = q.correctOption;
+          const correctValue = q.options[correctKey];
+          const userValue = q.options[userAnswerKey] || "";
+
+          const isCorrect = correctKey === userAnswerKey;
+          const enriched = { ...q, userAnswer: userAnswerKey };
+
+          if (isCorrect) {
+            correctAnswers.push(enriched);
+          } else {
+            wrongAnswers.push(enriched);
+            wrongPayload.push({
+              question: q.name,
+              expectedAnswer: correctValue,
+              userAnswer: userValue,
+            });
+          }
+        }
+      });
+
+      // 5️⃣ Final result
+      const verdict = correctAnswers.length >= examData.passingMarks ? "Pass" : "Fail";
+      const tempResult = { correctAnswers, wrongAnswers, verdict };
+
       setResult(tempResult);
+
       dispatch(ShowLoading());
       const response = await addReport({
         exam: params.id,
         result: tempResult,
         user: user._id,
       });
-      dispatch(HideLoading());
+
       if (response.success) {
         setView("result");
         window.scrollTo(0, 0);
@@ -89,11 +156,40 @@ function WriteExam() {
       } else {
         message.error(response.message);
       }
+      dispatch(HideLoading());
+
     } catch (error) {
       dispatch(HideLoading());
       message.error(error.message);
     }
   };
+
+  const fetchExplanation = async (question, expectedAnswer, userAnswer, imageUrl) => {
+    try {
+      dispatch(ShowLoading());
+      const response = await chatWithChatGPTToExplainAns({
+        question,
+        expectedAnswer,
+        userAnswer,
+        imageUrl,
+      });
+      dispatch(HideLoading());
+
+      if (response.success) {
+        setExplanations((prev) => ({
+          ...prev,
+          [question]: response.explanation,
+        }));
+      } else {
+        message.error(response.error || "Failed to fetch explanation.");
+      }
+    } catch (error) {
+      dispatch(HideLoading());
+      message.error(error.message);
+    }
+  };
+
+  console.log(result, 'RESULT')
 
   const startTimer = () => {
     let totalSeconds = examData.duration;
@@ -123,16 +219,21 @@ function WriteExam() {
       getExamData();
     }
   }, []);
-  
+
 
   console.log(questions, "questions");
   return (
     examData && (
-      <div className="mt-2">
+      <div className="mt-2 pb-2">
         <div className="divider"></div>
         <h1 className={`text-center ${isMobile ? "text-xl" : ""}`}>
           {examData.name}
         </h1>
+
+        {view === "questions" && (<h1 className={`text-center ${isMobile ? "text-md" : "text-lg"} m-2`}>
+          Questions {selectedQuestionIndex + 1} of {questions.length}
+        </h1>
+        )}
         <div className="divider"></div>
 
         {view === "instructions" && (
@@ -147,7 +248,6 @@ function WriteExam() {
           <div className="flex flex-col gap-2">
             <div className="flex justify-between">
               <h1 className={isMobile ? "text-lg" : "text-2xl"}>
-                {selectedQuestionIndex + 1} :{" "}
                 {questions[selectedQuestionIndex].name}
               </h1>
 
@@ -163,7 +263,7 @@ function WriteExam() {
                 <img
                   src={questions[selectedQuestionIndex].image}
                   alt="Question image"
-                  style={{ height: "200px", maxWidth:'200px'}}
+                  style={{ height: "200px", maxWidth: '200px' }}
                 />
               )}
             </div>
@@ -188,11 +288,10 @@ function WriteExam() {
                   questions[selectedQuestionIndex]?.options || {}
                 ).map((option, index) => (
                   <div
-                    className={`flex gap-2 flex-col ${
-                      selectedOptions[selectedQuestionIndex] === option
-                        ? "selected-option"
-                        : "option"
-                    }`}
+                    className={`flex gap-2 flex-col ${selectedOptions[selectedQuestionIndex] === option
+                      ? "selected-option"
+                      : "option"
+                      }`}
                     key={index}
                     onClick={() => {
                       setSelectedOptions({
@@ -286,9 +385,8 @@ function WriteExam() {
 
                   <div className="flex gap-2 mt-2">
                     <button
-                      className={`primary-outline-btn ${
-                        isMobile ? "mobile-btn" : ""
-                      }`}
+                      className={`primary-outline-btn ${isMobile ? "mobile-btn" : ""
+                        }`}
                       onClick={() => {
                         setView("instructions");
                         setSelectedQuestionIndex(0);
@@ -300,9 +398,8 @@ function WriteExam() {
                       Retake Exam
                     </button>
                     <button
-                      className={`primary-contained-btn ${
-                        isMobile ? "mobile-btn" : ""
-                      }`}
+                      className={`primary-contained-btn ${isMobile ? "mobile-btn" : ""
+                        }`}
                       onClick={() => {
                         setView("review");
                       }}
@@ -340,31 +437,78 @@ function WriteExam() {
         {view === "review" && (
           <div className="flex flex-col gap-2">
             {questions.map((question, index) => {
-              const isCorrect =
-                question?.correctOption === selectedOptions[index];
+              const isCorrect = question.correctOption === selectedOptions[index];
+
+              // find the matching wrong-answer object (if any)
+              const wrongObj = result.wrongAnswers.find(
+                (w) => w.name === question.name   // or w._id === question._id
+              );
+
               return (
                 <div
-                  className={`
-                  flex flex-col gap-1 p-2 ${
-                    isCorrect ? "bg-success" : "bg-error"
-                  }
-                `}
                   key={index}
+                  className={`flex flex-col gap-1 p-2 ${isCorrect ? "bg-success" : "bg-error"
+                    }`}
                 >
                   <h1 className={isMobile ? "text-md" : "text-xl"}>
-                    {index + 1} : {question?.name}
+                    {index + 1} : {question.name}
                   </h1>
+
+                  {/* image if available */}
+                  {question.image && (
+                    <img
+                      src={question.image}
+                      alt="Question image"
+                      style={{ height: "200px", maxWidth: '300px' }}
+                    />
+                  )}
+
+                  {/* submitted answer line */}
                   <h1 className={isMobile ? "text-sm" : "text-md"}>
-                    Submitted Answer : {selectedOptions[index]} -{" "}
-                    {question?.options && question?.options[selectedOptions[index]]}
+                    Submitted Answer :{" "}
+                    {question.answerType === "Options"
+                      ? `${selectedOptions[index]} ${question.options?.[selectedOptions[index]] || ""
+                      }`
+                      : selectedOptions[index]}
                   </h1>
-                  <h1 className={isMobile ? "text-sm" : "text-md"}>
-                    Correct Answer : {question?.correctOption} -{" "}
-                    {question?.options && question?.options[question?.correctOption]}
+
+                  {/* correct answer line */}
+                  <h1 className={isMobile ? "text-sm" : "text-md"} style={{ color: "white" }}>
+                    Correct Answer :{" "}
+                    {question.answerType === "Options"
+                      ? `${question.correctOption} ${question.options?.[question.correctOption] || ""
+                      }`
+                      : question.correctOption}
                   </h1>
+
+                  {explanations[question.name] && (
+                    <h1 className={isMobile ? "text-sm" : "text-md"}>
+                      Explanation :
+                      <ContentRenderer text={explanations[question.name]} />
+                    </h1>
+                  )}
+
+                  {/* reason line – only for wrong answers and when GPT gave one */}
+                  {!explanations[question.name] && !isCorrect && (
+                    <button
+                      style={{ width: 'fit-content' }}
+                      className="primary-contained-btn"
+                      onClick={() =>
+                        fetchExplanation(
+                          question.name,
+                          question.correctOption,
+                          selectedOptions[index],
+                          question.image || null
+                        )
+                      }
+                    >
+                      View Detail
+                    </button>
+                  )}
                 </div>
               );
             })}
+
 
             <div className="flex justify-center gap-2">
               <button
