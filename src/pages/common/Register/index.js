@@ -92,7 +92,7 @@ function Register() {
               - REGISTER<i className="ri-user-add-line"></i>
             </h1>
             <div className="divider"></div>
-            <Form layout="vertical" className="mt-2" onFinish={generateOTP}>
+            <Form layout="vertical" className="mt-2" onFinish={onFinish}>
               <Form.Item name="name" label="Name" initialValue="" rules={[{ required: true, message: "Please enter your name!" }]}>
                 <input type="text" />
               </Form.Item>
