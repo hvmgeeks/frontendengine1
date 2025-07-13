@@ -1,0 +1,255 @@
+.admin-notifications {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.admin-notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  gap: 2rem;
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.title-icon {
+  color: #3b82f6;
+}
+
+.page-description {
+  color: #6b7280;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.sent-notifications-card {
+  margin-top: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.sent-notifications-card .ant-card-head {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem 1.5rem;
+}
+
+.sent-notifications-card .ant-card-head-title {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.sent-notifications-card .ant-card-body {
+  padding: 0;
+}
+
+.sent-notifications-card .ant-list-item {
+  padding: 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.sent-notifications-card .ant-list-item:last-child {
+  border-bottom: none;
+}
+
+.notification-meta {
+  margin-top: 0.5rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.meta-icon {
+  margin-right: 0.25rem;
+  vertical-align: middle;
+}
+
+.notification-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.form-group .ant-input,
+.form-group .ant-input-affix-wrapper,
+.form-group .ant-select-selector {
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  padding: 0.75rem;
+}
+
+.form-group .ant-input:focus,
+.form-group .ant-input-affix-wrapper:focus,
+.form-group .ant-select-focused .ant-select-selector {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-group .ant-input::placeholder {
+  color: #9ca3af;
+}
+
+/* Modal customization */
+.ant-modal-header {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+}
+
+.ant-modal-title {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 1.25rem;
+}
+
+.ant-modal-body {
+  padding: 1.5rem;
+}
+
+.ant-modal-footer {
+  border-top: 1px solid #e5e7eb;
+  padding: 1rem 1.5rem;
+}
+
+/* Button customization */
+.ant-btn-primary {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  border-radius: 8px;
+  font-weight: 500;
+  height: auto;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ant-btn-primary:hover {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.ant-btn-text {
+  border-radius: 6px;
+  height: auto;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Tag customization */
+.ant-tag {
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border: none;
+}
+
+/* List customization */
+.ant-list-item-meta-title {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.ant-list-item-meta-description {
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.ant-list-item-action {
+  margin-left: 1rem;
+}
+
+/* Empty state */
+.ant-list-empty-text {
+  padding: 3rem 1rem;
+  color: #9ca3af;
+  text-align: center;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .admin-notifications {
+    padding: 1rem 0.5rem;
+  }
+  
+  .admin-notifications-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .page-title {
+    font-size: 1.5rem;
+  }
+  
+  .ant-modal {
+    margin: 1rem;
+    max-width: calc(100vw - 2rem);
+  }
+  
+  .notification-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Loading states */
+.ant-spin-container {
+  min-height: 200px;
+}
+
+/* Focus states for accessibility */
+.ant-btn:focus,
+.ant-input:focus,
+.ant-select:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Success/Error message styling */
+.ant-message {
+  z-index: 9999;
+}
+
+/* Select dropdown styling */
+.ant-select-dropdown {
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.ant-select-item {
+  border-radius: 4px;
+  margin: 2px 4px;
+}
+
+.ant-select-item-option-selected {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+.ant-select-item-option-active {
+  background-color: #f3f4f6;
+}

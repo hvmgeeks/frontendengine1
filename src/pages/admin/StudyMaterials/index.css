@@ -1,0 +1,304 @@
+.admin-study-materials {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.material-types-container {
+  text-align: center;
+}
+
+.header-section {
+  margin-bottom: 3rem;
+}
+
+.header-section h2 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.header-section p {
+  font-size: 1.1rem;
+  color: #7f8c8d;
+  margin: 0;
+}
+
+.material-types-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.material-type-card {
+  background: white;
+  border: 3px solid #ecf0f1;
+  border-radius: 16px;
+  padding: 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.material-type-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  border-color: currentColor;
+}
+
+.material-type-card:hover .add-button {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.card-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.material-type-card h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.material-type-card p {
+  color: #7f8c8d;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.add-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #3498db;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transform: translateY(10px);
+  opacity: 0;
+  transition: all 0.3s ease;
+  margin: 0 auto;
+  width: fit-content;
+}
+
+.add-form-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.form-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #ecf0f1;
+}
+
+.back-button {
+  background: #95a5a6;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+
+.back-button:hover {
+  background: #7f8c8d;
+}
+
+.form-header h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .admin-study-materials {
+    padding: 1rem 0.5rem;
+  }
+  
+  .material-types-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .material-type-card {
+    padding: 1.5rem;
+  }
+  
+  .header-section h2 {
+    font-size: 2rem;
+  }
+  
+  .form-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .form-header h2 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .material-type-card {
+    padding: 1rem;
+  }
+  
+  .card-icon {
+    font-size: 2.5rem;
+  }
+  
+  .material-type-card h3 {
+    font-size: 1.3rem;
+  }
+  
+  .header-section h2 {
+    font-size: 1.8rem;
+  }
+}
+
+/* Main Menu Styles */
+.main-menu-container {
+  text-align: center;
+}
+
+.menu-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin-top: 2rem;
+}
+
+.menu-section {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.menu-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #2c3e50;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.section-icon {
+  font-size: 20px;
+  color: #3498db;
+}
+
+.menu-section > p {
+  color: #7f8c8d;
+  font-size: 16px;
+  margin-bottom: 25px;
+}
+
+.management-options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.management-option-card {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.management-option-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: currentColor;
+}
+
+.management-option-card h4 {
+  color: #2c3e50;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 15px 0 8px 0;
+}
+
+.management-option-card p {
+  color: #7f8c8d;
+  font-size: 14px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.manage-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  margin-top: auto;
+}
+
+/* Container Styles */
+.material-manager-container,
+.edit-form-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Responsive adjustments for new components */
+@media (max-width: 768px) {
+  .menu-sections {
+    gap: 25px;
+  }
+
+  .menu-section {
+    padding: 20px;
+  }
+
+  .menu-section h3 {
+    font-size: 18px;
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .management-options-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .management-option-card {
+    padding: 20px;
+  }
+}

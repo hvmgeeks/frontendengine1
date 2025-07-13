@@ -1,0 +1,247 @@
+/* Custom styles for NewQuizRenderer */
+
+/* Hide scrollbar for question navigation dots */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+
+/* Smooth scrolling for the main content */
+.quiz-content {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 #f7fafc;
+}
+
+.quiz-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.quiz-content::-webkit-scrollbar-track {
+  background: #f7fafc;
+  border-radius: 3px;
+}
+
+.quiz-content::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 3px;
+}
+
+.quiz-content::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+/* Better touch targets for mobile */
+@media (max-width: 640px) {
+  .quiz-option-button {
+    min-height: 48px; /* Minimum touch target size */
+  }
+  
+  .quiz-nav-button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Improved image display */
+.quiz-image {
+  max-height: 50vh;
+  object-fit: contain;
+  width: 100%;
+  height: auto;
+}
+
+/* Better focus states for accessibility */
+.quiz-button:focus {
+  outline: 2px solid #3B82F6;
+  outline-offset: 2px;
+}
+
+/* Animation for question transitions */
+.question-transition {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Responsive text sizing */
+@media (max-width: 480px) {
+  .quiz-question-text {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  .quiz-option-text {
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .quiz-question-text {
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+  
+  .quiz-option-text {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+}
+
+@media (min-width: 769px) {
+  .quiz-question-text {
+    font-size: 1.25rem;
+    line-height: 1.7;
+  }
+  
+  .quiz-option-text {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+}
+
+/* Better spacing for different screen sizes */
+.quiz-container {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Question content scrolling */
+.quiz-question-content {
+  max-height: calc(100vh - 300px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #e2e8f0 #f8fafc;
+}
+
+.quiz-question-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.quiz-question-content::-webkit-scrollbar-track {
+  background: #f8fafc;
+  border-radius: 2px;
+}
+
+.quiz-question-content::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 2px;
+}
+
+.quiz-question-content::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e0;
+}
+
+/* Ensure text wraps properly in long questions */
+.quiz-question-text {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.quiz-option-text {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+/* Improved button hover states */
+.quiz-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.quiz-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Better loading animation */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Improved progress bar */
+.progress-bar {
+  transition: width 0.5s ease-out;
+}
+
+/* Better mobile navigation */
+@media (max-width: 640px) {
+  .mobile-nav {
+    padding: 0.75rem;
+  }
+  
+  .mobile-nav-button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .tablet-layout {
+    max-width: 90%;
+  }
+}
+
+/* Desktop optimizations */
+@media (min-width: 1025px) {
+  .desktop-layout {
+    max-width: 1024px;
+  }
+}
+
+/* High DPI display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .quiz-image {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Dark mode support (if needed in future) */
+@media (prefers-color-scheme: dark) {
+  .quiz-dark-mode {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: #f1f5f9;
+  }
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .question-transition,
+  .quiz-button,
+  .progress-bar {
+    transition: none;
+  }
+  
+  .loading-spinner {
+    animation: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .quiz-navigation,
+  .quiz-timer,
+  .quiz-footer {
+    display: none;
+  }
+  
+  .quiz-content {
+    background: white;
+    color: black;
+  }
+}

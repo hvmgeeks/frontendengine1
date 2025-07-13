@@ -1,149 +1,115 @@
 import React, { useState } from "react";
-import axios from "axios";
-import "./index.css"; // Import the custom CSS
-import { chatWithChatGPT, uploadImg } from "../../../apicalls/chat";
-import ContentRenderer from "../../../components/ContentRenderer";
 
-function ChatGPTIntegration() {
-  const [messages, setMessages] = useState([]);
-  const [prompt, setPrompt] = useState("");
-  const [imageFile, setImageFile] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+function BrainwaveAI() {
+  const [messages, setMessages] = useState([
+    { role: "assistant", content: "Hello! I'm Brainwave AI. How can I help you?" }
+  ]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleChat = async () => {
-    if (!prompt.trim() && !imageFile) return;
+  const sendMessage = () => {
+    if (!input.trim()) return;
 
-    setIsLoading(true);
+    const userMsg = input.trim();
+    setInput("");
+    setLoading(true);
 
-    try {
-      let imageUrl = null;
+    setMessages(prev => [...prev, { role: "user", content: userMsg }]);
 
-      // Step 1: Upload the image to the server (if an image is selected)
-      if (imageFile) {
-        const formData = new FormData();
-        formData.append("image", imageFile);
-
-        const data = await uploadImg(formData);
-
-        if (data?.success) {
-          imageUrl = data.url; // Extract the S3 URL
-          console.log("Image URL: ", imageUrl);
-        } else {
-          throw new Error("Image upload failed");
-        }
-      }
-
-      // Step 2: Construct the ChatGPT message payload
-      const userMessage = imageUrl
-        ? {
-          role: "user",
-          content: [
-            { type: "text", text: prompt },
-            { type: "image_url", image_url: { url: imageUrl } },
-          ],
-        }
-        : { role: "user", content: prompt };
-
-      const updatedMessages = [...messages, userMessage];
-      setMessages(updatedMessages);
-      setPrompt("");
-
-      // Step 3: Send the payload to ChatGPT
-      const chatPayload = { messages: updatedMessages };
-
-      const chatRes = await chatWithChatGPT(chatPayload);
-
-      const apiResponse = chatRes?.data;
-      console.log("API Response: ", apiResponse);
-
-      // Step 4: Append the assistant's response to the conversation
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: apiResponse },
-      ]);
-
-      setImageFile(null);
-    } catch (error) {
-      console.error("Error during chat:", error);
-      alert("An error occurred while processing your request. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleKeyPress = (event) => {
-    if (event.key === "Enter") {
-      handleChat(); // Trigger the handleChat function on Enter key
-    }
+    setTimeout(() => {
+      setMessages(prev => [...prev, { role: "assistant", content: "I received your message: " + userMsg }]);
+      setLoading(false);
+    }, 1000);
   };
 
   return (
-    <div className="chat-container">
-      {/* Chat messages */}
-      <div className="chat-messages">
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`message ${msg.role === "user" ? "user-message" : "assistant-message"
-              }`}
-          >
-            <>
-              {msg.role === "assistant" ? (
-                <>
-                  {msg?.content ? (
-                    <ContentRenderer text={msg.content} />
-                  ) : (
-                    <p>Unable to get a response from AI</p>
-                  )}
-                </>
-              ) : (
-                <>
-                  {typeof msg.content === "string"
-                    ? msg.content
-                    : msg.content.map((item, idx) =>
-                      item.type === "text" ? (
-                        <p key={idx}>{item.text}</p>
-                      ) : (
-                        <img
-                          key={idx}
-                          src={item.image_url.url}
-                          alt="User content"
-                          style={{ height: "100px" }}
-                        />
-                      )
-                    )}
-                </>
-              )}
-            </>
-          </div>
-        ))}
-        {isLoading && <div className="loading-indicator">Loading...</div>}
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#f0f9ff' }}>
+      <div style={{ background: 'white', padding: '20px', borderBottom: '1px solid #e5e7eb' }}>
+        <h1 style={{ margin: 0, color: '#1f2937', fontSize: '24px', fontWeight: 'bold' }}>Brainwave AI</h1>
+        <p style={{ margin: 0, color: '#6b7280', fontSize: '14px' }}>Your intelligent study assistant</p>
       </div>
 
-      {/* Input and upload */}
-      <div className="chat-input-container">
-        <textarea
-          className="chat-input"
-          placeholder="Type your message here..."
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-        ></textarea>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setImageFile(e.target.files[0])}
-          style={{ width: "200px", borderRadius: "5px", marginRight: "10px" }}
-        />
-        <button
-          disabled={isLoading}
-          className="send-button"
-          onClick={handleChat}
-        >
-          Send
-        </button>
+      <div style={{ flex: 1, padding: '20px', overflow: 'auto', maxWidth: '800px', margin: '0 auto', width: '100%' }}>
+        {messages.map((msg, index) => (
+          <div key={index} style={{ marginBottom: '20px', display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
+            <div style={{
+              background: msg.role === 'user' ? '#3b82f6' : 'white',
+              color: msg.role === 'user' ? 'white' : '#1f2937',
+              padding: '16px',
+              borderRadius: '16px',
+              maxWidth: '70%',
+              border: msg.role === 'assistant' ? '1px solid #e5e7eb' : 'none',
+              boxShadow: msg.role === 'assistant' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+              wordWrap: 'break-word'
+            }}>
+              {msg.content}
+            </div>
+          </div>
+        ))}
+
+        {loading && (
+          <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'flex-start' }}>
+            <div style={{
+              background: 'white',
+              padding: '16px',
+              borderRadius: '16px',
+              maxWidth: '70%',
+              border: '1px solid #e5e7eb',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+            }}>
+              Typing...
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div style={{ background: 'white', padding: '20px', borderTop: '1px solid #e5e7eb' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', gap: '12px' }}>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+            placeholder="Ask me anything..."
+            style={{
+              flex: 1,
+              padding: '12px 16px',
+              border: '1px solid #d1d5db',
+              borderRadius: '12px',
+              outline: 'none',
+              fontSize: '16px',
+              fontFamily: 'inherit'
+            }}
+          />
+          <button
+            onClick={sendMessage}
+            disabled={loading || !input.trim()}
+            style={{
+              padding: '12px 24px',
+              background: loading || !input.trim() ? '#e5e7eb' : '#3b82f6',
+              color: loading || !input.trim() ? '#9ca3af' : 'white',
+              border: 'none',
+              borderRadius: '12px',
+              cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
+              fontSize: '16px',
+              fontWeight: '500',
+              fontFamily: 'inherit'
+            }}
+          >
+            {loading ? 'Sending...' : 'Send'}
+          </button>
+        </div>
+        <p style={{
+          textAlign: 'center',
+          margin: '12px 0 0 0',
+          fontSize: '12px',
+          color: '#6b7280'
+        }}>
+          Press Enter to send your message
+        </p>
       </div>
     </div>
   );
 }
 
-export default ChatGPTIntegration;
+export default BrainwaveAI;

@@ -1,107 +1,216 @@
+/* Modern Profile Styles */
 .Profile {
-    display: flex;
-    flex-direction: column;
-    padding-bottom: 20px;
-}
+    /* Remove old styles and use modern Tailwind classes in JSX */
 
-.Profile .input-container {
-    margin-bottom: 20px;
-}
+    /* Custom form styling */
+    .form-group {
+        @apply relative;
+    }
 
-.Profile .flex-row {
-    justify-content: space-evenly;
-    padding: 10px 0px;
-    margin-bottom: 40px;
-}
+    .form-group input:focus {
+        @apply outline-none;
+    }
 
-.Profile .label {
-    font-weight: bolder;
-}
+    .form-group label {
+        @apply transition-all duration-300;
+    }
 
-.Profile .input {
-    padding: 7px 5px;
-    width: 90%;
-    border-radius: 5px;
-    border: 2px solid grey;
-    margin-top: 5px;
-    cursor: text;
-}
+    .form-group input:focus + label,
+    .form-group input:not(:placeholder-shown) + label {
+        @apply transform -translate-y-2 scale-75 text-blue-600;
+    }
 
-.Profile .btn {
-    border-radius: 5px;
-    padding: 0px 25px;
-    background-color: whitesmoke;
-}
+    /* Modern button styles */
+    .modern-btn {
+        @apply inline-flex items-center px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105;
+    }
 
-.Profile .btn-mt {
-    margin-top: 20px;
-}
+    .modern-btn-primary {
+        @apply bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl;
+    }
 
-.Profile .btn:hover {
-    cursor: pointer;
-    background-color: rgb(204, 204, 204);
-}
+    .modern-btn-secondary {
+        @apply bg-gray-100 text-gray-700 hover:bg-gray-200;
+    }
 
-.Profile .btns-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-}
+    .modern-btn-success {
+        @apply bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl;
+    }
 
-.Profile .profile-picture-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
-}
+    /* Profile picture enhancements */
+    .profile-picture-modern {
+        @apply relative overflow-hidden transition-all duration-300 transform hover:scale-105;
+    }
 
-.Profile .profile-picture {
-    position: relative;
-    width: 150px;
-    height: 150px;
-    border: 1px solid gray;
-    border-radius: 50%;
-    overflow: hidden;
-    cursor: pointer;
-}
+    .profile-picture-modern::after {
+        content: '';
+        @apply absolute inset-0 rounded-full ring-4 ring-blue-100 ring-opacity-50 transition-all duration-300;
+    }
 
-.Profile .profile-picture img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+    .profile-picture-modern:hover::after {
+        @apply ring-blue-300 ring-opacity-75;
+    }
 
-.Profile .profile-picture span {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #333;
-    font-weight: bold;
-}
+    /* Card hover effects */
+    .profile-card {
+        @apply transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl;
+    }
 
-.Profile .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #fff;
-    font-size: 16px;
-    cursor: pointer;
-}
+    /* Stats cards */
+    .stat-card {
+        @apply bg-gradient-to-br from-white to-gray-50 rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300;
+    }
 
-.Profile .overlay:hover {
-    background: rgba(0, 0, 0, 0.7);
+    .stat-card:hover {
+        @apply transform -translate-y-1;
+    }
+
+    /* Form animations */
+    .form-slide-in {
+        @apply animate-fade-in-up;
+    }
+
+    @keyframes fade-in-up {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in-up {
+        animation: fade-in-up 0.6s ease-out;
+    }
+
+    /* Input focus effects */
+    .input-modern {
+        @apply transition-all duration-300 border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none;
+    }
+
+    .input-modern:disabled {
+        @apply bg-gray-50 cursor-not-allowed;
+    }
+
+    /* Success states */
+    .success-message {
+        @apply bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg;
+    }
+
+    /* Error states */
+    .error-message {
+        @apply bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg;
+    }
 }
 
 @media only screen and (max-width: 768px) {
     .Profile .ranking-data {
         font-size: 18px;
+    }
+}
+
+/* Subscription Section Enhancements */
+.subscription-timeline {
+    background: linear-gradient(135deg, #f0f9ff 0%, #ecfdf5 100%);
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+.subscription-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.subscription-stat-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.subscription-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.progress-bar-container {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background-color: #f3f4f6;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%);
+    border-radius: 6px;
+    transition: width 0.5s ease;
+}
+
+/* Subscription status indicators */
+.status-active {
+    animation: pulse-green 2s infinite;
+}
+
+@keyframes pulse-green {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.days-warning {
+    color: #f59e0b !important;
+    font-weight: 600;
+}
+
+.days-critical {
+    color: #ef4444 !important;
+    font-weight: 700;
+    animation: pulse-red 1s infinite;
+}
+
+@keyframes pulse-red {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+/* Responsive adjustments for subscription section */
+@media (max-width: 768px) {
+    .subscription-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .subscription-stat-card {
+        padding: 0.75rem;
+    }
+
+    .subscription-stat-card .text-lg {
+        font-size: 1rem;
+    }
+
+    .subscription-timeline {
+        padding: 0.75rem;
     }
 }

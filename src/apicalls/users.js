@@ -9,12 +9,15 @@ export const registerUser = async (payload) => {
     }
 }
 
+
+
 export const sendOTP = async (payload) => {
     try {
-        const response = await axiosInstance.post('/api/users/otp', payload);
+        const response = await axiosInstance.post('/api/users/generate-otp', payload);
         return response.data;
     } catch (error) {
-        return error.response.data;
+        // Return the error object so we can handle it properly in the component
+        throw error;
     }
 }
 
@@ -58,10 +61,23 @@ export const getUserInfo = async () => {
 
 export const updateUserInfo = async (payload) => {
     try {
+        console.log('🔄 Making API call to update user info:', payload);
         const response = await axiosInstance.post('/api/users/update-user-info', payload);
+        console.log('✅ API call successful:', response.data);
         return response.data;
     } catch (error) {
-        return error.response.data;
+        console.error('❌ API call failed:', {
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            message: error.message
+        });
+
+        // Return error response data if available, otherwise throw the error
+        if (error.response?.data) {
+            return error.response.data;
+        }
+        throw error;
     }
 }
 

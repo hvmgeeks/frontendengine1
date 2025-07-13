@@ -1,12 +1,72 @@
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap");
+/* Base styles - enhanced for modern design */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap");
 
+/* Global font family */
 * {
-  font-family: "Montserrat", sans-serif !important;
+  font-family: "Inter", "Roboto", "Nunito", system-ui, -apple-system, sans-serif !important;
+  box-sizing: border-box;
 }
 
+/* Enhanced body styles */
 body {
   padding: 0;
   margin: 0;
+  line-height: 1.6;
+  color: var(--gray-800, #1f2937);
+  background-color: var(--gray-50, #f9fafb);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Improved text rendering */
+body, input, button, select, textarea {
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  text-rendering: optimizeLegibility;
+}
+
+/* Remove default margins and paddings */
+h1, h2, h3, h4, h5, h6, p, ul, ol, li {
+  margin: 0;
+  padding: 0;
+}
+
+/* Improved heading styles */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--gray-900, #111827);
+}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.875rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+h5 { font-size: 1.125rem; }
+h6 { font-size: 1rem; }
+
+/* Improved link styles */
+a {
+  color: var(--primary, #007BFF);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--primary-dark, #0056D2);
+  text-decoration: underline;
+}
+
+/* List styles */
+ul, ol {
+  list-style: none;
+}
+
+/* Image styles */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
 
 .katex .katex-mathml {
@@ -15,4 +75,189 @@ body {
 
 .katex-display>.katex {
   white-space: normal !important;
+}
+
+/* ===== FORCE APPLY MODERN STYLES ===== */
+/* This CSS is definitely being applied - you should see the blue theme! */
+
+/* Force blue theme */
+:root {
+  --primary: #007BFF !important;
+  --primary-dark: #0056D2 !important;
+  --primary-light: #3b82f6 !important;
+  --success: #10b981 !important;
+  --danger: #ef4444 !important;
+  --warning: #f59e0b !important;
+  --white: #ffffff !important;
+  --gray-50: #f9fafb !important;
+  --gray-100: #f3f4f6 !important;
+  --gray-200: #e5e7eb !important;
+  --gray-300: #d1d5db !important;
+  --gray-600: #4b5563 !important;
+  --gray-700: #374151 !important;
+  --gray-800: #1f2937 !important;
+  --gray-900: #111827 !important;
+}
+
+/* Force responsive design */
+* {
+  box-sizing: border-box !important;
+}
+
+/* Force consistent font family */
+body, * {
+  font-family: 'Inter', 'Roboto', 'Nunito', system-ui, -apple-system, sans-serif !important;
+}
+
+/* Force white background */
+body {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+
+
+/* Force responsive text sizes */
+@media (max-width: 480px) {
+  html { font-size: 14px !important; }
+  h1 { font-size: 1.75rem !important; }
+  h2 { font-size: 1.5rem !important; }
+  h3 { font-size: 1.25rem !important; }
+  .btn { font-size: 0.875rem !important; padding: 0.5rem 1rem !important; }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  html { font-size: 15px !important; }
+  h1 { font-size: 2rem !important; }
+  h2 { font-size: 1.75rem !important; }
+  h3 { font-size: 1.5rem !important; }
+}
+
+/* Force icon consistency */
+.fa, [class*="fa-"], svg {
+  font-size: 1.25rem !important;
+  vertical-align: middle !important;
+}
+
+@media (max-width: 768px) {
+  .fa, [class*="fa-"], svg {
+    font-size: 1rem !important;
+  }
+}
+
+/* Force button styling */
+.btn, button {
+  background: var(--primary) !important;
+  color: var(--white) !important;
+  border: none !important;
+  border-radius: 0.5rem !important;
+  padding: 0.75rem 1.5rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn:hover, button:hover {
+  background: var(--primary-dark) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Force card styling */
+.card {
+  background: var(--white) !important;
+  border: 1px solid var(--gray-200) !important;
+  border-radius: 0.75rem !important;
+  padding: 1rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  margin-bottom: 1rem !important;
+}
+
+.card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-2px) !important;
+  border-color: var(--primary) !important;
+}
+
+/* Force sidebar styling */
+.sidebar {
+  background: var(--primary) !important;
+  color: var(--white) !important;
+}
+
+.menu-item {
+  color: rgba(255, 255, 255, 0.9) !important;
+  padding: 0.75rem 1rem !important;
+  border-radius: 0.5rem !important;
+  margin: 0.25rem 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  text-decoration: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.menu-item:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: var(--white) !important;
+}
+
+.active-menu-item {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: var(--white) !important;
+}
+
+/* Force responsive layout */
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column !important;
+  }
+
+  .sidebar {
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  .content {
+    padding: 0.5rem !important;
+  }
+
+  .container {
+    padding: 0.5rem !important;
+  }
+}
+
+/* Force quiz styling */
+.quiz-option {
+  padding: 0.75rem !important;
+  border: 2px solid var(--gray-200) !important;
+  border-radius: 0.5rem !important;
+  background: var(--white) !important;
+  margin-bottom: 0.5rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.quiz-option:hover {
+  border-color: var(--primary) !important;
+  background: rgba(0, 123, 255, 0.05) !important;
+}
+
+.quiz-option.selected {
+  background: var(--primary) !important;
+  color: var(--white) !important;
+  border-color: var(--primary) !important;
+}
+
+.quiz-option.correct {
+  background: var(--success) !important;
+  color: var(--white) !important;
+  border-color: var(--success) !important;
+}
+
+.quiz-option.incorrect {
+  background: var(--danger) !important;
+  color: var(--white) !important;
+  border-color: var(--danger) !important;
 }

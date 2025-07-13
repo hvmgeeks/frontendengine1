@@ -1,7 +1,63 @@
+/* Modern Ranking Page Styles */
 .Ranking {
     padding-bottom: 40px;
 }
 
+/* Animated Blob Effects */
+@keyframes blob {
+    0% {
+        transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+        transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+        transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+        transform: translate(0px, 0px) scale(1);
+    }
+}
+
+.animate-blob {
+    animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+    animation-delay: 4s;
+}
+
+/* Find Me Highlight Effect */
+.find-me-highlight {
+    animation: findMePulse 2s ease-in-out;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+    border: 2px solid #ffd700;
+}
+
+@keyframes findMePulse {
+    0%, 100% {
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 50px rgba(255, 215, 0, 1);
+        transform: scale(1.02);
+    }
+}
+
+/* Glassmorphism Effects */
+.glass-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+}
+
+/* Legacy styles for backward compatibility */
 .Ranking .leaderboard {
     border: 4px solid #6cb1fb;
     border-radius: 10px;
@@ -66,6 +122,1379 @@
 
 .Ranking .flex {
     display: flex;
+}
+
+/* ===== AMAZING RANKING PAGE ENHANCEMENTS ===== */
+
+/* Gradient text animation */
+@keyframes gradient-x {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient-x {
+  animation: gradient-x 3s ease infinite;
+}
+
+.bg-300\% {
+  background-size: 300% 300%;
+}
+
+.bg-400\% {
+  background-size: 400% 400%;
+}
+
+/* Enhanced gradient animations */
+@keyframes rainbow-flow {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 100% 50%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
+  }
+}
+
+.animate-rainbow-flow {
+  animation: rainbow-flow 6s ease-in-out infinite;
+}
+
+/* Floating particles animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Pulse glow effect */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(168, 85, 247, 0.8);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Shimmer effect for cards */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Tier-specific glows */
+.legendary-glow {
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.6), 0 0 60px rgba(236, 72, 153, 0.4);
+}
+
+.diamond-glow {
+  box-shadow: 0 0 30px rgba(34, 211, 238, 0.6), 0 0 60px rgba(59, 130, 246, 0.4);
+}
+
+.platinum-glow {
+  box-shadow: 0 0 30px rgba(156, 163, 175, 0.6), 0 0 60px rgba(107, 114, 128, 0.4);
+}
+
+.gold-glow {
+  box-shadow: 0 0 30px rgba(251, 191, 36, 0.6), 0 0 60px rgba(245, 158, 11, 0.4);
+}
+
+.silver-glow {
+  box-shadow: 0 0 30px rgba(156, 163, 175, 0.6), 0 0 60px rgba(107, 114, 128, 0.4);
+}
+
+.bronze-glow {
+  box-shadow: 0 0 30px rgba(251, 146, 60, 0.6), 0 0 60px rgba(249, 115, 22, 0.4);
+}
+
+/* Hover effects */
+.hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Enhanced glass morphism */
+.glass-card-enhanced {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Loading animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Text glow effects */
+.text-glow {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.text-glow-purple {
+  text-shadow: 0 0 20px rgba(168, 85, 247, 0.8);
+}
+
+.text-glow-gold {
+  text-shadow: 0 0 20px rgba(251, 191, 36, 0.8);
+}
+
+/* Button hover effects */
+.btn-hover-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-hover-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.btn-hover-glow:hover::before {
+  left: 100%;
+}
+
+/* Rank badge animations */
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.6s ease-out;
+}
+
+/* Podium specific styles */
+.podium-first {
+  transform: scale(1.1);
+  z-index: 3;
+}
+
+.podium-second {
+  z-index: 2;
+}
+
+.podium-third {
+  z-index: 1;
+}
+
+/* Achievement badge styles */
+.achievement-badge {
+  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  color: #1a1a1a;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+}
+
+/* Subscription status indicators */
+.status-premium {
+  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  color: #1a1a1a;
+}
+
+.status-free {
+  background: linear-gradient(45deg, #6b7280, #9ca3af);
+  color: white;
+}
+
+.status-expired {
+  background: linear-gradient(45deg, #ef4444, #f87171);
+  color: white;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #8b5cf6, #ec4899);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, #7c3aed, #db2777);
+}
+
+/* ===== CONSISTENT PROFILE PICTURE SIZING ===== */
+
+/* FORCE ALL PROFILE PICTURES TO BE TINY CIRCLES - AGGRESSIVE OVERRIDE */
+.ranking-page .w-8.h-8,
+.ranking-page .w-10.h-10,
+.ranking-page .w-12.h-12,
+.ranking-page .w-14.h-14,
+.ranking-page .w-16.h-16,
+.ranking-page .w-20.h-20,
+.ranking-page .w-24.h-24,
+.ranking-page .w-32.h-32 {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
+}
+
+/* Force ALL profile picture images to be tiny */
+.ranking-page img,
+.ranking-page img[alt*="name"],
+.ranking-page [class*="profile"] img,
+.ranking-page .rounded-full img,
+.ranking-page div[class*="rounded-full"] img {
+  width: 32px !important;
+  height: 32px !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  border-radius: 50% !important;
+}
+
+/* Champion gets only slightly larger - still tiny */
+.ranking-page .w-12.h-12 img,
+.ranking-page .w-14.h-14 img {
+  width: 36px !important;
+  height: 36px !important;
+  max-width: 36px !important;
+  max-height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+}
+
+/* AGGRESSIVE OVERRIDE - FORCE TINY PICTURES ON TABLETS AND LAPTOPS */
+@media (min-width: 641px) {
+  .ranking-page .w-8.h-8,
+  .ranking-page .w-10.h-10,
+  .ranking-page .w-12.h-12,
+  .ranking-page .w-14.h-14,
+  .ranking-page .w-16.h-16,
+  .ranking-page .w-20.h-20,
+  .ranking-page .w-24.h-24,
+  .ranking-page .w-32.h-32 {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    max-width: 32px !important;
+    max-height: 32px !important;
+  }
+
+  .ranking-page img,
+  .ranking-page img[alt*="name"],
+  .ranking-page [class*="profile"] img,
+  .ranking-page .rounded-full img,
+  .ranking-page div[class*="rounded-full"] img {
+    width: 32px !important;
+    height: 32px !important;
+    max-width: 32px !important;
+    max-height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+  }
+
+  .ranking-page .w-12.h-12 img,
+  .ranking-page .w-14.h-14 img {
+    width: 36px !important;
+    height: 36px !important;
+    max-width: 36px !important;
+    max-height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .ranking-page .w-8.h-8,
+  .ranking-page .w-10.h-10,
+  .ranking-page .w-12.h-12,
+  .ranking-page .w-14.h-14,
+  .ranking-page .w-16.h-16,
+  .ranking-page .w-20.h-20,
+  .ranking-page .w-24.h-24,
+  .ranking-page .w-32.h-32 {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    max-width: 32px !important;
+    max-height: 32px !important;
+  }
+
+  .ranking-page img,
+  .ranking-page img[alt*="name"],
+  .ranking-page [class*="profile"] img,
+  .ranking-page .rounded-full img,
+  .ranking-page div[class*="rounded-full"] img {
+    width: 32px !important;
+    height: 32px !important;
+    max-width: 32px !important;
+    max-height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+  }
+
+  .ranking-page .w-12.h-12 img,
+  .ranking-page .w-14.h-14 img {
+    width: 36px !important;
+    height: 36px !important;
+    max-width: 36px !important;
+    max-height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+  }
+}
+
+/* Ensure all profile pictures are perfectly circular */
+.ranking-page img[alt*="name"],
+.ranking-page .rounded-full img,
+.ranking-page [class*="profile"] img {
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Force circular containers */
+.ranking-page .rounded-full {
+  border-radius: 50% !important;
+}
+
+/* ===== MOBILE-FIRST RESPONSIVE DESIGN ===== */
+
+/* Mobile (320px - 640px) */
+@media (max-width: 640px) {
+  .animate-blob {
+    animation-duration: 10s;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px) scale(1.01);
+  }
+
+  /* Reduce particle count on mobile */
+  .floating-particles {
+    display: none;
+  }
+
+  /* Optimize text sizes */
+  .text-5xl {
+    font-size: 2.5rem !important;
+  }
+
+  .text-6xl {
+    font-size: 3rem !important;
+  }
+
+  .text-8xl {
+    font-size: 4rem !important;
+  }
+
+  /* Optimize spacing */
+  .py-12 {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  .py-16 {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+  }
+
+  .py-20 {
+    padding-top: 4rem !important;
+    padding-bottom: 4rem !important;
+  }
+
+  /* Optimize podium for mobile */
+  .podium-first {
+    transform: scale(1.05);
+  }
+
+  /* Optimize cards for mobile */
+  .glass-card-enhanced {
+    backdrop-filter: blur(10px);
+  }
+
+  /* Enhanced Mobile Optimizations for Ranking Page */
+  .ranking-page {
+    padding: 0 !important;
+    min-height: 100vh;
+  }
+
+  /* Header optimizations */
+  .ranking-page .px-3 {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .ranking-page .py-4 {
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
+  }
+
+  /* Podium optimizations */
+  .ranking-page .max-w-4xl {
+    max-width: 100% !important;
+    padding: 0 8px !important;
+  }
+
+  /* Profile pictures remain consistently small on tablets */
+
+  /* Second and third place grid */
+  .ranking-page .grid-cols-2 {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* Ranking cards */
+  .ranking-card {
+    margin: 0 8px 12px 8px !important;
+    padding: 12px !important;
+    border-radius: 12px !important;
+    min-height: 80px !important;
+  }
+
+  .ranking-card h3 {
+    font-size: 14px !important;
+    line-height: 1.3 !important;
+  }
+
+  .ranking-card .text-sm {
+    font-size: 11px !important;
+  }
+
+  .ranking-card .text-xs {
+    font-size: 10px !important;
+  }
+
+  /* Profile pictures are now consistently sized via main rules */
+
+  /* Text size adjustments */
+  .ranking-page .text-2xl {
+    font-size: 1.25rem !important;
+  }
+
+  .ranking-page .text-3xl {
+    font-size: 1.5rem !important;
+  }
+
+  .ranking-page .text-4xl {
+    font-size: 1.75rem !important;
+  }
+
+  .ranking-page .text-xl {
+    font-size: 1rem !important;
+  }
+
+  .ranking-page .text-lg {
+    font-size: 0.9rem !important;
+  }
+
+  /* Button optimizations */
+  .ranking-page button {
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+  }
+
+  /* Spacing optimizations */
+  .ranking-page .mb-12 {
+    margin-bottom: 24px !important;
+  }
+
+  .ranking-page .mt-16 {
+    margin-top: 32px !important;
+  }
+
+  .ranking-page .gap-6 {
+    gap: 12px !important;
+  }
+
+  .ranking-page .p-6 {
+    padding: 16px !important;
+  }
+
+  /* Crown and badge adjustments */
+  .ranking-page .w-12.h-12 {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .ranking-page .w-8.h-8 {
+    width: 24px !important;
+    height: 24px !important;
+  }
+}
+
+/* Tablet (641px - 1024px) */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .hover-lift:hover {
+    transform: translateY(-6px) scale(1.015);
+  }
+
+  /* Enhanced Tablet Optimizations for Ranking Page */
+  .ranking-page {
+    padding: 0 24px !important;
+    min-height: 100vh;
+  }
+
+  /* Header optimizations */
+  .ranking-page .px-3,
+  .ranking-page .px-4,
+  .ranking-page .px-6 {
+    padding-left: 32px !important;
+    padding-right: 32px !important;
+  }
+
+  .ranking-page .py-4,
+  .ranking-page .py-6 {
+    padding-top: 32px !important;
+    padding-bottom: 32px !important;
+  }
+
+  /* Podium container optimizations */
+  .ranking-page .max-w-4xl {
+    max-width: 85% !important;
+    padding: 0 24px !important;
+  }
+
+  /* Champion podium card */
+  .ranking-page .p-6 {
+    padding: 32px !important;
+  }
+
+  /* Second and third place grid - maintain 2 columns */
+  .ranking-page .grid-cols-1.sm\\:grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 24px !important;
+  }
+
+  .ranking-page .max-w-2xl {
+    max-width: 100% !important;
+  }
+
+  /* Ranking cards optimizations */
+  .ranking-card {
+    margin: 0 16px 20px 16px !important;
+    padding: 20px !important;
+    border-radius: 20px !important;
+    min-height: 100px !important;
+  }
+
+  /* Text size optimizations */
+  .ranking-page .text-2xl {
+    font-size: 1.75rem !important;
+  }
+
+  .ranking-page .text-3xl {
+    font-size: 2.25rem !important;
+  }
+
+  .ranking-page .text-4xl {
+    font-size: 2.75rem !important;
+  }
+
+  .ranking-page .text-xl {
+    font-size: 1.25rem !important;
+  }
+
+  .ranking-page .text-lg {
+    font-size: 1.125rem !important;
+  }
+
+  /* Button optimizations */
+  .ranking-page button {
+    padding: 12px 24px !important;
+    font-size: 16px !important;
+  }
+
+  /* Spacing optimizations */
+  .ranking-page .mb-6 {
+    margin-bottom: 32px !important;
+  }
+
+  .ranking-page .mb-8 {
+    margin-bottom: 40px !important;
+  }
+
+  .ranking-page .mb-12 {
+    margin-bottom: 48px !important;
+  }
+
+  .ranking-page .mt-16 {
+    margin-top: 64px !important;
+  }
+
+  .ranking-page .gap-4,
+  .ranking-page .gap-6 {
+    gap: 24px !important;
+  }
+
+  /* Enhanced animations */
+  .ranking-page .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+  }
+
+  /* Grid optimizations */
+  .grid-cols-4 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .grid-cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  /* Enhanced glass morphism */
+  .ranking-page .backdrop-blur-lg {
+    backdrop-filter: blur(16px) !important;
+  }
+
+  /* Crown and badge sizing */
+  .ranking-page .w-12.h-12:not([class*="profile"]) {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  .ranking-page .w-8.h-8 {
+    width: 32px !important;
+    height: 32px !important;
+  }
+}
+
+  /* Ranking cards */
+  .ranking-card {
+    margin: 0 12px 16px 12px !important;
+    padding: 16px !important;
+    border-radius: 16px !important;
+    min-height: 90px !important;
+  }
+
+  .ranking-card h3 {
+    font-size: 16px !important;
+    line-height: 1.4 !important;
+  }
+
+  .ranking-card .text-sm {
+    font-size: 13px !important;
+  }
+
+  .ranking-card .text-xs {
+    font-size: 11px !important;
+  }
+
+  /* Profile pictures are now consistently sized via main rules */
+
+  /* Text size adjustments */
+  .ranking-page .text-2xl {
+    font-size: 1.5rem !important;
+  }
+
+  .ranking-page .text-3xl {
+    font-size: 1.875rem !important;
+  }
+
+  .ranking-page .text-4xl {
+    font-size: 2.25rem !important;
+  }
+
+  .ranking-page .text-xl {
+    font-size: 1.125rem !important;
+  }
+
+  .ranking-page .text-lg {
+    font-size: 1rem !important;
+  }
+
+  /* Button optimizations */
+  .ranking-page button {
+    padding: 10px 20px !important;
+    font-size: 15px !important;
+  }
+
+  /* Spacing optimizations */
+  .ranking-page .mb-12 {
+    margin-bottom: 36px !important;
+  }
+
+  .ranking-page .mt-16 {
+    margin-top: 48px !important;
+  }
+
+  .ranking-page .gap-6 {
+    gap: 20px !important;
+  }
+
+  .ranking-page .p-6 {
+    padding: 24px !important;
+  }
+
+  /* Crown and badge adjustments */
+  .ranking-page .w-12.h-12 {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .ranking-page .w-8.h-8 {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  /* Optimize grid layouts */
+  .grid-cols-4 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Desktop (1025px+) */
+@media (min-width: 1025px) {
+  .hover-lift:hover {
+    transform: translateY(-10px) scale(1.03);
+  }
+
+  /* Enhanced animations for desktop */
+  .animate-blob {
+    animation-duration: 8s;
+  }
+
+  /* Better glass effects on desktop */
+  .glass-card-enhanced {
+    backdrop-filter: blur(25px);
+  }
+
+  /* Enhanced Desktop Optimizations for Ranking Page */
+  .ranking-page {
+    padding: 0 48px !important;
+    min-height: 100vh;
+  }
+
+  /* Header optimizations */
+  .ranking-page .px-3,
+  .ranking-page .px-4,
+  .ranking-page .px-6,
+  .ranking-page .px-8 {
+    padding-left: 48px !important;
+    padding-right: 48px !important;
+  }
+
+  .ranking-page .py-4,
+  .ranking-page .py-6,
+  .ranking-page .py-8,
+  .ranking-page .py-12,
+  .ranking-page .py-16 {
+    padding-top: 64px !important;
+    padding-bottom: 64px !important;
+  }
+
+  /* Podium container optimizations */
+  .ranking-page .max-w-4xl {
+    max-width: 75% !important;
+    padding: 0 32px !important;
+  }
+
+  /* Champion podium card */
+  .ranking-page .p-6 {
+    padding: 48px !important;
+  }
+
+  /* Second and third place grid - maintain 2 columns with better spacing */
+  .ranking-page .grid-cols-1.sm\\:grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 32px !important;
+  }
+
+  .ranking-page .max-w-2xl {
+    max-width: 80% !important;
+  }
+
+  /* Ranking cards optimizations */
+  .ranking-card {
+    margin: 0 24px 24px 24px !important;
+    padding: 24px !important;
+    border-radius: 24px !important;
+    min-height: 120px !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .ranking-card:hover {
+    transform: translateY(-4px) scale(1.02) !important;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3) !important;
+  }
+
+  /* Text size optimizations */
+  .ranking-page .text-2xl {
+    font-size: 2rem !important;
+  }
+
+  .ranking-page .text-3xl {
+    font-size: 2.5rem !important;
+  }
+
+  .ranking-page .text-4xl {
+    font-size: 3rem !important;
+  }
+
+  .ranking-page .text-xl {
+    font-size: 1.5rem !important;
+  }
+
+  .ranking-page .text-lg {
+    font-size: 1.25rem !important;
+  }
+
+  /* Button optimizations */
+  .ranking-page button {
+    padding: 16px 32px !important;
+    font-size: 18px !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .ranking-page button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2) !important;
+  }
+
+  /* Spacing optimizations */
+  .ranking-page .mb-6 {
+    margin-bottom: 48px !important;
+  }
+
+  .ranking-page .mb-8 {
+    margin-bottom: 56px !important;
+  }
+
+  .ranking-page .mb-12 {
+    margin-bottom: 72px !important;
+  }
+
+  .ranking-page .mt-16 {
+    margin-top: 96px !important;
+  }
+
+  .ranking-page .gap-4 {
+    gap: 32px !important;
+  }
+
+  .ranking-page .gap-6 {
+    gap: 40px !important;
+  }
+
+  /* Enhanced animations */
+  .ranking-page .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+  }
+
+  /* Grid optimizations */
+  .grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  /* Enhanced glass morphism */
+  .ranking-page .backdrop-blur-lg {
+    backdrop-filter: blur(24px) !important;
+  }
+
+  .ranking-page .backdrop-blur-xl {
+    backdrop-filter: blur(32px) !important;
+  }
+
+  /* Crown and badge sizing - keep small */
+  .ranking-page .w-8.h-8 {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  /* Enhanced podium layout for desktop */
+  .ranking-page .max-w-2xl.lg\\:max-w-3xl {
+    max-width: 90% !important;
+  }
+
+  /* Better spacing for desktop stats */
+  .ranking-page .space-y-3 > * + * {
+    margin-top: 16px !important;
+  }
+
+  /* Enhanced hover effects for desktop */
+  .ranking-page [class*="motion.div"]:hover {
+    transform: translateY(-8px) scale(1.05) !important;
+  }
+}
+
+  /* Ranking cards */
+  .ranking-card {
+    margin: 0 16px 20px 16px !important;
+    padding: 20px !important;
+    border-radius: 20px !important;
+    min-height: 100px !important;
+  }
+
+  .ranking-card h3 {
+    font-size: 18px !important;
+    line-height: 1.5 !important;
+  }
+
+  .ranking-card .text-sm {
+    font-size: 14px !important;
+  }
+
+  .ranking-card .text-xs {
+    font-size: 12px !important;
+  }
+
+  /* Profile pictures are now consistently sized via main rules */
+
+  /* Enhanced hover effects */
+  .ranking-card:hover {
+    transform: translateY(-4px) scale(1.02) !important;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3) !important;
+  }
+
+  /* Text size adjustments */
+  .ranking-page .text-2xl {
+    font-size: 1.75rem !important;
+  }
+
+  .ranking-page .text-3xl {
+    font-size: 2.25rem !important;
+  }
+
+  .ranking-page .text-4xl {
+    font-size: 2.75rem !important;
+  }
+
+  .ranking-page .text-xl {
+    font-size: 1.25rem !important;
+  }
+
+  .ranking-page .text-lg {
+    font-size: 1.125rem !important;
+  }
+
+  /* Button optimizations */
+  .ranking-page button {
+    padding: 12px 24px !important;
+    font-size: 16px !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .ranking-page button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2) !important;
+  }
+
+  /* Spacing optimizations */
+  .ranking-page .mb-12 {
+    margin-bottom: 48px !important;
+  }
+
+  .ranking-page .mt-16 {
+    margin-top: 64px !important;
+  }
+
+  .ranking-page .gap-6 {
+    gap: 24px !important;
+  }
+
+  .ranking-page .p-6 {
+    padding: 32px !important;
+  }
+
+  /* Crown and badge adjustments */
+  .ranking-page .w-12.h-12 {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  .ranking-page .w-8.h-8 {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  /* Enhanced animations */
+  .ranking-page .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+  }
+
+  /* Grid optimizations */
+  .grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  /* Enhanced glass morphism */
+  .ranking-page .backdrop-blur-lg {
+    backdrop-filter: blur(20px) !important;
+  }
+
+  .ranking-page .backdrop-blur-xl {
+    backdrop-filter: blur(24px) !important;
+  }
+}
+
+/* Large screens (1440px+) */
+@media (min-width: 1440px) {
+  .max-w-7xl {
+    max-width: 90rem !important;
+  }
+
+  /* Enhanced spacing for large screens */
+  .text-8xl {
+    font-size: 8rem !important;
+  }
+}
+
+/* Ultra-wide screens (1920px+) */
+@media (min-width: 1920px) {
+  .max-w-7xl {
+    max-width: 100rem !important;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .glass-card-enhanced {
+    backdrop-filter: blur(30px);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .animate-blob,
+  .animate-gradient-x,
+  .animate-float,
+  .pulse-glow,
+  .shimmer,
+  .animate-spin,
+  .animate-bounce-in {
+    animation: none !important;
+  }
+
+  .hover-lift:hover {
+    transform: none !important;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .glass-card {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-card-enhanced {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+}
+
+/* Print styles */
+@media print {
+  .animate-blob,
+  .floating-particles,
+  .btn-hover-glow {
+    display: none !important;
+  }
+
+  .glass-card,
+  .glass-card-enhanced {
+    background: white !important;
+    border: 1px solid #ccc !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* ===== TEXT CONTRAST IMPROVEMENTS ===== */
+
+/* High contrast text for better visibility */
+.ranking-text-primary {
+  color: #ffffff !important;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.8) !important;
+  font-weight: 800 !important;
+}
+
+.ranking-text-secondary {
+  color: #e5e7eb !important;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+  font-weight: 600 !important;
+}
+
+.ranking-text-accent {
+  color: #fbbf24 !important;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.8) !important;
+  font-weight: 900 !important;
+}
+
+/* Badge improvements */
+.ranking-badge {
+  color: #ffffff !important;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+  font-weight: 700 !important;
+  border: 2px solid rgba(255,255,255,0.3) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.ranking-badge-you {
+  background: linear-gradient(45deg, #fbbf24, #f59e0b) !important;
+  color: #000000 !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important;
+}
+
+/* Profile picture enhancements */
+.ranking-profile-ring {
+  border: 3px solid rgba(255,255,255,0.5) !important;
+  box-shadow: 0 0 20px rgba(255,255,255,0.3) !important;
+}
+
+.ranking-profile-ring-current {
+  border: 4px solid #fbbf24 !important;
+  box-shadow: 0 0 30px rgba(251, 191, 36, 0.6) !important;
+}
+
+/* Rank number improvements */
+.ranking-number {
+  color: #ffffff !important;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.9) !important;
+  font-weight: 900 !important;
+  background: rgba(0,0,0,0.3) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 2px solid rgba(255,255,255,0.3) !important;
+}
+
+/* Stats improvements */
+.ranking-stats {
+  background: rgba(0,0,0,0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  border-radius: 8px !important;
+  padding: 8px !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+}
+
+/* Force high contrast for all ranking text */
+.ranking-page * {
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* ===== SPECTACULAR VISUAL ENHANCEMENTS ===== */
+
+/* Tier-specific background patterns */
+.tier-legendary {
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(147, 51, 234, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(239, 68, 68, 0.2) 0%, transparent 50%);
+}
+
+.tier-diamond {
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(6, 182, 212, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(99, 102, 241, 0.2) 0%, transparent 50%);
+}
+
+.tier-gold {
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(245, 158, 11, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(251, 191, 36, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(252, 211, 77, 0.2) 0%, transparent 50%);
+}
+
+/* Enhanced glow effects */
+.glow-legendary {
+  box-shadow:
+    0 0 20px rgba(147, 51, 234, 0.4),
+    0 0 40px rgba(236, 72, 153, 0.3),
+    0 0 60px rgba(239, 68, 68, 0.2),
+    inset 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.glow-diamond {
+  box-shadow:
+    0 0 20px rgba(6, 182, 212, 0.4),
+    0 0 40px rgba(59, 130, 246, 0.3),
+    0 0 60px rgba(99, 102, 241, 0.2),
+    inset 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.glow-gold {
+  box-shadow:
+    0 0 20px rgba(245, 158, 11, 0.4),
+    0 0 40px rgba(251, 191, 36, 0.3),
+    0 0 60px rgba(252, 211, 77, 0.2),
+    inset 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+/* Animated borders */
+@keyframes border-flow {
+  0%, 100% {
+    border-image-source: linear-gradient(0deg, #FFD700, #FF6B35, #8B5CF6, #06B6D4);
+  }
+  25% {
+    border-image-source: linear-gradient(90deg, #FFD700, #FF6B35, #8B5CF6, #06B6D4);
+  }
+  50% {
+    border-image-source: linear-gradient(180deg, #FFD700, #FF6B35, #8B5CF6, #06B6D4);
+  }
+  75% {
+    border-image-source: linear-gradient(270deg, #FFD700, #FF6B35, #8B5CF6, #06B6D4);
+  }
+}
+
+.animated-border {
+  border: 3px solid;
+  border-image: linear-gradient(45deg, #FFD700, #FF6B35, #8B5CF6, #06B6D4) 1;
+  animation: border-flow 4s linear infinite;
+}
+
+/* Text enhancement effects */
+.text-legendary {
+  background: linear-gradient(45deg, #FFD700, #FF6B35, #8B5CF6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.8));
+}
+
+.text-diamond {
+  background: linear-gradient(45deg, #00FFFF, #3B82F6, #8B5CF6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.8));
+}
+
+.text-gold {
+  background: linear-gradient(45deg, #FFD700, #FFA500, #FF8C00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.8));
+}
+
+/* Particle effects */
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.sparkle-effect::before,
+.sparkle-effect::after {
+  content: '✨';
+  position: absolute;
+  font-size: 1rem;
+  animation: sparkle 2s infinite;
+}
+
+.sparkle-effect::before {
+  top: 10%;
+  right: 10%;
+  animation-delay: 0s;
+}
+
+.sparkle-effect::after {
+  bottom: 10%;
+  left: 10%;
+  animation-delay: 1s;
+}
     align-items: center;
     justify-content: space-between;
     padding: 8px 12px;
@@ -183,4 +1612,165 @@
     transition: background-color 0.3s ease;
     width: 100%;
     font-size: 16px;
+}
+
+/* ===== TIER-SPECIFIC UNIQUE EFFECTS ===== */
+
+/* Diamond Shine Effect */
+@keyframes diamond-shine {
+  0%, 100% {
+    box-shadow:
+      0 0 20px rgba(0, 229, 255, 0.6),
+      0 0 40px rgba(0, 229, 255, 0.4),
+      inset 0 0 20px rgba(0, 229, 255, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 30px rgba(0, 229, 255, 0.8),
+      0 0 60px rgba(0, 229, 255, 0.6),
+      inset 0 0 30px rgba(0, 229, 255, 0.3);
+  }
+}
+
+.diamond-shine {
+  animation: diamond-shine 3s ease-in-out infinite;
+}
+
+/* Silver Shimmer Effect */
+@keyframes silver-shimmer {
+  0%, 100% {
+    box-shadow:
+      0 0 15px rgba(211, 211, 211, 0.5),
+      0 0 30px rgba(211, 211, 211, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 25px rgba(211, 211, 211, 0.7),
+      0 0 50px rgba(211, 211, 211, 0.5);
+  }
+}
+
+.silver-shimmer {
+  animation: silver-shimmer 3.5s ease-in-out infinite;
+}
+
+/* Bronze Warm Effect */
+@keyframes bronze-warm {
+  0%, 100% {
+    box-shadow:
+      0 0 15px rgba(205, 127, 50, 0.5),
+      0 0 30px rgba(205, 127, 50, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 25px rgba(205, 127, 50, 0.7),
+      0 0 50px rgba(205, 127, 50, 0.5);
+  }
+}
+
+.bronze-warm {
+  animation: bronze-warm 4s ease-in-out infinite;
+}
+
+/* Additional animation keyframes */
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Find Me highlight effect */
+.find-me-highlight {
+  animation: find-me-pulse 3s ease-in-out;
+  position: relative;
+}
+
+@keyframes find-me-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+  }
+  25% {
+    box-shadow: 0 0 0 10px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 20px rgba(255, 215, 0, 0.3);
+  }
+  75% {
+    box-shadow: 0 0 0 10px rgba(255, 215, 0, 0.5);
+  }
+}
+
+/* Enhanced profile picture effects */
+.profile-enhanced {
+  position: relative;
+  overflow: visible;
+}
+
+.profile-enhanced::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+  border-radius: 50%;
+  animation: profile-shine 3s linear infinite;
+  z-index: -1;
+}
+
+@keyframes profile-shine {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Enhanced text visibility */
+.text-ultra-visible {
+  text-shadow:
+    2px 2px 4px rgba(0,0,0,0.9),
+    0 0 10px currentColor,
+    0 0 20px currentColor;
+  font-weight: 900 !important;
+  letter-spacing: 0.5px;
+}
+
+/* Position badge enhancements */
+.position-badge {
+  position: relative;
+  overflow: visible;
+}
+
+.position-badge::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(circle, currentColor 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  opacity: 0.3;
+  border-radius: 50%;
+  z-index: -1;
+  animation: position-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes position-glow {
+  0% {
+    opacity: 0.2;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0.4;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
 }

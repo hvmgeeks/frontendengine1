@@ -1,12 +1,31 @@
+/* Theme variables are now defined in modern.css */
+/* This file provides legacy support and additional theme utilities */
+
 :root {
-  --primary: #0F3460;
-  --secondary: #ff5722;
-  --success: #6fbf71;
-  --info: #00bcd4;
-  --warning: #e47943;
-  --danger: #f44336;
-  --light: #f1f1f1;
-  --dark: #212121;
+  /* Legacy support - these are also defined in modern.css */
+  --primary: #007BFF;
+  --primary-dark: #0056D2;
+  --primary-light: #3b82f6;
+  --secondary: #6c757d;
+  --success: #10b981;
+  --info: #06b6d4;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --light: #f8f9fa;
+  --dark: #1f2937;
+
+  /* Additional theme colors */
+  --blue-50: #eff6ff;
+  --blue-100: #dbeafe;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+
+  /* Theme-specific gradients */
+  --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  --gradient-success: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+  --gradient-warning: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+  --gradient-danger: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
 }
 
 .bg-primary{
@@ -25,4 +44,55 @@
 
 .bg-error{
     background-color: var(--warning);
+}
+
+/* Modern Utility Classes */
+.glass-effect {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.gradient-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+}
+
+.gradient-blue {
+    background: linear-gradient(135deg, var(--blue-500) 0%, var(--blue-700) 100%);
+}
+
+.shadow-modern {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-modern-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-blue {
+    box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.15);
+}
+
+.border-modern {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--blue-600) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.transition-modern {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+}
+
+.hover-scale:hover {
+    transform: scale(1.02);
 }

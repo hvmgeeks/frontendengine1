@@ -13,20 +13,20 @@ import { useDispatch } from "react-redux";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
 import { Tabs } from "antd";
 import AddEditQuestion from "./AddEditQuestion";
-import { primarySubjects, secondarySubjects } from "../../../data/Subjects";
+import { primarySubjects, secondarySubjects, advanceSubjects } from "../../../data/Subjects";
 const { TabPane } = Tabs;
 
 function AddEditExam() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [examData, setExamData] = useState(null);
-  const [schoolType, setSchoolType] = useState('');
+  const [level, setLevel] = useState('');
   const [showAddEditQuestionModal, setShowAddEditQuestionModal] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [classValue, setClassValue] = useState('');
   const params = useParams();
 
-  console.log(examData?.questions, "examData?.questions")
+
 
   const onFinish = async (values) => {
     try {
@@ -43,7 +43,30 @@ function AddEditExam() {
       }
       if (response.success) {
         message.success(response.message);
-        navigate("/admin/exams");
+
+        // Dispatch event to notify other components about new exam creation
+        if (!params.id) { // Only for new exams, not edits
+          window.dispatchEvent(new CustomEvent('newExamCreated', {
+            detail: {
+              examName: values.name,
+              level: values.level,
+              timestamp: Date.now()
+            }
+          }));
+
+          // For new exams, navigate to edit mode so user can add questions
+          const newExamId = response.data?._id || response.data?.id;
+          if (newExamId) {
+            dispatch(HideLoading()); // Hide loading before navigation
+            navigate(`/admin/exams/edit/${newExamId}`);
+            return; // Don't continue with the rest of the function
+          }
+        }
+
+        // For edits, stay on the same page and refresh data
+        if (params.id) {
+          getExamData(); // Refresh the exam data
+        }
       } else {
         message.error(response.message);
       }
@@ -57,11 +80,17 @@ function AddEditExam() {
   const getExamData = async () => {
     try {
       dispatch(ShowLoading());
+
+      // Get user data from localStorage for the API call
+      const user = JSON.parse(localStorage.getItem("user"));
+
       const response = await getExamById({
         examId: params.id,
+        userId: user?._id, // Add userId for backend validation
       });
+
       setClassValue(response?.data?.class);
-      setSchoolType(response?.data?.schoolType);
+      setLevel(response?.data?.level);
       dispatch(HideLoading());
       if (response.success) {
         setExamData(response.data);
@@ -122,33 +151,91 @@ function AddEditExam() {
     },
     {
       title: "Correct Answer",
-      dataIndex: "correctOption",
+      dataIndex: "correctAnswer",
       render: (text, record) => {
-        if (record.answerType === "Free Text") {
-          return <div>{record.correctOption}</div>;
+        // Handle both old (correctOption) and new (correctAnswer) formats
+        const correctAnswer = record.correctAnswer || record.correctOption;
+
+        if (record.answerType === "Free Text" || record.type === "fill" || record.type === "text") {
+          return <div>{correctAnswer}</div>;
         } else {
           return (
             <div>
-              {record.correctOption}: {record.options[record.correctOption]}
+              {correctAnswer}: {record.options && record.options[correctAnswer] ? record.options[correctAnswer] : correctAnswer}
             </div>
           );
         }
       },
     },
     {
+      title: "Source",
+      dataIndex: "source",
+      render: (text, record) => (
+        <div className="flex items-center gap-1">
+          {record?.isAIGenerated ? (
+            <span className="flex items-center gap-1 text-blue-600 text-sm">
+              🤖 AI
+            </span>
+          ) : (
+            <span className="text-gray-600 text-sm">Manual</span>
+          )}
+          {(record?.image || record?.imageUrl) && (
+            <span title="Has Image">🖼️</span>
+          )}
+        </div>
+      ),
+    },
+    {
       title: "Action",
       dataIndex: "action",
       render: (text, record) => (
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          {/* Edit Button */}
           <i
-            className="ri-pencil-line"
+            className="ri-pencil-line cursor-pointer text-blue-600 hover:text-blue-800"
+            title="Edit Question"
             onClick={() => {
               setSelectedQuestion(record);
               setShowAddEditQuestionModal(true);
             }}
           ></i>
+
+          {/* Add Image Button for AI-generated questions without images */}
+          {record?.isAIGenerated && !record?.image && !record?.imageUrl && (
+            <i
+              className="ri-image-add-line cursor-pointer text-green-600 hover:text-green-800"
+              title="Add Image to AI Question"
+              onClick={() => {
+                setSelectedQuestion(record);
+                setShowAddEditQuestionModal(true);
+              }}
+            ></i>
+          )}
+
+          {/* AI Generated Indicator */}
+          {record?.isAIGenerated && (
+            <span
+              className="text-blue-500 text-sm"
+              title="AI Generated Question"
+            >
+              🤖
+            </span>
+          )}
+
+          {/* Image Indicator */}
+          {(record?.image || record?.imageUrl) && (
+            <span
+              className="text-green-500 text-sm"
+              title="Has Image"
+            >
+              🖼️
+            </span>
+          )}
+
+          {/* Delete Button */}
           <i
-            className="ri-delete-bin-line"
+            className="ri-delete-bin-line cursor-pointer text-red-600 hover:text-red-800"
+            title="Delete Question"
             onClick={() => {
               deleteQuestion(record._id);
             }}
@@ -158,8 +245,8 @@ function AddEditExam() {
     },
   ];
 
-  const handleSchoolTypeChange = (e) => {
-    setSchoolType(e.target.value);
+  const handleLevelChange = (e) => {
+    setLevel(e.target.value);
     setClassValue(""); // Reset class
   };
 
@@ -169,7 +256,35 @@ function AddEditExam() {
 
   return (
     <div>
-      <PageTitle title={params.id ? "Edit Exam" : "Add Exam"} />
+      {/* Header with Dashboard Shortcut */}
+      <div className="flex items-center justify-between mb-4">
+        <PageTitle title={params.id ? "Edit Exam" : "Add Exam"} />
+
+        {/* Dashboard Shortcut */}
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={() => navigate('/admin')}
+            className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z" />
+            </svg>
+            <span className="font-medium">Dashboard</span>
+          </button>
+
+          <button
+            onClick={() => navigate('/admin/exams')}
+            className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 border border-gray-300"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <span className="font-medium">All Exams</span>
+          </button>
+        </div>
+      </div>
+
       <div className="divider"></div>
 
       {(examData || !params.id) && (
@@ -183,6 +298,11 @@ function AddEditExam() {
                   </Form.Item>
                 </Col>
                 <Col span={8}>
+                  <Form.Item label="Topic" name="topic">
+                    <input type="text" placeholder="Enter quiz topic (e.g., Algebra, Cell Biology)" />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
                   <Form.Item label="Exam Duration (Seconds)" name="duration">
                     <input type="number" />
                   </Form.Item>
@@ -191,13 +311,14 @@ function AddEditExam() {
 
 
                 <Col span={8}>
-                  <Form.Item name="schoolType" label="School Type" initialValue="">
-                    <select value={schoolType} onChange={handleSchoolTypeChange}   >
+                  <Form.Item name="level" label="Level" initialValue="">
+                    <select value={level} onChange={handleLevelChange}   >
                       <option value="" disabled >
-                        Select School Type
+                        Select Level
                       </option>
-                      <option value="primary">Primary</option>
-                      <option value="secondary">Secondary</option>
+                      <option value="Primary">Primary</option>
+                      <option value="Secondary">Secondary</option>
+                      <option value="Advance">Advance</option>
                     </select>
                   </Form.Item>
                 </Col>
@@ -206,7 +327,7 @@ function AddEditExam() {
                   <Form.Item label="Category" name="category">
                     <select name="" id="">
                       <option value="">Select Category</option>
-                      {schoolType === "primary" && (
+                      {level.toLowerCase() === "primary" && (
                         <>
                           {primarySubjects.map((subject, index) => (
                             <option key={index} value={subject}>
@@ -215,9 +336,18 @@ function AddEditExam() {
                           ))}
                         </>
                       )}
-                      {schoolType === "secondary" && (
+                      {level.toLowerCase() === "secondary" && (
                         <>
                           {secondarySubjects.map((subject, index) => (
+                            <option key={index} value={subject}>
+                              {subject}
+                            </option>
+                          ))}
+                        </>
+                      )}
+                      {level.toLowerCase() === "advance" && (
+                        <>
+                          {advanceSubjects.map((subject, index) => (
                             <option key={index} value={subject}>
                               {subject}
                             </option>
@@ -235,7 +365,7 @@ function AddEditExam() {
                       <option value=""  >
                         Select Class
                       </option>
-                      {schoolType === "primary" && (
+                      {level.toLowerCase() === "primary" && (
                         <>
                           <option value="1">1</option>
                           <option value="2">2</option>
@@ -246,12 +376,16 @@ function AddEditExam() {
                           <option value="7">7</option>
                         </>
                       )}
-                      {schoolType === "secondary" && (
+                      {level.toLowerCase() === "secondary" && (
                         <>
                           <option value="Form-1">Form-1</option>
                           <option value="Form-2">Form-2</option>
                           <option value="Form-3">Form-3</option>
                           <option value="Form-4">Form-4</option>
+                        </>
+                      )}
+                      {level.toLowerCase() === "advance" && (
+                        <>
                           <option value="Form-5">Form-5</option>
                           <option value="Form-6">Form-6</option>
                         </>
@@ -285,9 +419,13 @@ function AddEditExam() {
             </TabPane>
             {params.id && (
               <TabPane tab="Questions" key="2">
-                <div className="flex justify-end">
+                <div className="flex justify-between items-center mb-4">
+                  <div>
+                    <h3 className="text-lg font-semibold">Exam Questions</h3>
+                    <p className="text-gray-600">Add and manage questions for this exam</p>
+                  </div>
                   <button
-                    className="primary-outlined-btn"
+                    className="primary-contained-btn"
                     type="button"
                     onClick={() => setShowAddEditQuestionModal(true)}
                   >
@@ -298,6 +436,16 @@ function AddEditExam() {
                 <Table
                   columns={questionsColumns}
                   dataSource={examData?.questions || []}
+                  pagination={{
+                    pageSize: 10,
+                    showSizeChanger: true,
+                    showQuickJumper: true,
+                  }}
+                  locale={{
+                    emptyText: examData?.questions?.length === 0 ?
+                      'No questions added yet. Click "Add Question" to add questions.' :
+                      'Loading questions...'
+                  }}
                 />
               </TabPane>
             )}
@@ -315,6 +463,8 @@ function AddEditExam() {
           setSelectedQuestion={setSelectedQuestion}
         />
       )}
+
+
     </div>
   );
 }

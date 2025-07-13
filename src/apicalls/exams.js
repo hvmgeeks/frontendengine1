@@ -63,6 +63,16 @@ export const deleteExamById = async (payload) => {
   }
 };
 
+// get exam statistics
+export const getExamStats = async (examId) => {
+  try {
+    const response = await axiosInstance.get(`/api/exams/stats/${examId}`);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
 // add question to exam
 
 export const addQuestionToExam = async (payload) => {

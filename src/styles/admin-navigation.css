@@ -1,0 +1,21 @@
+/* Hide scrollbar for admin navigation */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar { 
+  display: none;  /* Safari and Chrome */
+}
+
+/* Smooth scrolling for navigation */
+.scrollbar-hide {
+  scroll-behavior: smooth;
+}
+
+/* Add padding for mobile scroll */
+@media (max-width: 640px) {
+  .scrollbar-hide {
+    padding-right: 1rem;
+  }
+}

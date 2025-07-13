@@ -1,6 +1,230 @@
-@media only screen and (max-width: 768px) {
-    .reports-container {
-        width: 77.5vw;
-    }
+/* Modern Reports Styles */
+.reports-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 50%, #eef2ff 100%);
+}
 
+/* Custom animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Card hover effects */
+.ant-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.ant-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Progress bar customization */
+.ant-progress-bg {
+  border-radius: 8px;
+}
+
+.ant-progress-inner {
+  border-radius: 8px;
+  background: #f3f4f6;
+}
+
+/* Button customization */
+.ant-btn-primary {
+  border-radius: 12px;
+  font-weight: 600;
+  height: auto;
+  padding: 12px 24px;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+}
+
+.ant-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+}
+
+/* Select and DatePicker customization */
+.ant-select-selector,
+.ant-picker {
+  border-radius: 12px !important;
+  border: 2px solid #e5e7eb !important;
+  transition: all 0.3s ease !important;
+}
+
+.ant-select-focused .ant-select-selector,
+.ant-picker-focused {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Text truncation utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Responsive statistic styling */
+.responsive-statistic .ant-statistic-content {
+  font-size: 24px !important;
+}
+
+.responsive-statistic .ant-statistic-title {
+  font-size: 12px !important;
+}
+
+/* Modal styling */
+.exam-details-modal .ant-modal-header {
+  border-bottom: 2px solid #f0f0f0;
+  padding: 20px 24px;
+}
+
+.exam-details-modal .ant-modal-body {
+  padding: 24px;
+}
+
+.exam-details-modal .ant-modal-footer {
+  border-top: 2px solid #f0f0f0;
+  padding: 16px 24px;
+  text-align: center;
+}
+
+.exam-details-modal .ant-descriptions-item-label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.exam-details-modal .ant-descriptions-item-content {
+  color: #6b7280;
+}
+
+/* Responsive design */
+@media only screen and (max-width: 768px) {
+  .reports-container {
+    padding: 12px;
+  }
+
+  .ant-card {
+    margin-bottom: 12px;
+  }
+
+  .ant-card-body {
+    padding: 12px !important;
+  }
+
+  .ant-statistic-title {
+    font-size: 10px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .ant-statistic-content {
+    font-size: 16px !important;
+  }
+
+  .ant-table-thead > tr > th {
+    padding: 8px 4px !important;
+    font-size: 12px !important;
+  }
+
+  .ant-table-tbody > tr > td {
+    padding: 8px 4px !important;
+    font-size: 12px !important;
+  }
+
+  .ant-pagination {
+    margin: 16px 0 !important;
+  }
+
+  .ant-pagination-item {
+    min-width: 28px !important;
+    height: 28px !important;
+    line-height: 26px !important;
+  }
+}
+
+@media only screen and (max-width: 640px) {
+  .ant-btn {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  .ant-select {
+    width: 100% !important;
+  }
+
+  .ant-picker {
+    width: 100% !important;
+  }
+
+  .ant-statistic-title {
+    font-size: 9px !important;
+  }
+
+  .ant-statistic-content {
+    font-size: 14px !important;
+  }
+
+  .ant-table-pagination {
+    text-align: center !important;
+  }
+
+  .ant-pagination-options {
+    display: none !important;
+  }
+}
+
+@media only screen and (min-width: 769px) and (max-width: 1024px) {
+  .ant-statistic-title {
+    font-size: 11px !important;
+  }
+
+  .ant-statistic-content {
+    font-size: 20px !important;
+  }
+
+  .ant-table-thead > tr > th {
+    padding: 12px 8px !important;
+    font-size: 13px !important;
+  }
+
+  .ant-table-tbody > tr > td {
+    padding: 12px 8px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .reports-container {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  }
+
+  .ant-card {
+    background: #1e293b;
+    border-color: #334155;
+  }
+
+  .ant-card .ant-card-body {
+    color: #f1f5f9;
+  }
 }

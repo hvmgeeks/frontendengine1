@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Debug Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .header {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #007BFF;
+            margin-bottom: 10px;
+        }
+        .section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #007BFF;
+            border-bottom: 2px solid #007BFF;
+            padding-bottom: 10px;
+        }
+        .field {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 5px solid #ddd;
+        }
+        .field.valid {
+            background-color: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+        .field.invalid {
+            background-color: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+        .field.warning {
+            background-color: #fff3cd;
+            border-left-color: #ffc107;
+            color: #856404;
+        }
+        .btn {
+            background: linear-gradient(45deg, #007BFF, #0056b3);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+        }
+        .btn.success {
+            background: linear-gradient(45deg, #28a745, #1e7e34);
+        }
+        .btn.danger {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+        }
+        .log {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #4a5568;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        .status.success {
+            background: linear-gradient(45deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+        .status.error {
+            background: linear-gradient(45deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+        .status.warning {
+            background: linear-gradient(45deg, #fff3cd, #ffeaa7);
+            color: #856404;
+            border: 2px solid #ffc107;
+        }
+        .code {
+            background: #f1f3f4;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+            border-left: 4px solid #007BFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Profile Debug Tool</h1>
+            <p>Check your profile data for payment validation</p>
+        </div>
+
+        <div class="section">
+            <h3>📋 Current Status</h3>
+            <div id="profile-status">
+                <p>Click "Check Profile" to analyze your data</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>🔧 Actions</h3>
+            <button class="btn" onclick="checkProfile()">🔍 Check Profile</button>
+            <button class="btn" onclick="testPaymentValidation()">🧪 Test Payment Validation</button>
+            <button class="btn success" onclick="copyDebugInfo()">📋 Copy Debug Info</button>
+            <button class="btn danger" onclick="clearLog()">🗑️ Clear Log</button>
+        </div>
+
+        <div class="section">
+            <h3>📊 Validation Results</h3>
+            <div id="validation-results">
+                <p>No validation performed yet</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>💡 Quick Fixes</h3>
+            <div id="quick-fixes">
+                <p>Run profile check to see specific fixes needed</p>
+            </div>
+        </div>
+
+        <div class="log" id="debug-log">
+            <strong>🚀 Debug Log Started</strong><br>
+            Ready to check your profile data...
+        </div>
+    </div>
+
+    <script>
+        let debugInfo = '';
+
+        function log(message) {
+            const logDiv = document.getElementById('debug-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            logDiv.innerHTML += `<br>${logEntry}`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            debugInfo += logEntry + '\n';
+        }
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('profile-status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function showValidationResults(results) {
+            const resultsDiv = document.getElementById('validation-results');
+            resultsDiv.innerHTML = results;
+        }
+
+        function showQuickFixes(fixes) {
+            const fixesDiv = document.getElementById('quick-fixes');
+            fixesDiv.innerHTML = fixes;
+        }
+
+        function checkProfile() {
+            log('🔍 Starting profile check...');
+            showStatus('Checking profile...', 'warning');
+
+            try {
+                // Get user data from localStorage
+                const userStr = localStorage.getItem('user');
+                if (!userStr) {
+                    throw new Error('No user data found in localStorage. Please login first.');
+                }
+
+                const user = JSON.parse(userStr);
+                log('👤 User data found in localStorage');
+                
+                analyzeUserData(user);
+
+            } catch (error) {
+                log(`❌ Error: ${error.message}`);
+                showStatus(`Error: ${error.message}`, 'error');
+                showValidationResults('<div class="field invalid">❌ Cannot analyze profile. Please ensure you are logged in.</div>');
+            }
+        }
+
+        function analyzeUserData(user) {
+            log('📊 Analyzing user data...');
+            log(`📋 Raw user data: ${JSON.stringify(user, null, 2)}`);
+            
+            // Compute name (same logic as backend)
+            let userName = user.name;
+            if (!userName && user.firstName && user.lastName) {
+                userName = `${user.firstName} ${user.lastName}`;
+            } else if (!userName && user.firstName) {
+                userName = user.firstName;
+            }
+
+            log(`👤 Computed name: "${userName}"`);
+
+            // Validate phone number (Tanzania format)
+            const phoneRegex = /^0[67]\d{8}$/;
+            const phoneValid = user.phoneNumber && phoneRegex.test(user.phoneNumber);
+
+            log(`📱 Phone validation:`);
+            log(`  - Raw phone: ${JSON.stringify(user.phoneNumber)}`);
+            log(`  - Phone type: ${typeof user.phoneNumber}`);
+            log(`  - Phone length: ${user.phoneNumber ? user.phoneNumber.length : 'N/A'}`);
+            log(`  - Regex test: ${phoneValid}`);
+
+            // Validate email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const emailValid = user.email && emailRegex.test(user.email);
+
+            // Generate results
+            let results = '<h4>📋 Detailed Analysis:</h4>';
+            let fixes = '<h4>🔧 Required Fixes:</h4>';
+            let hasIssues = false;
+            
+            // Name check
+            if (userName && userName.trim().length >= 2) {
+                results += `<div class="field valid">✅ Name: "${userName}" (Valid)</div>`;
+                log(`✅ Name is valid: "${userName}"`);
+            } else {
+                results += `<div class="field invalid">❌ Name: Missing or too short</div>`;
+                fixes += `<div class="field invalid">📝 Fix Name: Go to Profile → Edit → Add first and last name</div>`;
+                log(`❌ Name issue: "${userName}"`);
+                hasIssues = true;
+            }
+
+            // Phone check
+            if (phoneValid) {
+                results += `<div class="field valid">✅ Phone: ${user.phoneNumber} (Valid Tanzania format)</div>`;
+                log(`✅ Phone is valid: ${user.phoneNumber}`);
+            } else if (user.phoneNumber) {
+                results += `<div class="field invalid">❌ Phone: ${user.phoneNumber} (Invalid format)</div>`;
+                fixes += `<div class="field invalid">📱 Fix Phone: Change to format 06xxxxxxxx or 07xxxxxxxx (10 digits)</div>`;
+                log(`❌ Phone format invalid: ${user.phoneNumber}`);
+                hasIssues = true;
+            } else {
+                results += `<div class="field invalid">❌ Phone: Missing</div>`;
+                fixes += `<div class="field invalid">📱 Add Phone: Go to Profile → Edit → Add phone number (06xxxxxxxx or 07xxxxxxxx)</div>`;
+                log(`❌ Phone is missing`);
+                hasIssues = true;
+            }
+
+            // Email check
+            if (emailValid) {
+                results += `<div class="field valid">✅ Email: ${user.email} (Valid)</div>`;
+                log(`✅ Email is valid: ${user.email}`);
+            } else if (user.email) {
+                results += `<div class="field warning">⚠️ Email: ${user.email} (Invalid format, but auto-generated email will be used)</div>`;
+                log(`⚠️ Email format invalid: ${user.email}`);
+            } else {
+                results += `<div class="field warning">⚠️ Email: Missing (Auto-generated email will be used)</div>`;
+                log(`⚠️ Email is missing - will auto-generate`);
+            }
+
+            // Overall status
+            if (!hasIssues) {
+                showStatus('✅ Profile is ready for payments!', 'success');
+                results += '<div class="field valid"><strong>🎉 Overall: Ready for payments!</strong></div>';
+                fixes = '<div class="field valid"><strong>✅ No fixes needed - profile is ready!</strong></div>';
+                log('🎉 Profile validation passed!');
+            } else {
+                showStatus('❌ Profile needs attention before payment', 'error');
+                results += '<div class="field invalid"><strong>❌ Overall: Fix issues above before payment</strong></div>';
+                log('❌ Profile validation failed');
+            }
+
+            showValidationResults(results);
+            showQuickFixes(fixes);
+        }
+
+        async function testPaymentValidation() {
+            log('🧪 Testing payment validation...');
+            showStatus('Testing payment validation...', 'warning');
+
+            try {
+                const userStr = localStorage.getItem('user');
+                const token = localStorage.getItem('token');
+                
+                if (!userStr || !token) {
+                    throw new Error('No user data or token found. Please login first.');
+                }
+
+                const user = JSON.parse(userStr);
+
+                const testPaymentData = {
+                    plan: {
+                        _id: "test_plan_id",
+                        title: "Test Plan",
+                        discountedPrice: 1000,
+                        duration: 1
+                    },
+                    userId: user._id
+                };
+
+                log('📤 Sending test payment request...');
+                log(`📋 Payment data: ${JSON.stringify(testPaymentData, null, 2)}`);
+
+                const response = await fetch('/api/payment/create-invoice', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testPaymentData)
+                });
+
+                const data = await response.json();
+                log(`📥 Response status: ${response.status}`);
+                log(`📥 Response data: ${JSON.stringify(data, null, 2)}`);
+
+                if (response.ok) {
+                    log('✅ Payment validation passed!');
+                    showStatus('✅ Payment validation successful!', 'success');
+                    showValidationResults('<div class="field valid"><strong>✅ Payment system is ready to use!</strong></div>');
+                } else {
+                    log(`❌ Payment validation failed: ${data.message}`);
+                    showStatus(`❌ Payment validation failed`, 'error');
+                    
+                    let errorDetails = `<div class="field invalid"><strong>❌ ${data.message}</strong></div>`;
+                    if (data.debug) {
+                        errorDetails += `<div class="code">Debug Info: ${JSON.stringify(data.debug, null, 2)}</div>`;
+                    }
+                    showValidationResults(errorDetails);
+                }
+
+            } catch (error) {
+                log(`❌ Test payment error: ${error.message}`);
+                showStatus(`Test failed: ${error.message}`, 'error');
+            }
+        }
+
+        function copyDebugInfo() {
+            navigator.clipboard.writeText(debugInfo).then(() => {
+                log('📋 Debug info copied to clipboard');
+                showStatus('Debug info copied to clipboard!', 'success');
+            }).catch(() => {
+                log('❌ Failed to copy debug info');
+            });
+        }
+
+        function clearLog() {
+            document.getElementById('debug-log').innerHTML = '<strong>🚀 Debug Log Cleared</strong><br>Ready for new checks...';
+            debugInfo = '';
+            log('🗑️ Log cleared');
+        }
+
+        // Auto-check profile on page load
+        window.addEventListener('load', () => {
+            log('🚀 Profile Debug Tool loaded');
+            log('💡 Click "Check Profile" to analyze your data');
+        });
+    </script>
+</body>
+</html>

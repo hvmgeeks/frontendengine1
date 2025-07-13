@@ -1,26 +1,93 @@
+/* Modern responsive layout system */
 .layout {
   padding: 0;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+  background: var(--white);
+  font-family: 'Inter', 'Roboto', 'Nunito', system-ui, -apple-system, sans-serif;
+  display: flex;
+}
+
+/* Enhanced responsive layout adjustments */
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    padding: 0;
+  }
+}
+
+/* Mobile-first responsive breakpoints */
+@media (max-width: 480px) {
+  .layout {
+    padding: 0;
+    overflow-x: hidden;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .layout {
+    padding: 0;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .layout {
+    padding: 0;
+  }
 }
 
 .sidebar {
-  background-color: var(--primary);
-  padding: 20px 10px;
-  border-radius: 5px;
+  background: var(--primary);
+  padding: var(--space-4);
+  border-radius: 0;
   height: 100vh;
-  /* display: flex; */
-  /* justify-content: center; */
-  /* align-items: center; */
   overflow-y: auto;
   box-sizing: border-box;
   scrollbar-width: thin;
+  box-shadow: var(--shadow-lg);
+  border-right: 1px solid var(--primary-dark);
+  position: relative;
+  min-width: 250px;
+  flex-shrink: 0;
+}
+
+/* Responsive sidebar */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    min-height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--primary-dark);
+    padding: var(--space-3);
+  }
+}
+
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  opacity: 1;
+  z-index: -1;
 }
 
 .mobile-sidebar {
-  width: 15vw;
-  padding: 5px;
+  width: 100%;
+  padding: var(--space-2);
+}
+
+@media (min-width: 769px) {
+  .mobile-sidebar {
+    width: 15vw;
+    padding: var(--space-2);
+  }
 }
 
 .menu {
@@ -34,24 +101,92 @@
 }
 
 .menu-item {
-  display: flex;
-  align-items: center;
-  padding: 17px 20px;
-  margin: 5px;
+  display: flex !important;
+  align-items: center !important;
+  padding: var(--space-3) var(--space-4) !important;
+  margin: var(--space-1) 0 !important;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  gap: 15px;
+  transition: var(--transition-normal);
+  gap: var(--space-3) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  border-radius: var(--radius-lg) !important;
+  font-weight: 500 !important;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none !important;
+  border: none !important;
+  background: transparent !important;
+  font-size: 0.875rem !important;
+  white-space: nowrap;
+}
+
+/* Responsive menu items */
+@media (max-width: 768px) {
+  .menu-item {
+    padding: var(--space-2) var(--space-3) !important;
+    font-size: 0.8rem !important;
+    gap: var(--space-2) !important;
+  }
+
+  .mobile-sidebar .menu-item {
+    justify-content: center;
+    padding: var(--space-2) !important;
+  }
+
+  .mobile-sidebar .menu-item span {
+    display: none;
+  }
+}
+
+.menu-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: var(--transition-normal);
+}
+
+.menu-item:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
   color: white !important;
+  transform: translateX(2px);
+  backdrop-filter: blur(10px);
 }
 
 .active-menu-item {
-  border: 2px solid white;
-  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+.active-menu-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: white;
+  border-radius: 0 4px 4px 0;
 }
 
 .body {
   overflow: hidden;
   flex: 1;
+  background: var(--white) !important;
+  min-width: 0;
+}
+
+/* Responsive body */
+@media (max-width: 768px) {
+  .body {
+    width: 100%;
+    overflow: visible;
+  }
 }
 
 .collapsed-body {
@@ -68,14 +203,96 @@
 
 .content {
   overflow-y: auto;
+  background: var(--white) !important;
+  min-height: 100vh;
+  padding: var(--space-4) !important;
+}
+
+/* Enhanced responsive content */
+@media (max-width: 480px) {
+  .content {
+    padding: var(--space-2) !important;
+    min-height: auto;
+    margin: 0;
+    border-radius: 0;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .content {
+    padding: var(--space-3) !important;
+    margin: 0;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .content {
+    padding: var(--space-4) !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .content {
+    padding: var(--space-6) !important;
+  }
 }
 
 .header {
-  background-color: var(--primary);
+  background-color: var(--primary) !important;
   color: white !important;
-  padding: 15px;
-  border-radius: 5px;
+  padding: var(--space-4) !important;
+  border-radius: var(--radius-lg) !important;
   align-items: center !important;
   box-sizing: border-box;
   width: 100%;
+  margin-bottom: var(--space-4) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* Quiz Fullscreen Mode - Instructions, Questions, and Results */
+.quiz-fullscreen .layout {
+  display: block !important;
+}
+
+.quiz-fullscreen .sidebar {
+  display: none !important;
+}
+
+.quiz-fullscreen .body {
+  width: 100vw !important;
+  margin-left: 0 !important;
+}
+
+.quiz-fullscreen .header {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 10px 20px !important;
+  background-color: var(--primary) !important;
+  border-radius: 0 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 1000 !important;
+  height: 60px !important;
+  box-sizing: border-box !important;
+}
+
+.quiz-fullscreen .header > div:first-child,
+.quiz-fullscreen .header > div:last-child {
+  display: none !important;
+}
+
+.quiz-fullscreen .header .flex.items-center.gap-1 {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.quiz-fullscreen .content {
+  padding: 0 !important;
+  height: calc(100vh - 60px) !important;
+  margin-top: 60px !important;
+  overflow-y: auto;
 }

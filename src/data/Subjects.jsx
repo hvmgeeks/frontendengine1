@@ -3,7 +3,7 @@ export const primarySubjects = [
   "Science and Technology",
   "Geography",
   "Kiswahili",
-  "Social Studies",
+  "SocialStudies",
   "English",
   "Religion",
   "Arithmetic",
@@ -14,7 +14,42 @@ export const primarySubjects = [
   "Historia ya Tanzania",
 ];
 
+export const primaryKiswahiliSubjects = [
+  "Hisabati",
+  "Sayansi na Teknolojia",
+  "Jiografia",
+  "Kiswahili",
+  "Maarifa ya Jamii",
+  "Kiingereza",
+  "Dini",
+  "Hesabu",
+  "Michezo na Sanaa",
+  "Afya na Mazingira",
+  "Uraia na Maadili",
+  "Kifaransa",
+  "Historia ya Tanzania",
+];
+
 export const secondarySubjects = [
+  "Physics",
+  "Mathematics",
+  "Biology",
+  "Chemistry",
+  "Geography",
+  "Civics",
+  "History",
+  "Computer",
+  "English language",
+  "Kiswahili",
+  "Commerce",
+  "Economics",
+  "Advanced Mathematics",
+  "Basic Applied Mathematics",
+  "Accountancy",
+  "Agriculture",
+];
+
+export const advanceSubjects = [
   "Physics",
   "Mathematics",
   "Biology",

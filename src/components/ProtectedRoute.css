@@ -2,3 +2,655 @@
   opacity: 0.5;
   pointer-events: none; /* This will disable clicking on the buttons */
 }
+
+/* ===== MODERN NAVIGATION ===== */
+.nav-modern {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  min-height: 3rem; /* Reduced from 3.5rem to 3rem for more compact header */
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-modern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.nav-modern > * {
+  position: relative;
+  z-index: 1;
+}
+
+.nav-modern:hover {
+  box-shadow: 0 8px 32px rgba(0, 123, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+/* ===== BACK BUTTON ===== */
+.back-button {
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(75, 85, 99, 0.3);
+}
+
+.back-button:hover {
+  box-shadow: 0 4px 16px rgba(75, 85, 99, 0.4);
+}
+
+.back-button:active {
+  transform: scale(0.95);
+}
+
+/* ===== BRAINWAVE HEADING ===== */
+.brainwave-heading {
+  background: linear-gradient(135deg, #007BFF 0%, #0056D2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
+}
+
+/* ===== ENHANCED BRAINWAVE HEADING ===== */
+.brainwave-heading-enhanced {
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  text-shadow: 0 4px 8px rgba(0, 123, 255, 0.15);
+  position: relative;
+  display: inline-block;
+}
+
+/* ===== AMAZING BRAINWAVE ANIMATIONS ===== */
+
+/* Simple test animation to make sure CSS is working */
+@keyframes simpleGlow {
+  0% {
+    text-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 30px rgba(16, 185, 129, 0.6);
+  }
+  100% {
+    text-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+  }
+}
+
+/* ===== FORCE BLUE LOGOUT BUTTON ===== */
+.force-blue-logout {
+  background-color: #2563eb !important;
+  background: #2563eb !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border: 2px solid #1d4ed8 !important;
+  padding: 8px 16px !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  min-width: 80px !important;
+  outline: none !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important;
+}
+
+.force-blue-logout:hover {
+  background-color: #1d4ed8 !important;
+  background: #1d4ed8 !important;
+}
+
+.force-blue-logout * {
+  color: #ffffff !important;
+  background: transparent !important;
+}
+
+/* Brain pulse animation - electric energy effect */
+@keyframes brainPulse {
+  0% {
+    background-position: 0% 50%;
+    filter: brightness(1) contrast(1);
+  }
+  25% {
+    background-position: 50% 50%;
+    filter: brightness(1.2) contrast(1.1);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: brightness(1.3) contrast(1.2);
+  }
+  75% {
+    background-position: 50% 50%;
+    filter: brightness(1.1) contrast(1.05);
+  }
+  100% {
+    background-position: 0% 50%;
+    filter: brightness(1) contrast(1);
+  }
+}
+
+/* Visible test class */
+.brainwave-test {
+  animation: simpleGlow 2s ease-in-out infinite !important;
+  color: #3b82f6 !important;
+  font-weight: 900 !important;
+}
+
+/* Wave flow animation - flowing water effect */
+@keyframes waveFlow {
+  0% {
+    background-position: 0% 50%;
+    transform: translateY(0px);
+  }
+  25% {
+    background-position: 25% 25%;
+    transform: translateY(-1px);
+  }
+  50% {
+    background-position: 100% 50%;
+    transform: translateY(0px);
+  }
+  75% {
+    background-position: 75% 75%;
+    transform: translateY(1px);
+  }
+  100% {
+    background-position: 0% 50%;
+    transform: translateY(0px);
+  }
+}
+
+/* Glowing underline pulse */
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
+    opacity: 0.7;
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.8), 0 0 30px rgba(59, 130, 246, 0.4);
+    opacity: 1;
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
+    opacity: 0.7;
+  }
+}
+
+/* Hover effects for the entire brainwave container */
+.brainwave-container:hover .brain-text {
+  animation-duration: 1.5s;
+}
+
+.brainwave-container:hover .wave-text {
+  animation-duration: 1.8s;
+}
+
+/* Responsive animations */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes brainPulse {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes waveFlow {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes glowPulse {
+    0%, 100% {
+      opacity: 0.8;
+    }
+  }
+}
+
+.brain-text {
+  background: linear-gradient(135deg, #007BFF 0%, #0056D2 50%, #4338CA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 900;
+}
+
+.wave-text {
+  background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 900;
+  margin-left: -0.05em;
+}
+
+/* Fix for quiz pages - white text on blue background */
+.quiz-header .brain-text,
+.quiz-header .wave-text {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  -webkit-text-fill-color: white !important;
+  background-clip: unset !important;
+  color: white !important;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Ensure quiz header text is always white */
+.quiz-header h1,
+.quiz-header .brainwave-container h1,
+.quiz-header .brainwave-container span {
+  color: white !important;
+  -webkit-text-fill-color: white !important;
+}
+
+.hub-title-gradient {
+  background: linear-gradient(135deg, #007BFF 0%, #0056D2 30%, #4338CA 60%, #7C3AED 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 900;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.hub-title-gradient {
+  background-size: 200% 200%;
+}
+
+/* ===== USER PROFILE SECTION ===== */
+.user-profile-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.user-avatar {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.user-avatar:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
+}
+
+.user-avatar::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(45deg, #007BFF, #4338CA, #7C3AED, #A855F7);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.user-avatar:hover::before {
+  opacity: 0.3;
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== RESPONSIVE HEADER ===== */
+@media (max-width: 480px) {
+  .nav-modern {
+    padding: 0 0.5rem; /* Reduced from 0.75rem to 0.5rem for more compact mobile header */
+  }
+
+  .nav-modern .back-button {
+    padding: 0.5rem;
+    min-width: 2.5rem;
+  }
+
+  .nav-modern .back-button span {
+    display: none;
+  }
+
+  .brainwave-heading-enhanced {
+    font-size: 1.125rem;
+    font-weight: 800;
+  }
+
+  .user-avatar {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 640px) {
+  .nav-modern .back-button span {
+    display: none;
+  }
+
+  .brainwave-heading-enhanced {
+    font-size: 1.25rem;
+  }
+
+  .user-avatar {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  .brainwave-heading-enhanced {
+    font-size: 1.5rem;
+  }
+
+  .user-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .brainwave-heading-enhanced {
+    font-size: 2rem;
+  }
+
+  .user-avatar {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  .brainwave-heading {
+    font-size: 1.5rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .brainwave-heading {
+    font-size: 1.875rem;
+  }
+}
+
+/* ===== SAFE CSS ANIMATIONS TO REPLACE FRAMER MOTION ===== */
+
+/* Brain text glow animation */
+@keyframes brainGlow {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    transform: scale(1);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+    transform: scale(1.02);
+  }
+}
+
+.brain-text {
+  animation: brainGlow 3s ease-in-out infinite;
+  transition: transform 0.3s ease;
+}
+
+.brain-text:hover {
+  transform: scale(1.05) !important;
+  animation-duration: 1.5s;
+}
+
+/* Electric spark animation */
+@keyframes sparkPulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+    box-shadow: 0 0 8px #3b82f6;
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+    box-shadow: 0 0 15px #3b82f6;
+  }
+}
+
+.electric-spark {
+  animation: sparkPulse 2s ease-in-out infinite;
+}
+
+/* Wave text flow animation */
+@keyframes waveFlow {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    transform: translateY(-2px) scale(1.01);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(16, 185, 129, 0.8);
+    transform: translateY(0) scale(1.02);
+  }
+  75% {
+    transform: translateY(2px) scale(1.01);
+  }
+}
+
+.wave-text {
+  animation: waveFlow 3s ease-in-out infinite;
+  transition: transform 0.3s ease;
+}
+
+.wave-text:hover {
+  transform: scale(1.05) !important;
+  animation-duration: 1.5s;
+}
+
+/* Wave particle animation */
+@keyframes waveParticle {
+  0% {
+    opacity: 0;
+    transform: translateX(0) translateY(0) scale(0.5);
+  }
+  25% {
+    opacity: 1;
+    transform: translateX(20px) translateY(-3px) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(40px) translateY(0) scale(1.2);
+  }
+  75% {
+    opacity: 1;
+    transform: translateX(60px) translateY(3px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(80px) translateY(0) scale(0.5);
+  }
+}
+
+.wave-particle {
+  animation: waveParticle 3s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+/* Glowing underline animation */
+@keyframes underlineGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    opacity: 0.8;
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+    opacity: 1;
+  }
+}
+
+.glowing-underline {
+  animation: underlineGlow 3s ease-in-out infinite;
+  animation-delay: 1.2s;
+}
+
+/* Safe header animation */
+@keyframes safeHeaderSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.safe-header-animation {
+  animation: safeHeaderSlide 0.5s ease-out;
+}
+
+/* Safe center animation */
+@keyframes safeCenterFade {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.safe-center-animation {
+  animation: safeCenterFade 0.6s ease-out 0.2s both;
+}
+
+/* Safe notification animation */
+@keyframes safeNotificationPop {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.safe-notification-animation {
+  animation: safeNotificationPop 0.5s ease-out 0.2s both;
+}
+
+/* Fix notification bell sizing */
+.safe-notification-animation .notification-bell-button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.safe-notification-animation .notification-badge {
+  position: absolute !important;
+  bottom: -2px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+/* Header centering improvements */
+.nav-modern .brainwave-container {
+  max-width: fit-content;
+  margin: 0 auto;
+}
+
+/* Responsive header adjustments */
+@media (max-width: 640px) {
+  .nav-modern h1 {
+    font-size: 1rem !important;
+  }
+
+  .nav-modern .brainwave-container {
+    transform: scale(0.9);
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  .nav-modern h1 {
+    font-size: 1.125rem !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .nav-modern h1 {
+    font-size: 1.25rem !important;
+  }
+}
+
+/* Safe profile animation */
+@keyframes safeProfileSlide {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.safe-profile-animation {
+  animation: safeProfileSlide 0.5s ease-out 0.3s both;
+}
+
+/* Safe content animation */
+@keyframes safeContentFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.safe-content-animation {
+  animation: safeContentFade 0.3s ease-out 0.1s both;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .brain-text,
+  .wave-text,
+  .electric-spark,
+  .wave-particle,
+  .glowing-underline,
+  .safe-header-animation,
+  .safe-center-animation,
+  .safe-notification-animation,
+  .safe-profile-animation,
+  .safe-content-animation {
+    animation: none !important;
+  }
+
+  .brain-text:hover,
+  .wave-text:hover {
+    transform: none !important;
+  }
+}

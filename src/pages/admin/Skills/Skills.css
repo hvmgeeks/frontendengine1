@@ -1,0 +1,363 @@
+/* Admin Skills Management Styles */
+
+.admin-skills-container {
+  padding: 24px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+}
+
+.skills-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  flex: 1;
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 8px 0;
+}
+
+.title-icon {
+  color: #3182ce;
+}
+
+.page-description {
+  color: #718096;
+  font-size: 16px;
+  margin: 0;
+}
+
+.create-btn {
+  height: 48px;
+  padding: 0 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s ease;
+}
+
+.create-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+}
+
+/* Filters */
+.skills-filters {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filter-group {
+  flex: 1;
+  max-width: 300px;
+}
+
+.search-input {
+  height: 40px;
+  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.level-filter {
+  width: 100%;
+  height: 40px;
+}
+
+.level-filter .ant-select-selector {
+  height: 40px !important;
+  border-radius: 8px !important;
+  border: 2px solid #e2e8f0 !important;
+  transition: all 0.3s ease;
+}
+
+.level-filter:hover .ant-select-selector {
+  border-color: #3182ce !important;
+}
+
+/* Table Container */
+.skills-table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.skills-table-container .ant-table {
+  border-radius: 12px;
+}
+
+.skills-table-container .ant-table-thead > tr > th {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+  border: none;
+  padding: 16px;
+}
+
+.skills-table-container .ant-table-tbody > tr > td {
+  padding: 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.skills-table-container .ant-table-tbody > tr:hover > td {
+  background: #f8fafc;
+}
+
+/* Modal Styles */
+.skill-modal .ant-modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px 8px 0 0;
+}
+
+.skill-modal .ant-modal-title {
+  color: white;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.skill-modal .ant-modal-close {
+  color: white;
+}
+
+.skill-modal .ant-modal-close:hover {
+  color: #f1f5f9;
+}
+
+/* Form Styles */
+.skill-form {
+  padding: 24px 0;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.form-item-half {
+  flex: 1;
+}
+
+.skill-form .ant-form-item-label > label {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.skill-form .ant-input,
+.skill-form .ant-input-number,
+.skill-form .ant-select-selector {
+  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+  height: 40px;
+  transition: all 0.3s ease;
+}
+
+.skill-form .ant-input:focus,
+.skill-form .ant-input-number:focus,
+.skill-form .ant-select-focused .ant-select-selector {
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.skill-form .ant-input.ant-input-lg {
+  height: 48px;
+}
+
+/* Video Upload Section */
+.video-upload-section {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 8px;
+  margin: 16px 0;
+  border: 2px dashed #cbd5e0;
+}
+
+.video-upload-section h4 {
+  margin: 0 0 16px 0;
+  color: #2d3748;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.upload-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  margin-bottom: 12px;
+}
+
+.upload-label:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.file-input {
+  display: none;
+}
+
+.file-info {
+  background: #e6fffa;
+  color: #234e52;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 8px;
+  border: 1px solid #b2f5ea;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.form-actions .ant-btn {
+  height: 40px;
+  padding: 0 24px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.form-actions .ant-btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.form-actions .ant-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .admin-skills-container {
+    padding: 16px;
+  }
+
+  .skills-header {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .skills-filters {
+    flex-direction: column;
+  }
+
+  .filter-group {
+    max-width: none;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .form-item-half {
+    flex: none;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .skills-table-container {
+    overflow-x: auto;
+  }
+}
+
+/* Loading and Empty States */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #718096;
+}
+
+.empty-state h3 {
+  color: #2d3748;
+  margin-bottom: 8px;
+}
+
+/* Status Tags */
+.ant-tag {
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 4px 8px;
+}
+
+/* Action Buttons */
+.skills-table-container .ant-btn {
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.skills-table-container .ant-btn-primary {
+  background: #3182ce;
+  border-color: #3182ce;
+}
+
+.skills-table-container .ant-btn-primary:hover {
+  background: #2c5aa0;
+  border-color: #2c5aa0;
+}
+
+.skills-table-container .ant-btn-dangerous {
+  background: #e53e3e;
+  border-color: #e53e3e;
+}
+
+.skills-table-container .ant-btn-dangerous:hover {
+  background: #c53030;
+  border-color: #c53030;
+}
