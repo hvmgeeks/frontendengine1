@@ -39,8 +39,7 @@
     "build:analyze": "npm run build:prod && npx webpack-bundle-analyzer build/static/js/*.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "serve": "serve -s build -l 3000",
-    "preinstall": "npm audit fix --force"
+    "serve": "serve -s build -l 3000"
   },
   "eslintConfig": {
     "extends": [
