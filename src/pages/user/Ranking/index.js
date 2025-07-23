@@ -9,7 +9,7 @@ import {
   TbStar,
   TbFlame,
   TbBrain,
-  TbHome,
+
   TbRefresh,
   TbMedal,
   TbRocket,
@@ -1021,7 +1021,7 @@ const AmazingRankingPage = () => {
         if (podiumSection) {
           setTimeout(() => {
             podiumSection.scrollIntoView({
-              behavior: 'smooth',
+              behavior: 'auto',
               block: 'center',
               inline: 'nearest'
             });
@@ -1031,8 +1031,8 @@ const AmazingRankingPage = () => {
               setUserHasBeenShown(true);
               setAutoScrollCompleted(true);
               console.log('✅ Auto-scroll completed');
-            }, 1000);
-          }, 500);
+            }, 100);
+          }, 100);
         } else {
           setAutoScrollCompleted(true);
         }
@@ -1044,7 +1044,7 @@ const AmazingRankingPage = () => {
         if (userElement) {
           setTimeout(() => {
             userElement.scrollIntoView({
-              behavior: 'smooth',
+              behavior: 'auto',
               block: 'center',
               inline: 'nearest'
             });
@@ -1054,8 +1054,8 @@ const AmazingRankingPage = () => {
               setUserHasBeenShown(true);
               setAutoScrollCompleted(true);
               console.log('✅ Auto-scroll completed');
-            }, 1000);
-          }, 500);
+            }, 100);
+          }, 100);
         } else {
           console.log('❌ User element not found in DOM');
           setAutoScrollCompleted(true);
@@ -1063,8 +1063,8 @@ const AmazingRankingPage = () => {
       }
     };
 
-    // Delay to ensure DOM is ready, but not too long
-    const timer = setTimeout(scrollToUser, 2000);
+    // Delay to ensure DOM is ready, but make it instant
+    const timer = setTimeout(scrollToUser, 500);
     return () => clearTimeout(timer);
   }, [user?._id, rankingData, autoScrollCompleted]);
 
@@ -1174,6 +1174,8 @@ const AmazingRankingPage = () => {
           background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
           min-height: 100vh;
           color: #ffffff;
+          overflow-y: auto;
+          scroll-behavior: smooth;
         }
 
         /* Fix black text visibility - Enhanced */
@@ -1325,7 +1327,7 @@ const AmazingRankingPage = () => {
           50% { transform: translateY(-5px); }
         }
       `}</style>
-      <div className="ranking-page-container ranking-page min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black relative overflow-hidden" onClick={handlePageClick}>
+      <div className="ranking-page-container ranking-page min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black relative" onClick={handlePageClick}>
 
       {/* Highlighting Notification */}
       {!userHasBeenShown && user && (
@@ -1335,7 +1337,7 @@ const AmazingRankingPage = () => {
           exit={{ opacity: 0, y: -20 }}
           className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-yellow-500/90 backdrop-blur-sm text-black px-4 py-2 rounded-lg shadow-lg text-sm font-medium"
         >
-          🎯 Finding your position... Click anywhere to stop highlighting
+          🎯 Finding your position in the rankings...
         </motion.div>
       )}
 
@@ -1386,19 +1388,7 @@ const AmazingRankingPage = () => {
             <div className="bg-white/5 backdrop-blur-lg rounded-xl sm:rounded-2xl md:rounded-3xl p-3 sm:p-4 md:p-6 lg:p-8 border border-white/10">
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 lg:gap-6 items-center justify-center">
 
-                {/* Hub Button */}
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => navigate('/user/hub')}
-                  className="flex items-center gap-2 md:gap-3 px-4 md:px-6 py-3 md:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto"
-                  style={{
-                    fontSize: window.innerWidth < 768 ? '1rem' : '1.1rem'
-                  }}
-                >
-                  <TbHome className="w-5 h-5 md:w-6 md:h-6" />
-                  <span>Hub</span>
-                </motion.button>
+
 
                 {/* User League Info Display */}
                 {userLeagueInfo && (
@@ -1559,7 +1549,7 @@ const AmazingRankingPage = () => {
                           // Find user's position in their league
                           for (const [leagueKey, leagueData] of Object.entries(leagueGroups)) {
                             const userIndex = leagueData.users?.findIndex(u => String(u._id) === String(fullUserData._id));
-                            if (userIndex !== -1 && userIndex !== undefined) {
+                            if (userIndex !== -1) {
                               return (
                                 <div className="mt-2 text-center">
                                   <div className="bg-gradient-to-r from-yellow-400/20 to-orange-400/20 rounded-lg p-1.5">
@@ -1784,7 +1774,7 @@ const AmazingRankingPage = () => {
           </motion.div>
         )}
 
-        {/* SPECTACULAR RANKING HEADER */}
+        {/* Header removed - using ProtectedRoute header only */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -2026,8 +2016,9 @@ const AmazingRankingPage = () => {
                   <div
                     className="flex items-end justify-center max-w-5xl mx-auto mb-4 md:mb-8"
                     style={{
-                      gap: window.innerWidth <= 768 ? '8px' : window.innerWidth <= 1024 ? '16px' : '32px',
-                      padding: window.innerWidth <= 768 ? '8px' : '16px 24px'
+                      gap: window.innerWidth <= 480 ? '4px' : window.innerWidth <= 768 ? '8px' : window.innerWidth <= 1024 ? '16px' : '32px',
+                      padding: window.innerWidth <= 480 ? '4px' : window.innerWidth <= 768 ? '8px' : '16px 24px',
+                      overflowX: window.innerWidth <= 480 ? 'auto' : 'visible'
                     }}
                   >
                     {/* Second Place - Left */}
@@ -2070,8 +2061,8 @@ const AmazingRankingPage = () => {
                         }}
                       >
                         {/* Second Place Podium Base */}
-                        <div className="absolute bottom-0 w-full h-20 bg-gradient-to-t from-gray-400 to-gray-300 rounded-t-lg border-2 border-gray-500 flex items-center justify-center z-10">
-                          <span className="text-2xl font-black text-gray-800 relative z-20">2nd</span>
+                        <div className="absolute bottom-0 w-full h-20 bg-gradient-to-t from-gray-400 to-gray-300 rounded-t-lg border-2 border-gray-500 flex items-center justify-center z-0">
+                          <span className="text-2xl font-black text-gray-800 relative z-10">2nd</span>
                         </div>
 
                         {/* Second Place Champion Card */}
@@ -2079,7 +2070,7 @@ const AmazingRankingPage = () => {
                           className={`relative bg-gradient-to-br ${topPerformers[1].tier.color} p-1 rounded-xl ${topPerformers[1].tier.glow} shadow-xl mb-20`}
                           style={{
                             boxShadow: `0 6px 20px ${topPerformers[1].tier.shadowColor}50`,
-                            width: '200px'
+                            width: window.innerWidth <= 480 ? '140px' : window.innerWidth <= 768 ? '160px' : '200px'
                           }}
                         >
                           <div
@@ -2181,8 +2172,8 @@ const AmazingRankingPage = () => {
 
                       >
                         {/* First Place Podium Base - Tallest */}
-                        <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-yellow-500 to-yellow-300 rounded-t-lg border-2 border-yellow-600 flex items-center justify-center z-10">
-                          <span className="text-3xl font-black text-yellow-900 relative z-20">1st</span>
+                        <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-yellow-500 to-yellow-300 rounded-t-lg border-2 border-yellow-600 flex items-center justify-center z-0">
+                          <span className="text-3xl font-black text-yellow-900 relative z-10">1st</span>
                         </div>
 
                         {/* Crown Animation */}
@@ -2196,10 +2187,10 @@ const AmazingRankingPage = () => {
 
                         {/* First Place Champion Card */}
                         <div
-                          className={`relative bg-gradient-to-br ${topPerformers[0].tier.color} p-1.5 rounded-2xl ${topPerformers[0].tier.glow} shadow-2xl mb-32 transform scale-110`}
+                          className={`relative bg-gradient-to-br ${topPerformers[0].tier.color} p-1.5 rounded-2xl ${topPerformers[0].tier.glow} shadow-2xl mb-32 transform ${window.innerWidth <= 480 ? 'scale-100' : 'scale-110'}`}
                           style={{
                             boxShadow: `0 8px 32px ${topPerformers[0].tier.shadowColor}60, 0 0 0 1px rgba(255,255,255,0.1)`,
-                            width: '240px'
+                            width: window.innerWidth <= 480 ? '160px' : window.innerWidth <= 768 ? '200px' : '240px'
                           }}
                         >
                           <div
@@ -2390,8 +2381,8 @@ const AmazingRankingPage = () => {
                         }}
                       >
                         {/* Third Place Podium Base */}
-                        <div className="absolute bottom-0 w-full h-16 bg-gradient-to-t from-amber-600 to-amber-400 rounded-t-lg border-2 border-amber-700 flex items-center justify-center z-10">
-                          <span className="text-xl font-black text-amber-900 relative z-20">3rd</span>
+                        <div className="absolute bottom-0 w-full h-16 bg-gradient-to-t from-amber-600 to-amber-400 rounded-t-lg border-2 border-amber-700 flex items-center justify-center z-0">
+                          <span className="text-xl font-black text-amber-900 relative z-10">3rd</span>
                         </div>
 
                         {/* Third Place Champion Card */}
@@ -2399,7 +2390,7 @@ const AmazingRankingPage = () => {
                           className={`relative bg-gradient-to-br ${topPerformers[2].tier.color} p-1 rounded-xl ${topPerformers[2].tier.glow} shadow-xl mb-16`}
                           style={{
                             boxShadow: `0 6px 20px ${topPerformers[2].tier.shadowColor}50`,
-                            width: '200px'
+                            width: window.innerWidth <= 480 ? '140px' : window.innerWidth <= 768 ? '160px' : '200px'
                           }}
                         >
                           <div

@@ -99,6 +99,15 @@ export const blockUserById = async (payload) => {
     }
 }
 
+export const wipeLevelData = async (payload) => {
+    try {
+        const response = await axiosInstance.post('/api/users/wipe-level-data', payload);
+        return response.data;
+    } catch (error) {
+        return error.response.data;
+    }
+}
+
 export const deleteUserById = async (payload) => {
     try {
         const response = await axiosInstance.delete('/api/users/delete-user', { data: payload });

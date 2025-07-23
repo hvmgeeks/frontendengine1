@@ -95,7 +95,6 @@ const QuizUITest = () => {
               userResult={testUserResult}
               showResults={true}
               onStart={() => console.log('Quiz started')}
-              onView={() => console.log('Quiz viewed')}
             />
             <QuizCard
               quiz={testQuiz}

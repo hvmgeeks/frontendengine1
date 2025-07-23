@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Form, message, Select, Upload, Button } from "antd";
 import { useDispatch } from "react-redux";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
-import { 
-  updateVideo, 
-  updateNote, 
-  updatePastPaper, 
-  updateBook 
+import {
+  updateVideo,
+  updateNote,
+  updatePastPaper,
+  updateBook,
+  updateLiterature
 } from "../../../apicalls/study";
 import { primarySubjects, secondarySubjects, advanceSubjects } from "../../../data/Subjects";
 import {
@@ -114,6 +115,10 @@ function EditStudyMaterialForm({ material, onSuccess, onCancel }) {
   // Handle form submission
   const handleSubmit = async (values) => {
     try {
+      console.log('🔧 Edit form submission started');
+      console.log('Material:', material);
+      console.log('Form values:', values);
+
       setLoading(true);
       dispatch(ShowLoading());
 
@@ -177,21 +182,43 @@ function EditStudyMaterialForm({ material, onSuccess, onCancel }) {
           case "books":
             response = await updateBook(material._id, formData);
             break;
+          case "literature":
+            response = await updateLiterature(material._id, formData);
+            break;
           default:
-            throw new Error("Invalid material type");
+            throw new Error(`Invalid material type: ${material.type}`);
         }
       }
 
-      if (response.status === 200 && response.data.success) {
+      console.log('📤 API Response:', response);
+
+      if (response && response.status === 200 && response.data.success) {
+        console.log('✅ Update successful');
         message.success(response.data.message);
         onSuccess(material.type);
-      } else {
+      } else if (response) {
+        console.log('❌ Update failed with response:', response.data);
         const errorMessage = response.data?.message || "Failed to update material";
         message.error(errorMessage);
+      } else {
+        console.log('❌ No response received');
+        message.error("Failed to update material - no response received");
       }
     } catch (error) {
-      console.error("Error updating material:", error);
-      message.error("Failed to update material");
+      console.error("❌ Error updating material:", error);
+
+      // Handle authentication errors specifically
+      if (error.response && error.response.status === 401) {
+        message.error("Authentication failed. Please login again.");
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 1000);
+        return;
+      }
+
+      // Handle other errors
+      const errorMessage = error.response?.data?.message || error.message || "Failed to update material";
+      message.error(errorMessage);
     } finally {
       setLoading(false);
       dispatch(HideLoading());

@@ -1,21 +1,43 @@
 import React, { useEffect, useState } from "react";
 import "./index.css";
-import PageTitle from "../../../components/PageTitle";
+
 import {
   getUserInfo,
   updateUserInfo,
   updateUserPhoto,
+  wipeLevelData,
 } from "../../../apicalls/users";
-import { Form, message, Modal, Input, Button } from "antd";
+import { message, Modal } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
+import { SetUser } from "../../../redux/usersSlice";
 import { getAllReportsForRanking, getUserRanking, getXPLeaderboard } from "../../../apicalls/reports";
 import ProfilePicture from "../../../components/common/ProfilePicture";
-import SubscriptionModal from "../../../components/SubscriptionModal/SubscriptionModal";
+
 import { useLanguage } from "../../../contexts/LanguageContext";
 
 const Profile = () => {
-  const { t, isKiswahili, getClassName } = useLanguage();
+  const { isKiswahili } = useLanguage();
+
+  // Function to format class name based on level
+  const formatClassName = (classValue, level) => {
+    if (!classValue) return 'N/A';
+
+    switch (level) {
+      case 'primary':
+        return `Class ${classValue}`;
+      case 'primary_kiswahili':
+        return `Darasa la ${classValue}`;
+      case 'secondary':
+        // If it's already in Form-X format, use it; otherwise add Form prefix
+        return classValue.toString().startsWith('Form') ? classValue : `Form ${classValue}`;
+      case 'advance':
+        // If it's already in Form-X format, use it; otherwise add Form prefix
+        return classValue.toString().startsWith('Form') ? classValue : `Form ${classValue}`;
+      default:
+        return classValue.toString();
+    }
+  };
   const [userDetails, setUserDetails] = useState(null);
   const [rankingData, setRankingData] = useState(null);
   const [userRanking, setUserRanking] = useState(null);
@@ -31,10 +53,11 @@ const Profile = () => {
     phoneNumber: "",
   });
   const [profileImage, setProfileImage] = useState(null);
-  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+
   const [showLevelChangeModal, setShowLevelChangeModal] = useState(false);
   const [pendingLevelChange, setPendingLevelChange] = useState(null);
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.user);
   const { subscriptionData } = useSelector((state) => state.subscription);
 
   const fetchReports = async () => {
@@ -118,14 +141,27 @@ const Profile = () => {
       const response = await getUserInfo();
       if (response.success) {
         setUserDetails(response.data);
-        setFormData({
+
+        // CRITICAL FIX: Update Redux store with fresh user data including subscription status
+        dispatch(SetUser(response.data));
+
+        // Also update localStorage to maintain consistency
+        localStorage.setItem("user", JSON.stringify(response.data));
+
+        // Update form data with server response, but preserve any pending changes
+        const newFormData = {
           name: response.data.name || "",
           email: response.data.email || "",
           school: response.data.school || "",
           class_: response.data.class || "",
           level: response.data.level || "",
           phoneNumber: response.data.phoneNumber || "",
-        });
+        };
+
+        console.log('🔍 Server response level:', response.data.level);
+        console.log('🔍 Setting form data:', newFormData);
+
+        setFormData(newFormData);
         if (response.data.profileImage) {
           setProfileImage(response.data.profileImage);
         }
@@ -244,14 +280,85 @@ const Profile = () => {
     }
   };
 
-  const handleLevelChangeConfirm = () => {
-    setFormData((prev) => ({
-      ...prev,
-      level: pendingLevelChange,
-      class_: "",
-    }));
-    setShowLevelChangeModal(false);
-    setPendingLevelChange(null);
+  const handleLevelChangeConfirm = async () => {
+    try {
+      dispatch(ShowLoading());
+
+      // Store old level for reference
+      const oldLevel = userDetails?.level;
+      const userId = user?._id || userDetails?._id;
+
+      console.log('🔄 Starting level change:', {
+        userId,
+        oldLevel,
+        newLevel: pendingLevelChange
+      });
+
+      // Validate required data
+      if (!userId) {
+        message.error('User ID not found. Please refresh the page and try again.');
+        return;
+      }
+
+      if (!pendingLevelChange) {
+        message.error('No level selected. Please try again.');
+        return;
+      }
+
+      // Call API to change level (data is now preserved)
+      const changeResponse = await wipeLevelData({
+        userId: userId,
+        newLevel: pendingLevelChange,
+        oldLevel: oldLevel
+      });
+
+      console.log('📥 Level change response:', changeResponse);
+
+      if (changeResponse.success) {
+        console.log(`✅ Level changed successfully: ${oldLevel} → ${pendingLevelChange}`);
+        message.success(`Level changed to ${pendingLevelChange} successfully! Your learning progress has been reset.`);
+
+        // Update userDetails first to maintain consistency
+        setUserDetails(prev => ({
+          ...prev,
+          level: pendingLevelChange,
+          class: "" // Reset class when level changes
+        }));
+
+        // Update form data with new level
+        console.log('🔄 Updating form data with new level:', pendingLevelChange);
+        setFormData((prev) => {
+          const newData = {
+            ...prev,
+            level: pendingLevelChange,
+            class_: "",
+          };
+          console.log('🔄 New form data after level change:', newData);
+          return newData;
+        });
+
+        setShowLevelChangeModal(false);
+        setPendingLevelChange(null);
+
+        // Refresh user data to get updated level from server
+        setTimeout(() => {
+          getUserData();
+        }, 500);
+
+      } else {
+        console.error('⚠️ Level change failed:', changeResponse);
+        const errorMessage = changeResponse.message || 'Failed to change level. Please try again.';
+        message.error(errorMessage);
+        return;
+      }
+
+    } catch (error) {
+      console.error('❌ Error during level change:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to change level. Please try again.';
+      message.error(`Level change failed: ${errorMessage}`);
+    } finally {
+      dispatch(HideLoading());
+    }
   };
 
   const handleLevelChangeCancel = () => {
@@ -335,21 +442,23 @@ const Profile = () => {
     }
   }, [userDetails]);
 
-  // Ensure formData is synchronized with userDetails
+  // Ensure formData is synchronized with userDetails (but preserve form changes)
   useEffect(() => {
-    if (userDetails) {
-      setFormData({
-        name: userDetails.name || "",
-        email: userDetails.email || "", // Email is optional
-        school: userDetails.school || "",
-        class_: userDetails.class || "",
-        level: userDetails.level || "",
-        phoneNumber: userDetails.phoneNumber || "",
-      });
+    if (userDetails && !edit) {
+      // Only sync when not in edit mode to preserve user changes
+      setFormData(prevFormData => ({
+        name: userDetails.name || prevFormData.name || "",
+        email: userDetails.email || prevFormData.email || "",
+        school: userDetails.school || prevFormData.school || "",
+        class_: userDetails.class || prevFormData.class_ || "",
+        level: userDetails.level || prevFormData.level || "",
+        phoneNumber: userDetails.phoneNumber || prevFormData.phoneNumber || "",
+      }));
     }
-  }, [userDetails]);
+  }, [userDetails, edit]);
 
   return (
+    <>
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
@@ -412,7 +521,64 @@ const Profile = () => {
                   </div>
                   <div className="bg-purple-50 rounded-lg px-4 py-3 border border-purple-200 min-w-[120px]">
                     <p className="text-sm text-purple-600 font-medium">{isKiswahili ? 'Darasa' : 'Class'}</p>
-                    <p className="text-lg font-bold" style={{color: '#111827'}}>{userDetails?.class ? (isKiswahili ? `Darasa la ${userDetails.class}` : userDetails.class) : 'N/A'}</p>
+                    <p className="text-lg font-bold" style={{color: '#111827'}}>{formatClassName(userDetails?.class, userDetails?.level)}</p>
+                  </div>
+
+                  {/* Subscription Status */}
+                  <div className={`rounded-lg px-4 py-3 border min-w-[140px] ${
+                    userDetails?.subscriptionStatus === 'active'
+                      ? 'bg-white border-green-400'
+                      : 'bg-red-50 border-red-200'
+                  }`} style={{
+                    ...(userDetails?.subscriptionStatus === 'active' && {
+                      background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
+                      borderColor: '#22c55e',
+                      borderWidth: '2px',
+                      boxShadow: '0 4px 12px rgba(34, 197, 94, 0.15)'
+                    })
+                  }}>
+                    <p className={`text-sm font-medium ${
+                      userDetails?.subscriptionStatus === 'active'
+                        ? 'text-green-700'
+                        : 'text-red-600'
+                    }`}>
+                      {isKiswahili ? 'Hali ya Uanachama' : 'Subscription'}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${
+                        userDetails?.subscriptionStatus === 'active'
+                          ? 'bg-green-500'
+                          : 'bg-red-500'
+                      }`} style={{
+                        ...(userDetails?.subscriptionStatus === 'active' && {
+                          background: '#22c55e',
+                          boxShadow: '0 0 8px rgba(34, 197, 94, 0.4)'
+                        })
+                      }}></div>
+                      <p className={`text-lg font-bold ${
+                        userDetails?.subscriptionStatus === 'active'
+                          ? 'text-green-600'
+                          : 'text-red-700'
+                      }`}>
+                        {userDetails?.subscriptionStatus === 'active'
+                          ? (isKiswahili ? 'Amilifu' : 'Active')
+                          : (isKiswahili ? 'Imeisha' : 'Expired')
+                        }
+                      </p>
+                    </div>
+                    {userDetails?.subscriptionEndDate && (
+                      <p className={`text-xs mt-1 font-medium ${
+                        userDetails?.subscriptionStatus === 'active'
+                          ? 'text-green-600'
+                          : 'text-gray-500'
+                      }`}>
+                        {userDetails?.subscriptionStatus === 'active'
+                          ? (isKiswahili ? 'Inaisha: ' : 'Expires: ')
+                          : (isKiswahili ? 'Iliisha: ' : 'Expired: ')
+                        }
+                        {new Date(userDetails.subscriptionEndDate).toLocaleDateString()}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -605,13 +771,14 @@ const Profile = () => {
                         name="level"
                         value={formData.level}
                         onChange={handleChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors mobile-dropdown"
                         required
                       >
                         <option value="">Select Level</option>
-                        <option value="Primary">Primary</option>
-                        <option value="Secondary">Secondary</option>
-                        <option value="Advance">Advance</option>
+                        <option value="primary">Primary Education (Classes 1-7)</option>
+                        <option value="primary_kiswahili">Elimu ya Msingi - Kiswahili (Madarasa 1-7)</option>
+                        <option value="secondary">Secondary Education (Forms 1-4)</option>
+                        <option value="advance">Advanced Level (Forms 5-6)</option>
                       </select>
                     </div>
                     <div>
@@ -620,33 +787,44 @@ const Profile = () => {
                         name="class_"
                         value={formData.class_}
                         onChange={handleChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors mobile-dropdown"
                         required
                       >
                         <option value="">Select Class</option>
-                        {formData.level === "Primary" && (
+                        {formData.level === "primary" && (
                           <>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
+                            <option value="1">Class 1</option>
+                            <option value="2">Class 2</option>
+                            <option value="3">Class 3</option>
+                            <option value="4">Class 4</option>
+                            <option value="5">Class 5</option>
+                            <option value="6">Class 6</option>
+                            <option value="7">Class 7</option>
                           </>
                         )}
-                        {formData.level === "Secondary" && (
+                        {formData.level === "primary_kiswahili" && (
                           <>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
+                            <option value="1">Darasa la 1</option>
+                            <option value="2">Darasa la 2</option>
+                            <option value="3">Darasa la 3</option>
+                            <option value="4">Darasa la 4</option>
+                            <option value="5">Darasa la 5</option>
+                            <option value="6">Darasa la 6</option>
+                            <option value="7">Darasa la 7</option>
                           </>
                         )}
-                        {formData.level === "Advance" && (
+                        {formData.level === "secondary" && (
                           <>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
+                            <option value="1">Form 1</option>
+                            <option value="2">Form 2</option>
+                            <option value="3">Form 3</option>
+                            <option value="4">Form 4</option>
+                          </>
+                        )}
+                        {formData.level === "advance" && (
+                          <>
+                            <option value="5">Form 5</option>
+                            <option value="6">Form 6</option>
                           </>
                         )}
                       </select>
@@ -667,263 +845,15 @@ const Profile = () => {
                 </div>
               )}
 
-              {/* Subscription Section */}
-              <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200">
-                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                  <span className="mr-2">💎</span>
-                  Subscription Plan
-                </h3>
 
-                {subscriptionData && subscriptionData.status === 'active' ? (
-                  // Active Subscription
-                  <div className="space-y-6">
-                    {/* Plan Header */}
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="text-xl font-bold text-blue-700">{subscriptionData.planTitle || subscriptionData.plan?.title || 'Premium Plan'}</h4>
-                        <p className="text-gray-600 mt-1">
-                          <span className="inline-flex items-center">
-                            <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-                            Active Subscription
-                          </span>
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
-                          ✅ Active
-                        </span>
-                      </div>
-                    </div>
 
-                    {/* Subscription Timeline */}
-                    <div className="bg-gradient-to-r from-blue-50 to-green-50 p-4 rounded-xl border border-blue-200">
-                      <h5 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                        <span className="mr-2">📅</span>
-                        Subscription Timeline
-                      </h5>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-xs text-gray-500 uppercase tracking-wide">Started On</p>
-                          <p className="text-sm font-semibold text-gray-900">
-                            {subscriptionData.startDate ?
-                              new Date(subscriptionData.startDate).toLocaleDateString('en-US', {
-                                weekday: 'short',
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric'
-                              }) :
-                              new Date(subscriptionData.createdAt).toLocaleDateString('en-US', {
-                                weekday: 'short',
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric'
-                              })
-                            }
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-500 uppercase tracking-wide">Expires On</p>
-                          <p className="text-sm font-semibold text-red-600">
-                            {new Date(subscriptionData.endDate).toLocaleDateString('en-US', {
-                              weekday: 'short',
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric'
-                            })}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
 
-                    {/* Plan Statistics Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide">Total Duration</p>
-                            <p className="text-lg font-bold text-gray-900">
-                              {subscriptionData.duration || subscriptionData.plan?.duration || 1} month{(subscriptionData.duration || subscriptionData.plan?.duration || 1) > 1 ? 's' : ''}
-                            </p>
-                          </div>
-                          <div className="text-blue-500">
-                            <span className="text-2xl">📆</span>
-                          </div>
-                        </div>
-                      </div>
 
-                      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide">Amount Paid</p>
-                            <p className="text-lg font-bold text-green-600">
-                              {(subscriptionData.amount || subscriptionData.discountedPrice || 0).toLocaleString()} TZS
-                            </p>
-                          </div>
-                          <div className="text-green-500">
-                            <span className="text-2xl">💰</span>
-                          </div>
-                        </div>
-                      </div>
 
-                      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide">Days Remaining</p>
-                            <p className="text-lg font-bold text-orange-600">
-                              {(() => {
-                                const daysLeft = Math.max(0, Math.ceil((new Date(subscriptionData.endDate) - new Date()) / (1000 * 60 * 60 * 24)));
-                                return daysLeft;
-                              })()} days
-                            </p>
-                          </div>
-                          <div className="text-orange-500">
-                            <span className="text-2xl">⏰</span>
-                          </div>
-                        </div>
-                      </div>
 
-                      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide">Total Days</p>
-                            <p className="text-lg font-bold text-purple-600">
-                              {(subscriptionData.duration || subscriptionData.plan?.duration || 1) * 30} days
-                            </p>
-                          </div>
-                          <div className="text-purple-500">
-                            <span className="text-2xl">📊</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
 
-                    {/* Progress Bar */}
-                    <div className="bg-white p-4 rounded-xl border border-gray-200">
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="text-sm font-semibold text-gray-700">Subscription Progress</p>
-                        <p className="text-xs text-gray-500">
-                          {(() => {
-                            const duration = subscriptionData.duration || subscriptionData.plan?.duration || 1;
-                            const totalDays = duration * 30;
-                            const daysLeft = Math.max(0, Math.ceil((new Date(subscriptionData.endDate) - new Date()) / (1000 * 60 * 60 * 24)));
-                            const daysUsed = totalDays - daysLeft;
-                            const percentage = Math.min(100, Math.max(0, (daysUsed / totalDays) * 100));
-                            return `${percentage.toFixed(1)}% completed`;
-                          })()}
-                        </p>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-3">
-                        <div
-                          className="bg-gradient-to-r from-blue-500 to-green-500 h-3 rounded-full transition-all duration-500"
-                          style={{
-                            width: `${(() => {
-                              const duration = subscriptionData.duration || subscriptionData.plan?.duration || 1;
-                              const totalDays = duration * 30;
-                              const daysLeft = Math.max(0, Math.ceil((new Date(subscriptionData.endDate) - new Date()) / (1000 * 60 * 60 * 24)));
-                              const daysUsed = totalDays - daysLeft;
-                              const percentage = Math.min(100, Math.max(0, (daysUsed / totalDays) * 100));
-                              return percentage;
-                            })()}%`
-                          }}
-                        ></div>
-                      </div>
-                      <div className="flex justify-between text-xs text-gray-500 mt-1">
-                        <span>Started</span>
-                        <span>
-                          {(() => {
-                            const daysLeft = Math.max(0, Math.ceil((new Date(subscriptionData.endDate) - new Date()) / (1000 * 60 * 60 * 24)));
-                            if (daysLeft > 7) {
-                              return `${daysLeft} days left`;
-                            } else if (daysLeft > 0) {
-                              return `⚠️ ${daysLeft} days left`;
-                            } else {
-                              return '❌ Expired';
-                            }
-                          })()}
-                        </span>
-                      </div>
-                    </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => setShowSubscriptionModal(true)}
-                        className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all font-medium shadow-md"
-                      >
-                        🚀 Upgrade Plan
-                      </button>
-                      <button
-                        onClick={() => {
-                          const endDate = new Date(subscriptionData.endDate);
-                          const today = new Date();
-                          const daysLeft = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
 
-                          if (daysLeft <= 7 && daysLeft > 0) {
-                            message.warning(`Your subscription expires in ${daysLeft} days. Consider renewing soon!`);
-                          } else if (daysLeft <= 0) {
-                            message.error('Your subscription has expired. Please renew to continue accessing premium features.');
-                          } else {
-                            message.info(`Your subscription is active for ${daysLeft} more days.`);
-                          }
-                        }}
-                        className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-                      >
-                        📊 Check Status
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  // No Active Subscription
-                  <div className="text-center py-8">
-                    <div className="mb-6">
-                      <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                        <span className="text-4xl">🔒</span>
-                      </div>
-                      <h4 className="text-xl font-bold text-gray-900 mb-2">No Active Subscription</h4>
-                      <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                        Unlock premium features and get unlimited access to all educational content with a subscription plan.
-                      </p>
-                    </div>
-
-                    {/* Premium Features Preview */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 max-w-2xl mx-auto">
-                      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
-                        <div className="text-blue-600 text-2xl mb-2">📚</div>
-                        <h5 className="font-semibold text-gray-900 mb-1">Unlimited Quizzes</h5>
-                        <p className="text-sm text-gray-600">Access all quizzes without restrictions</p>
-                      </div>
-                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg border border-green-200">
-                        <div className="text-green-600 text-2xl mb-2">🤖</div>
-                        <h5 className="font-semibold text-gray-900 mb-1">AI Study Assistant</h5>
-                        <p className="text-sm text-gray-600">Get instant help with your studies</p>
-                      </div>
-                      <div className="bg-gradient-to-br from-purple-50 to-violet-50 p-4 rounded-lg border border-purple-200">
-                        <div className="text-purple-600 text-2xl mb-2">📊</div>
-                        <h5 className="font-semibold text-gray-900 mb-1">Progress Tracking</h5>
-                        <p className="text-sm text-gray-600">Monitor your learning progress</p>
-                      </div>
-                      <div className="bg-gradient-to-br from-orange-50 to-amber-50 p-4 rounded-lg border border-orange-200">
-                        <div className="text-orange-600 text-2xl mb-2">🏆</div>
-                        <h5 className="font-semibold text-gray-900 mb-1">Rankings & Badges</h5>
-                        <p className="text-sm text-gray-600">Compete and earn achievements</p>
-                      </div>
-                    </div>
-
-                    {/* Call to Action */}
-                    <div className="space-y-3">
-                      <button
-                        onClick={() => setShowSubscriptionModal(true)}
-                        className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
-                      >
-                        🚀 Choose Subscription Plan
-                      </button>
-                      <p className="text-xs text-gray-500">
-                        Plans start from as low as 13,000 TZS per month
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
 
               {/* Action Buttons */}
               <div className="mt-8 flex justify-center gap-4">
@@ -989,37 +919,61 @@ const Profile = () => {
 
       {/* Level Change Confirmation Modal */}
       <Modal
-        title="Confirm Level Change"
+        title="⚠️ Confirm Level Change"
         open={showLevelChangeModal}
         onOk={handleLevelChangeConfirm}
         onCancel={() => {
           setShowLevelChangeModal(false);
           setPendingLevelChange(null);
         }}
-        okText="Confirm"
+        okText="Yes, Change Level"
         cancelText="Cancel"
+        okButtonProps={{
+          danger: true,
+          style: { backgroundColor: '#dc2626', borderColor: '#dc2626' }
+        }}
+        width={500}
       >
-        <p>
-          Are you sure you want to change your level to <strong>{pendingLevelChange}</strong>?
-        </p>
-        <p className="text-orange-600 text-sm mt-2">
-          Note: Changing your level will reset your class selection and you'll only have access to content for the new level.
-        </p>
+        <div className="space-y-4">
+          <p className="text-lg">
+            Are you sure you want to change your level to <strong className="text-blue-600">{pendingLevelChange}</strong>?
+          </p>
+
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <h4 className="text-green-800 font-semibold mb-2 flex items-center">
+              <span className="mr-2">✅</span>
+              Your Data Will Be Preserved
+            </h4>
+            <ul className="text-green-700 text-sm space-y-1">
+              <li>• All quiz results and progress will be kept</li>
+              <li>• Learning history and achievements preserved</li>
+              <li>• XP points and rankings maintained</li>
+              <li>• You can access content from your new level</li>
+            </ul>
+          </div>
+
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <h4 className="text-green-800 font-semibold mb-2 flex items-center">
+              <span className="mr-2">✅</span>
+              What Will Be Preserved
+            </h4>
+            <ul className="text-green-700 text-sm space-y-1">
+              <li>• Your subscription status and plan</li>
+              <li>• Profile information (name, email, etc.)</li>
+              <li>• Account settings and preferences</li>
+            </ul>
+          </div>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <p className="text-blue-800 text-sm">
+              <strong>Note:</strong> This action cannot be undone. You'll start fresh with content for the new level.
+            </p>
+          </div>
+        </div>
       </Modal>
 
-      {/* Subscription Modal */}
-      <SubscriptionModal
-        isOpen={showSubscriptionModal}
-        onClose={() => setShowSubscriptionModal(false)}
-        onSuccess={() => {
-          setShowSubscriptionModal(false);
-          // Refresh user data to show updated subscription
-          getUserData();
-          message.success('Subscription updated successfully!');
-        }}
-      />
-
     </div>
+    </>
   );
 };
 

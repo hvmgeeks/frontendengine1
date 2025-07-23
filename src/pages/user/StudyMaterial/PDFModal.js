@@ -64,6 +64,8 @@ const PDFModal = ({ modalIsOpen, closeModal, documentUrl }) => {
     }
   };
 
+
+
   // Enhanced copy function with better feedback
   const copyToClipboard = async () => {
     if (selectedText) {
@@ -212,7 +214,9 @@ const PDFModal = ({ modalIsOpen, closeModal, documentUrl }) => {
       renderingRefs.current[index] = true;
 
       const viewport = page.getViewport({ scale: 1.0 });
-      const containerWidth = containerRef.current.clientWidth;
+      const containerWidth = containerRef.current.clientWidth - 40; // Account for padding
+
+      // Always fit to width for optimal reading experience
       const scale = containerWidth / viewport.width;
       const scaledViewport = page.getViewport({ scale });
 
@@ -328,7 +332,8 @@ const PDFModal = ({ modalIsOpen, closeModal, documentUrl }) => {
       contentLabel="Document Preview"
       style={{
         overlay: {
-          backgroundColor: 'rgba(0, 0, 0, 0.75)'
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          zIndex: 9999
         },
         content: {
           top: '50%',
@@ -337,28 +342,50 @@ const PDFModal = ({ modalIsOpen, closeModal, documentUrl }) => {
           bottom: 'auto',
           marginRight: '-50%',
           transform: 'translate(-50%, -50%)',
-          width: '70%',
-          height: '90%',
-          padding: '20px',
-          borderRadius: '10px',
+          width: window.innerWidth <= 768 ? '95%' : window.innerWidth <= 1024 ? '85%' : '75%',
+          height: window.innerWidth <= 768 ? '95%' : '90%',
+          padding: window.innerWidth <= 768 ? '10px' : '20px',
+          borderRadius: window.innerWidth <= 768 ? '8px' : '12px',
           overflow: 'hidden',
+          border: 'none',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
         },
       }}
     >
+
+
+      {/* Close Button */}
       <button
         onClick={closeModal}
         style={{
           position: "absolute",
-          top: "10px",
-          right: "10px",
-          background: "transparent",
+          top: window.innerWidth <= 768 ? "5px" : "10px",
+          right: window.innerWidth <= 768 ? "5px" : "10px",
+          background: "rgba(255, 0, 0, 0.8)",
           border: "none",
-          fontSize: "20px",
+          fontSize: window.innerWidth <= 768 ? "16px" : "18px",
           cursor: "pointer",
-          zIndex: 1,
+          zIndex: 1001,
+          color: "white",
+          borderRadius: "50%",
+          width: window.innerWidth <= 768 ? "32px" : "36px",
+          height: window.innerWidth <= 768 ? "32px" : "36px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          transition: "all 0.2s ease",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)"
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.background = "rgba(255, 0, 0, 1)";
+          e.target.style.transform = "scale(1.1)";
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.background = "rgba(255, 0, 0, 0.8)";
+          e.target.style.transform = "scale(1)";
         }}
       >
-        X
+        ✕
       </button>
 
       <div
@@ -366,8 +393,10 @@ const PDFModal = ({ modalIsOpen, closeModal, documentUrl }) => {
         style={{
           height: '100%',
           overflow: 'auto',
-          padding: '10px',
-          scrollbarWidth: 'thin'
+          padding: '20px',
+          scrollbarWidth: 'thin',
+          scrollBehavior: 'smooth',
+          background: '#f8f9fa'
         }}
       >
         {isLoading && (
@@ -488,14 +517,22 @@ const PDFModal = ({ modalIsOpen, closeModal, documentUrl }) => {
           <div
             key={index}
             style={{
-              marginBottom: '10px',
+              marginBottom: '15px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              position: 'relative'
+              position: 'relative',
+              background: 'white',
+              borderRadius: '4px',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              padding: '10px'
             }}
           >
-            <div style={{ position: 'relative', display: 'inline-block' }}>
+            <div style={{
+              position: 'relative',
+              display: 'inline-block',
+              maxWidth: '100%'
+            }}>
               <canvas
                 ref={element => {
                   canvasRefs.current[index] = element;
@@ -503,8 +540,8 @@ const PDFModal = ({ modalIsOpen, closeModal, documentUrl }) => {
                 style={{
                   maxWidth: '100%',
                   height: 'auto',
-                  border: '1px solid black',
-                  display: 'block'
+                  display: 'block',
+                  borderRadius: '2px'
                 }}
               />
               <div

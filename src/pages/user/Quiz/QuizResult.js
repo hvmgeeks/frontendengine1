@@ -60,11 +60,11 @@ const QuizResult = () => {
 
       try {
         if (isPassed) {
-          // Success sound with clapping
+          // LOUD SUCCESS SOUND with celebration
           const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-          // Create a success melody
-          const playTone = (frequency, startTime, duration, type = 'sine') => {
+          // Create a LOUD success melody
+          const playTone = (frequency, startTime, duration, type = 'sine', volume = 0.3) => {
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
 
@@ -75,17 +75,17 @@ const QuizResult = () => {
             oscillator.type = type;
 
             gainNode.gain.setValueAtTime(0, startTime);
-            gainNode.gain.linearRampToValueAtTime(0.1, startTime + 0.01);
+            gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.01); // Much louder
             gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
 
             oscillator.start(startTime);
             oscillator.stop(startTime + duration);
           };
 
-          // Create clapping sound effect
-          const createClap = (startTime) => {
+          // Create LOUD clapping sound effect
+          const createClap = (startTime, volume = 0.5) => {
             const noise = audioContext.createBufferSource();
-            const buffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.1, audioContext.sampleRate);
+            const buffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.15, audioContext.sampleRate);
             const data = buffer.getChannelData(0);
 
             // Generate white noise for clap
@@ -101,36 +101,43 @@ const QuizResult = () => {
 
             const gainNode = audioContext.createGain();
             gainNode.gain.setValueAtTime(0, startTime);
-            gainNode.gain.linearRampToValueAtTime(0.3, startTime + 0.01);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.1);
+            gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.01); // LOUDER
+            gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.15);
 
             noise.connect(filter);
             filter.connect(gainNode);
             gainNode.connect(audioContext.destination);
 
             noise.start(startTime);
-            noise.stop(startTime + 0.1);
+            noise.stop(startTime + 0.15);
           };
 
           const now = audioContext.currentTime;
 
-          // Play success melody: C-E-G-C (major chord progression)
-          playTone(523.25, now, 0.2); // C5
-          playTone(659.25, now + 0.1, 0.2); // E5
-          playTone(783.99, now + 0.2, 0.2); // G5
-          playTone(1046.5, now + 0.3, 0.4); // C6
+          // Play LOUD success melody: C-E-G-C (major chord progression)
+          playTone(523.25, now, 0.3, 'sine', 0.4); // C5 - LOUDER
+          playTone(659.25, now + 0.15, 0.3, 'sine', 0.4); // E5 - LOUDER
+          playTone(783.99, now + 0.3, 0.3, 'sine', 0.4); // G5 - LOUDER
+          playTone(1046.5, now + 0.45, 0.6, 'sine', 0.5); // C6 - LOUDEST
 
-          // Add clapping sounds
-          createClap(now + 0.5);
-          createClap(now + 0.7);
-          createClap(now + 0.9);
-          createClap(now + 1.1);
+          // Add LOUD celebration sounds
+          createClap(now + 0.6, 0.6);
+          createClap(now + 0.8, 0.6);
+          createClap(now + 1.0, 0.6);
+          createClap(now + 1.2, 0.6);
+          createClap(now + 1.4, 0.5);
+          createClap(now + 1.6, 0.5);
+
+          // Add victory fanfare
+          playTone(1046.5, now + 1.8, 0.4, 'triangle', 0.4); // High C
+          playTone(1318.5, now + 2.0, 0.4, 'triangle', 0.4); // High E
+          playTone(1568.0, now + 2.2, 0.6, 'triangle', 0.5); // High G
 
         } else {
-          // Fail sound - create a gentle, encouraging tone
+          // HEAVY BUZZER sound for "keep going" - loud and attention-grabbing
           const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-          const playTone = (frequency, startTime, duration) => {
+          const playBuzzer = (frequency, startTime, duration, volume = 0.4) => {
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
 
@@ -138,84 +145,117 @@ const QuizResult = () => {
             gainNode.connect(audioContext.destination);
 
             oscillator.frequency.setValueAtTime(frequency, startTime);
-            oscillator.type = 'sine';
+            oscillator.type = 'sawtooth'; // Harsh buzzer sound
 
             gainNode.gain.setValueAtTime(0, startTime);
-            gainNode.gain.linearRampToValueAtTime(0.08, startTime + 0.01);
+            gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.01);
             gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
 
             oscillator.start(startTime);
             oscillator.stop(startTime + duration);
           };
 
-          // Play gentle fail tone: A-F (not harsh, encouraging)
+          // Create heavy buzzer pattern - attention-grabbing but motivational
           const now = audioContext.currentTime;
-          playTone(440, now, 0.3); // A4
-          playTone(349.23, now + 0.2, 0.4); // F4
+
+          // Heavy buzzer sequence - like a game show buzzer but encouraging
+          playBuzzer(220, now, 0.3, 0.5); // Low A - LOUD
+          playBuzzer(220, now + 0.4, 0.3, 0.5); // Low A - LOUD
+          playBuzzer(220, now + 0.8, 0.3, 0.5); // Low A - LOUD
+
+          // Add motivational rising tone at the end
+          playBuzzer(330, now + 1.2, 0.4, 0.3); // E4 - encouraging rise
+          playBuzzer(440, now + 1.6, 0.5, 0.3); // A4 - hopeful ending
         }
       } catch (error) {
         console.log('Audio not supported');
       }
     };
 
-    // Generate premium animations based on pass/fail
+    // Generate HEAVY confetti rain for passed results
     if (isPassed) {
-      // Premium confetti explosion
-      const premiumConfetti = [];
+      // MASSIVE confetti explosion like heavy rain
+      const heavyConfetti = [];
 
-      // Main confetti burst (200 pieces)
-      for (let i = 0; i < 200; i++) {
+      // Heavy rain confetti (500 pieces) - like heavy rain
+      for (let i = 0; i < 500; i++) {
         const colors = [
           '#FFD700', '#FFA500', '#FF6B6B', '#4ECDC4', '#45B7D1',
           '#96CEB4', '#FF69B4', '#32CD32', '#FF4500', '#9370DB',
-          '#00CED1', '#FF1493', '#00FF7F', '#FF8C00', '#DA70D6'
+          '#00CED1', '#FF1493', '#00FF7F', '#FF8C00', '#DA70D6',
+          '#FF0080', '#00FF80', '#8000FF', '#FF8000', '#0080FF'
         ];
 
-        premiumConfetti.push({
+        heavyConfetti.push({
           id: `confetti_${i}`,
-          left: 20 + Math.random() * 60, // More centered
-          delay: Math.random() * 2,
-          duration: 4 + Math.random() * 3,
+          left: Math.random() * 100, // Full width coverage
+          delay: Math.random() * 3, // Staggered timing
+          duration: 5 + Math.random() * 4, // Longer duration
           color: colors[Math.floor(Math.random() * colors.length)],
           shape: ['circle', 'square', 'triangle'][Math.floor(Math.random() * 3)],
-          size: 3 + Math.random() * 6,
+          size: 2 + Math.random() * 8, // Bigger pieces
           type: 'confetti',
-          randomX: (Math.random() - 0.5) * 200 // For burst effect
-        });
-      }
-
-      // Premium sparkles (50 pieces)
-      for (let i = 0; i < 50; i++) {
-        premiumConfetti.push({
-          id: `sparkle_${i}`,
-          left: Math.random() * 100,
-          delay: Math.random() * 3,
-          duration: 2 + Math.random() * 2,
-          color: ['#FFD700', '#FFFFFF', '#FFF700', '#FFFF00'][Math.floor(Math.random() * 4)],
-          size: 1 + Math.random() * 3,
-          type: 'sparkle'
-        });
-      }
-
-      // Burst confetti (100 pieces from center)
-      for (let i = 0; i < 100; i++) {
-        premiumConfetti.push({
-          id: `burst_${i}`,
-          left: 45 + Math.random() * 10, // Center burst
-          delay: Math.random() * 0.5,
-          duration: 3 + Math.random() * 2,
-          color: ['#FFD700', '#FF6B6B', '#4ECDC4', '#FF69B4'][Math.floor(Math.random() * 4)],
-          shape: 'circle',
-          size: 2 + Math.random() * 4,
-          type: 'burst',
           randomX: (Math.random() - 0.5) * 300
         });
       }
 
-      setConfetti(premiumConfetti);
+      // Extra sparkles (150 pieces) - more sparkly
+      for (let i = 0; i < 150; i++) {
+        heavyConfetti.push({
+          id: `sparkle_${i}`,
+          left: Math.random() * 100,
+          delay: Math.random() * 4,
+          duration: 3 + Math.random() * 3,
+          color: ['#FFD700', '#FFFFFF', '#FFF700', '#FFFF00', '#FF69B4', '#00FFFF'][Math.floor(Math.random() * 6)],
+          size: 1 + Math.random() * 4,
+          type: 'sparkle'
+        });
+      }
 
-      // Remove all animations after 10 seconds
-      setTimeout(() => setConfetti([]), 10000);
+      // Multiple burst waves (200 pieces) - continuous bursts
+      for (let i = 0; i < 200; i++) {
+        heavyConfetti.push({
+          id: `burst_${i}`,
+          left: 30 + Math.random() * 40, // Center area
+          delay: Math.random() * 2, // Quick succession
+          duration: 4 + Math.random() * 3,
+          color: ['#FFD700', '#FF6B6B', '#4ECDC4', '#FF69B4', '#32CD32', '#9370DB'][Math.floor(Math.random() * 6)],
+          shape: 'circle',
+          size: 3 + Math.random() * 6,
+          type: 'burst',
+          randomX: (Math.random() - 0.5) * 400
+        });
+      }
+
+      // Continuous rain effect (300 more pieces) - delayed start
+      setTimeout(() => {
+        const rainColors = [
+          '#FFD700', '#FFA500', '#FF6B6B', '#4ECDC4', '#45B7D1',
+          '#96CEB4', '#FF69B4', '#32CD32', '#FF4500', '#9370DB',
+          '#00CED1', '#FF1493', '#00FF7F', '#FF8C00', '#DA70D6',
+          '#FF0080', '#00FF80', '#8000FF', '#FF8000', '#0080FF'
+        ];
+        const rainWave = [];
+        for (let i = 0; i < 300; i++) {
+          rainWave.push({
+            id: `rain_${i}`,
+            left: Math.random() * 100,
+            delay: Math.random() * 2,
+            duration: 4 + Math.random() * 3,
+            color: rainColors[Math.floor(Math.random() * rainColors.length)],
+            shape: ['circle', 'square'][Math.floor(Math.random() * 2)],
+            size: 2 + Math.random() * 5,
+            type: 'confetti',
+            randomX: (Math.random() - 0.5) * 200
+          });
+        }
+        setConfetti(prev => [...prev, ...rainWave]);
+      }, 1000);
+
+      setConfetti(heavyConfetti);
+
+      // Remove all animations after 15 seconds (longer for heavy effect)
+      setTimeout(() => setConfetti([]), 15000);
     } else {
       // Premium motivational elements
       const motivationalElements = [];
@@ -255,31 +295,61 @@ const QuizResult = () => {
     try {
       setLoadingExplanations(prev => ({ ...prev, [questionKey]: true }));
 
-      const response = await chatWithChatGPTToExplainAns({
-        question: detail.questionText || detail.questionName,
-        expectedAnswer: detail.correctAnswer,
-        userAnswer: detail.userAnswer,
-        imageUrl: detail.questionImage || detail.image || detail.imageUrl || null,
-        language: isKiswahili ? 'kiswahili' : 'english'
+      console.log('Requesting explanation for:', {
+        questionType: detail.type || detail.answerType,
+        questionLength: (detail.questionText || detail.questionName || '').length,
+        hasCorrectAnswer: !!detail.correctAnswer,
+        hasUserAnswer: !!detail.userAnswer,
+        hasImage: !!(detail.questionImage || detail.image || detail.imageUrl)
       });
 
-      if (response.success) {
+      const explanationData = {
+        question: detail.questionText || detail.questionName || 'Question text not available',
+        expectedAnswer: detail.correctAnswer || 'Answer not available',
+        userAnswer: detail.userAnswer || 'No answer provided',
+        imageUrl: detail.questionImage || detail.image || detail.imageUrl || null,
+        language: isKiswahili ? 'kiswahili' : 'english'
+      };
+
+      console.log('🔍 Sending explanation request:', {
+        question: explanationData.question.substring(0, 100) + '...',
+        expectedAnswer: explanationData.expectedAnswer,
+        userAnswer: explanationData.userAnswer,
+        hasImage: !!explanationData.imageUrl,
+        language: explanationData.language
+      });
+
+      const response = await chatWithChatGPTToExplainAns(explanationData);
+
+      console.log('Explanation response:', {
+        success: response.success,
+        hasExplanation: !!response.explanation,
+        error: response.error
+      });
+
+      if (response.success && response.explanation) {
         setExplanations(prev => ({
           ...prev,
           [questionKey]: response.explanation
         }));
       } else {
-        console.error('Failed to fetch explanation:', response.error);
+        console.error('Failed to fetch explanation:', response.error || 'No explanation in response');
+        const errorMessage = isKiswahili
+          ? 'Samahani, hatukuweza kutengeneza maelezo kwa wakati huu. Tafadhali jaribu tena baadaye.'
+          : 'Sorry, we could not generate an explanation at this time. Please try again later.';
         setExplanations(prev => ({
           ...prev,
-          [questionKey]: 'Sorry, we could not generate an explanation at this time. Please try again later.'
+          [questionKey]: errorMessage
         }));
       }
     } catch (error) {
       console.error('Error fetching explanation:', error);
+      const errorMessage = isKiswahili
+        ? 'Samahani, hatukuweza kutengeneza maelezo kwa wakati huu. Tafadhali jaribu tena baadaye.'
+        : 'Sorry, we could not generate an explanation at this time. Please try again later.';
       setExplanations(prev => ({
         ...prev,
-        [questionKey]: 'Sorry, we could not generate an explanation at this time. Please try again later.'
+        [questionKey]: errorMessage
       }));
     } finally {
       setLoadingExplanations(prev => ({ ...prev, [questionKey]: false }));

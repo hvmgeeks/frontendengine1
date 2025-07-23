@@ -8,6 +8,7 @@ import AddStudyMaterialForm from "./AddStudyMaterialForm";
 import SubtitleManager from "./SubtitleManager";
 import StudyMaterialManager from "./StudyMaterialManager";
 import EditStudyMaterialForm from "./EditStudyMaterialForm";
+import LiteratureForm from "./LiteratureForm";
 import "./index.css";
 import {
   FaVideo,
@@ -57,6 +58,13 @@ function AdminStudyMaterials() {
       icon: <FaBook />,
       description: "Upload textbooks and reference materials",
       color: "#27ae60"
+    },
+    {
+      key: "literature",
+      title: "Plays, Novel & Poetry",
+      icon: <FaBook />,
+      description: "Add literature materials (Secondary level only)",
+      color: "#f39c12"
     }
   ];
 
@@ -78,6 +86,7 @@ function AdminStudyMaterials() {
   ];
 
   const handleMaterialTypeSelect = (materialType) => {
+    // Fast transition without loading spinner
     setSelectedMaterialType(materialType);
     setShowAddForm(true);
   };
@@ -202,11 +211,18 @@ function AdminStudyMaterials() {
             </h2>
           </div>
 
-          <AddStudyMaterialForm
-            materialType={selectedMaterialType}
-            onSuccess={handleFormSuccess}
-            onCancel={handleFormClose}
-          />
+          {selectedMaterialType === 'literature' ? (
+            <LiteratureForm
+              onSuccess={handleFormSuccess}
+              onCancel={handleFormClose}
+            />
+          ) : (
+            <AddStudyMaterialForm
+              materialType={selectedMaterialType}
+              onSuccess={handleFormSuccess}
+              onCancel={handleFormClose}
+            />
+          )}
         </div>
       ) : (
         <div className="main-menu-container">

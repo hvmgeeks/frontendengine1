@@ -2078,5 +2078,218 @@ section + section {
     color: #9ca3af;
 }
 
+/* ===== ENHANCED RESPONSIVE SIZING FOR ALL ELEMENTS ===== */
+
+/* Extra Small Mobile Devices (≤480px) */
+@media (max-width: 480px) {
+    /* Hero Title Sizing */
+    .Home h1 {
+        font-size: 1.5rem !important;
+        line-height: 1.2 !important;
+        margin-bottom: 0.75rem !important;
+    }
+
+    /* Section Headings */
+    .Home h2 {
+        font-size: 1.25rem !important;
+        line-height: 1.3 !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .Home h3 {
+        font-size: 1.125rem !important;
+        line-height: 1.4 !important;
+    }
+
+    /* Paragraph Text */
+    .Home p {
+        font-size: 0.8rem !important;
+        line-height: 1.5 !important;
+    }
+
+    /* Button Sizing */
+    .Home button, .Home .btn {
+        padding: 0.625rem 1rem !important;
+        font-size: 0.8rem !important;
+        min-height: 40px !important;
+        border-radius: 0.5rem !important;
+    }
+
+    /* Stats Numbers */
+    .Home .text-2xl {
+        font-size: 1.25rem !important;
+    }
+
+    /* Icon Sizing */
+    .Home .w-6 {
+        width: 1rem !important;
+        height: 1rem !important;
+    }
+
+    .Home .w-8 {
+        width: 1.25rem !important;
+        height: 1.25rem !important;
+    }
+
+    /* Badge/Tag Sizing */
+    .Home .px-6 {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+
+    .Home .py-3 {
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+    }
+}
+
+/* Standard Mobile Devices (481px - 640px) */
+@media (min-width: 481px) and (max-width: 640px) {
+    /* Hero Title Sizing */
+    .Home h1 {
+        font-size: 1.75rem !important;
+        line-height: 1.2 !important;
+        margin-bottom: 1rem !important;
+    }
+
+    /* Section Headings */
+    .Home h2 {
+        font-size: 1.4rem !important;
+        line-height: 1.3 !important;
+        margin-bottom: 0.75rem !important;
+    }
+
+    .Home h3 {
+        font-size: 1.2rem !important;
+        line-height: 1.4 !important;
+    }
+
+    /* Paragraph Text */
+    .Home p {
+        font-size: 0.875rem !important;
+        line-height: 1.5 !important;
+    }
+
+    /* Button Sizing */
+    .Home button, .Home .btn {
+        padding: 0.75rem 1.25rem !important;
+        font-size: 0.875rem !important;
+        min-height: 44px !important;
+        border-radius: 0.625rem !important;
+    }
+
+    /* Stats Numbers */
+    .Home .text-2xl {
+        font-size: 1.5rem !important;
+    }
+
+    /* Icon Sizing */
+    .Home .w-6 {
+        width: 1.25rem !important;
+        height: 1.25rem !important;
+    }
+
+    .Home .w-8 {
+        width: 1.5rem !important;
+        height: 1.5rem !important;
+    }
+}
+
+/* Tablet Devices (641px - 768px) */
+@media (min-width: 641px) and (max-width: 768px) {
+    /* Hero Title Sizing */
+    .Home h1 {
+        font-size: 2.25rem !important;
+        line-height: 1.2 !important;
+        margin-bottom: 1.25rem !important;
+    }
+
+    /* Section Headings */
+    .Home h2 {
+        font-size: 1.75rem !important;
+        line-height: 1.3 !important;
+        margin-bottom: 1rem !important;
+    }
+
+    /* Button Sizing */
+    .Home button, .Home .btn {
+        padding: 0.875rem 1.5rem !important;
+        font-size: 0.9rem !important;
+        min-height: 48px !important;
+        border-radius: 0.75rem !important;
+    }
+
+    /* Stats Numbers */
+    .Home .text-2xl {
+        font-size: 1.75rem !important;
+    }
+}
+
+/* Large Tablet/Small Laptop (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    /* Hero Title Sizing */
+    .Home h1 {
+        font-size: 2.75rem !important;
+        line-height: 1.1 !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    /* Section Headings */
+    .Home h2 {
+        font-size: 2rem !important;
+        line-height: 1.3 !important;
+        margin-bottom: 1.25rem !important;
+    }
+
+    /* Button Sizing */
+    .Home button, .Home .btn {
+        padding: 1rem 1.75rem !important;
+        font-size: 1rem !important;
+        min-height: 52px !important;
+        border-radius: 0.875rem !important;
+    }
+
+    /* Stats Numbers */
+    .Home .text-2xl {
+        font-size: 2rem !important;
+    }
+}
+
+/* Desktop Devices (≥1025px) */
+@media (min-width: 1025px) {
+    /* Hero Title Sizing */
+    .Home h1 {
+        font-size: 3.5rem !important;
+        line-height: 1.1 !important;
+        margin-bottom: 2rem !important;
+    }
+
+    /* Section Headings */
+    .Home h2 {
+        font-size: 2.5rem !important;
+        line-height: 1.2 !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    /* Button Sizing */
+    .Home button, .Home .btn {
+        padding: 1.25rem 2rem !important;
+        font-size: 1.125rem !important;
+        min-height: 56px !important;
+        border-radius: 1rem !important;
+    }
+
+    /* Stats Numbers */
+    .Home .text-2xl {
+        font-size: 2.5rem !important;
+    }
+
+    /* Enhanced hover effects for desktop */
+    .Home button:hover, .Home .btn:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+    }
+}
+
 /* ===== RESPONSIVE DESIGN ===== */
 /* Note: Mobile-first responsive design implemented above */

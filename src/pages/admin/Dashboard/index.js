@@ -46,7 +46,7 @@ const AdminDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      dispatch(ShowLoading());
+      dispatch(ShowLoading()); // Restore normal loading behavior
       
       // Fetch users data
       const usersResponse = await getAllUsers();
@@ -84,11 +84,11 @@ const AdminDashboard = () => {
       });
 
       setLoading(false);
-      dispatch(HideLoading());
+      dispatch(HideLoading()); // Restore normal loading behavior
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
       setLoading(false);
-      dispatch(HideLoading());
+      dispatch(HideLoading()); // Restore normal loading behavior
     }
   };
 

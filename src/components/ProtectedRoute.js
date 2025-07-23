@@ -10,12 +10,9 @@ import "./ProtectedRoute.css";
 import { SetSubscription } from "../redux/subscriptionSlice.js";
 import { setPaymentVerificationNeeded } from "../redux/paymentSlice.js";
 import AdminNavigation from "./AdminNavigation";
-import ModernSidebar from "./ModernSidebar";
+import BrainwaveHeader from "./common/BrainwaveHeader";
 
-import { TbHome, TbBrandTanzania, TbMenu2, TbX, TbChevronDown, TbLogout, TbUser, TbSettings, TbBell, TbStar } from "react-icons/tb";
-import OnlineStatusIndicator from './common/OnlineStatusIndicator';
-import NotificationBell from './common/NotificationBell';
-import ProfilePicture from './common/ProfilePicture';
+// Header-related imports removed since header was removed
 import FloatingBrainwaveAI from './FloatingBrainwaveAI';
 import { setUserOnline, setUserOffline, sendHeartbeat } from '../apicalls/notifications';
 
@@ -23,6 +20,7 @@ import { setUserOnline, setUserOffline, sendHeartbeat } from '../apicalls/notifi
 function ProtectedRoute({ children }) {
   const { user } = useSelector((state) => state.user);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
+  // Mobile menu state removed since header was removed
   const intervalRef = useRef(null);
   const heartbeatRef = useRef(null);
   const { subscriptionData } = useSelector((state) => state.subscription);
@@ -126,12 +124,81 @@ function ProtectedRoute({ children }) {
     const allowedRoutes = ['/user/profile', '/profile', '/subscription', '/user/subscription', '/logout'];
     const isAllowedRoute = allowedRoutes.some(route => activeRoute.includes(route));
 
+    // Check for recent payment success to avoid redirecting users who just paid
+    const paymentSuccess = localStorage.getItem('paymentSuccess');
+    let hasRecentPayment = false;
+
+    if (paymentSuccess) {
+      try {
+        const successData = JSON.parse(paymentSuccess);
+        const timeDiff = Date.now() - successData.timestamp;
+        // Consider payment recent if within last 5 minutes
+        hasRecentPayment = timeDiff < 300000; // 5 minutes
+      } catch (error) {
+        console.error('Error parsing payment success data:', error);
+        localStorage.removeItem('paymentSuccess');
+      }
+    }
+
     // Redirect users with paymentRequired or no subscription to subscription page
-    if (isPaymentPending && !isAllowedRoute &&
+    // BUT skip redirect if they have recent payment success
+    if (isPaymentPending && !isAllowedRoute && !hasRecentPayment &&
         (user?.paymentRequired || user?.subscriptionStatus === 'free' || !user?.subscriptionStatus) &&
         !user?.isAdmin) {
-      console.log("Redirecting user to subscription page - paymentRequired:", user?.paymentRequired);
+      console.log("Redirecting user to subscription page - paymentRequired:", user?.paymentRequired, "subscriptionStatus:", user?.subscriptionStatus);
+
+      // Show different messages for expired vs free users
+      if (user?.subscriptionStatus === 'free' && user?.subscriptionEndDate) {
+        // User had a subscription that expired
+        message.warning({
+          content: '⏰ Your subscription has expired! Please renew to continue accessing premium features.',
+          duration: 5,
+          style: { marginTop: '20vh' }
+        });
+      } else if (user?.paymentRequired) {
+        // User needs to complete payment
+        message.info({
+          content: '💳 Please complete your subscription to access premium features.',
+          duration: 4,
+          style: { marginTop: '20vh' }
+        });
+      }
+
       navigate('/subscription'); // Redirect to subscription page to choose plan
+    } else if (hasRecentPayment) {
+      console.log("🎉 Recent payment detected, allowing access to hub");
+
+      // Refresh user data to get updated subscription status
+      const refreshUserData = async () => {
+        try {
+          const token = localStorage.getItem('token');
+          if (token) {
+            const response = await fetch('/api/users/get-user-info', {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+
+            if (response.ok) {
+              const userData = await response.json();
+              if (userData.success) {
+                // Update Redux state with fresh user data
+                dispatch(SetUser(userData.data));
+                console.log("✅ User data refreshed after payment");
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error refreshing user data:', error);
+        }
+      };
+
+      // Only refresh once per payment
+      const refreshKey = `refreshed_${paymentSuccess}`;
+      if (!localStorage.getItem(refreshKey)) {
+        refreshUserData();
+        localStorage.setItem(refreshKey, 'true');
+      }
     }
   }, [isPaymentPending, activeRoute, navigate, user]);
 
@@ -228,239 +295,94 @@ function ProtectedRoute({ children }) {
   }, [user]);
 
 
-  const getButtonClass = (title) => {
-    // Always allow access to Profile, Subscription/Plans, and Logout
-    if (title === "Plans" || title === "Profile" || title === "Logout" || title === "Subscription") {
-      return ""; // No class applied
-    }
-
-    // Disable buttons for users with paymentRequired or no subscription
-    if ((user?.paymentRequired || user?.subscriptionStatus === 'free' || !user?.subscriptionStatus) && !user?.isAdmin) {
-      return subscriptionData?.paymentStatus !== "paid" ? "button-disabled" : "";
-    }
-
-    // Users with active subscription can access all features
-    return "";
-  };
+  // getButtonClass function removed since header was removed
 
 
 
 
   return (
     <div className="layout-modern min-h-screen flex flex-col">
-      {/* Modern Sidebar for regular users */}
-      {!user?.isAdmin && <ModernSidebar />}
+      {/* CSS Override to fix mobile header issues */}
+      <style>{`
+        @media (max-width: 768px) {
+          /* Reset all old mobile header styles */
+          .nav-modern, header, .safe-header-animation {
+            all: unset !important;
+          }
+
+          .lg\\:hidden {
+            all: unset !important;
+          }
+
+          /* Hide old sidebar */
+          .sidebar, .mobile-sidebar, .modern-sidebar {
+            display: none !important;
+          }
+
+          /* Ensure flag image displays properly */
+          img[alt*="flag"] {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+          }
+        }
+
+        /* Bell positioning - mobile vs tablet */
+        @media (max-width: 640px) {
+          .mobile-bell-left {
+            display: block !important;
+          }
+          .mobile-bell-right {
+            display: none !important;
+          }
+
+          /* Force bell to top-left corner on mobile - override all positioning */
+          .block.sm\\:hidden {
+            position: fixed !important;
+            top: 8px !important;
+            left: 8px !important;
+            z-index: 99999 !important;
+          }
+
+          /* Remove blue background from bell button on all mobile pages */
+          .notification-bell-button,
+          .mobile-bell-left .notification-bell-button,
+          .mobile-bell-right .notification-bell-button,
+          button.notification-bell-button {
+            background: transparent !important;
+            box-shadow: none !important;
+            border: none !important;
+            backdrop-filter: none !important;
+          }
+
+          /* Remove hover effects on mobile */
+          .notification-bell-button:hover,
+          .mobile-bell-left .notification-bell-button:hover,
+          .mobile-bell-right .notification-bell-button:hover,
+          button.notification-bell-button:hover {
+            background: transparent !important;
+            box-shadow: none !important;
+          }
+        }
+
+        @media (min-width: 641px) {
+          .mobile-bell-left {
+            display: none !important;
+          }
+          .mobile-bell-right {
+            display: block !important;
+          }
+        }
+      `}</style>
+
+
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-h-screen">
-        {/* Modern Responsive Header - Show for all users */}
-        {(
-          <header
-            className={`nav-modern safe-header-animation ${
-              location.pathname.includes('/write-exam') || location.pathname.includes('/take-quiz/')
-                ? 'quiz-header bg-gradient-to-r from-blue-600/98 via-blue-700/95 to-blue-600/98'
-                : 'bg-gradient-to-r from-white/98 via-blue-50/95 to-white/98'
-            } backdrop-blur-xl border-b border-blue-100/50 sticky top-0 z-30 shadow-lg shadow-blue-100/20`}
-            style={{
-              minHeight: '48px',
-              height: '48px',
-              maxHeight: '48px',
-              padding: '0'
-            }}
-          >
-          <div className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 max-w-6xl mx-auto" style={{ padding: '0 1rem', maxWidth: '1200px' }}>
-            <div className="flex items-center justify-between" style={{ height: '48px', minHeight: '48px', maxHeight: '48px' }}>
-              {/* Left section - Empty for spacing */}
-              <div className="flex-1"></div>
+        {/* Brainwave Header for all pages */}
+        {!user?.isAdmin && <BrainwaveHeader />}
 
-              {/* Center Section - Tanzania Flag + Brainwave Title + Logo */}
-              <div className="flex justify-center flex-1" style={{ alignItems: 'center', height: '100%' }}>
-                <div
-                  className="relative group flex items-center space-x-2 sm:space-x-3 safe-center-animation"
-                  style={{ alignItems: 'center', gap: '0.5rem', height: 'auto' }}
-                >
-                  {/* Tanzania Flag - Using actual flag image */}
-                  <div
-                    className="rounded-md overflow-hidden border-2 border-gray-300 shadow-lg relative"
-                    style={{
-                      width: '24px',
-                      height: '18px',
-                      flexShrink: 0
-                    }}
-                  >
-                    <img
-                      src="https://flagcdn.com/w40/tz.png"
-                      alt="Tanzania Flag"
-                      className="w-full h-full object-cover"
-                      style={{ objectFit: 'cover' }}
-                      onError={(e) => {
-                        // Fallback to another flag source if first fails
-                        e.target.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Flag_of_Tanzania.svg/32px-Flag_of_Tanzania.svg.png";
-                        e.target.onerror = () => {
-                          // Final fallback - hide image and show text
-                          e.target.style.display = 'none';
-                          e.target.parentElement.innerHTML = '<div class="w-full h-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold">TZ</div>';
-                        };
-                      }}
-                    />
-                  </div>
 
-                  {/* Amazing Animated Brainwave Text */}
-                  <div className="relative brainwave-container">
-                    <h1 className="text-base sm:text-lg md:text-xl font-black tracking-tight relative z-10 select-none"
-                        style={{
-                          fontFamily: "'Inter', 'SF Pro Display', 'Helvetica Neue', sans-serif",
-                          letterSpacing: '-0.02em',
-                          fontSize: '1.1rem',
-                          lineHeight: '1.2',
-                          margin: '0',
-                          padding: '0'
-                        }}>
-                      {/* Brain - simplified safe animation */}
-                      <span
-                        className="relative inline-block brain-text"
-                        style={{
-                          color: '#1f2937',
-                          fontWeight: '900',
-                          textShadow: '0 0 10px rgba(59, 130, 246, 0.5)',
-                          animation: 'brainGlow 3s ease-in-out infinite'
-                        }}
-                      >
-                        Brain
-
-                        {/* Electric spark - CSS animation */}
-                        <div
-                          className="absolute -top-1 -right-1 w-2 h-2 rounded-full electric-spark"
-                          style={{
-                            backgroundColor: '#3b82f6',
-                            boxShadow: '0 0 10px #3b82f6',
-                            animation: 'sparkPulse 2s ease-in-out infinite'
-                          }}
-                        />
-                      </span>
-
-                      {/* Wave - simplified safe animation */}
-                      <span
-                        className="relative inline-block wave-text"
-                        style={{
-                          color: '#059669',
-                          fontWeight: '900',
-                          textShadow: '0 0 10px rgba(16, 185, 129, 0.5)',
-                          animation: 'waveFlow 3s ease-in-out infinite'
-                        }}
-                      >
-                        wave
-
-                        {/* Wave particle - CSS animation */}
-                        <div
-                          className="absolute top-0 left-0 w-1.5 h-1.5 rounded-full wave-particle"
-                          style={{
-                            backgroundColor: '#10b981',
-                            boxShadow: '0 0 8px #10b981',
-                            animation: 'waveParticle 3s ease-in-out infinite'
-                          }}
-                        />
-                      </span>
-                    </h1>
-
-                    {/* Glowing underline effect - CSS animation */}
-                    <div
-                      className="absolute -bottom-1 left-0 h-1 rounded-full glowing-underline"
-                      style={{
-                        background: 'linear-gradient(90deg, #3b82f6, #10b981, #3b82f6)',
-                        boxShadow: '0 0 15px rgba(16, 185, 129, 0.6)',
-                        width: '100%',
-                        animation: 'underlineGlow 3s ease-in-out infinite'
-                      }}
-                    />
-                  </div>
-
-                  {/* Official Logo - Small like profile */}
-                  <div
-                    className="rounded-full overflow-hidden border-2 border-white/20 relative"
-                    style={{
-                      background: '#f0f0f0',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                      width: '24px',
-                      height: '24px',
-                      flexShrink: 0
-                    }}
-                  >
-                    <img
-                      src="/favicon.png"
-                      alt="Brainwave Logo"
-                      className="w-full h-full object-cover"
-                      style={{ objectFit: 'cover' }}
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'flex';
-                      }}
-                    />
-                    <div
-                      className="w-full h-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold"
-                      style={{
-                        display: 'none',
-                        fontSize: '12px'
-                      }}
-                    >
-                      🧠
-                    </div>
-                  </div>
-
-                  {/* Modern Glow Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-gray-900/5 to-blue-500/5 blur-xl opacity-0 group-hover:opacity-100 transition-all duration-700 -z-10 scale-110"></div>
-                </div>
-              </div>
-
-              {/* Right Section - Notifications + User Profile */}
-              <div className="flex items-center justify-end space-x-2 sm:space-x-3 flex-1">
-                {/* Notification Bell */}
-                {!user?.isAdmin && (
-                  <div className="safe-notification-animation">
-                    <NotificationBell unreadCount={2} />
-                  </div>
-                )}
-
-                <div
-                  className="flex items-center space-x-2 group safe-profile-animation cursor-pointer"
-                  onClick={() => navigate('/profile')}
-                  title="Go to Profile"
-                >
-                  {/* Profile Picture with Online Status */}
-                  <ProfilePicture
-                    user={{
-                      ...user,
-                      isOnline: true,
-                      lastActivity: new Date().toISOString()
-                    }}
-                    size="sm"
-                    showOnlineStatus={true}
-                    style={{
-                      width: '32px',
-                      height: '32px'
-                    }}
-                  />
-
-                  {/* User Name and Class */}
-                  <div className="hidden sm:block text-right">
-                    <div className="text-xs md:text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors duration-300">
-                      {user?.name || 'User'}
-                    </div>
-                    <div className="text-xs text-gray-500 group-hover:text-blue-500 transition-colors duration-300">
-                      {user?.level === 'primary' ? `Class ${user?.class}` : user?.class}
-                    </div>
-                  </div>
-
-                  {/* Profile Access Indicator */}
-                  <div className="hidden md:block">
-                    <TbUser className="text-gray-400 group-hover:text-blue-500 transition-colors duration-300 text-sm" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </header>
-        )}
 
         {/* Page Content */}
         <main className={`flex-1 overflow-auto ${

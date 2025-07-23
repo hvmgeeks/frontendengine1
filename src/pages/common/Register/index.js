@@ -203,16 +203,34 @@ function Register() {
             label="Education Level"
             rules={[{ required: true, message: "Please select your education level" }]}
           >
-            <Select
-              className="form-input"
-              placeholder="Select your education level"
-              onChange={(value) => setSchoolType(value)}
+            <select
+              className="form-input mobile-dropdown-fix"
+              onChange={(e) => {
+                setSchoolType(e.target.value);
+                form.setFieldsValue({ level: e.target.value, class: undefined });
+              }}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                fontSize: '16px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                backgroundColor: 'white',
+                minHeight: '48px',
+                appearance: 'none',
+                backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 12px center',
+                backgroundSize: '16px',
+                paddingRight: '40px'
+              }}
             >
-              <Option value="Primary">Primary Education (Classes 1-7)</Option>
-              <Option value="Primary_Kiswahili">Elimu ya Msingi - Kiswahili (Madarasa 1-7)</Option>
-              <Option value="Secondary">Secondary Education (Forms 1-4)</Option>
-              <Option value="Advance">Advanced Level (Forms 5-6)</Option>
-            </Select>
+              <option value="">Select your education level</option>
+              <option value="Primary">Primary Education (Classes 1-7)</option>
+              <option value="Primary_Kiswahili">Elimu ya Msingi - Kiswahili (Madarasa 1-7)</option>
+              <option value="Secondary">Secondary Education (Forms 1-4)</option>
+              <option value="Advance">Advanced Level (Forms 5-6)</option>
+            </select>
           </Form.Item>
 
           {/* Class/Form */}
@@ -221,24 +239,44 @@ function Register() {
             label="Class/Form"
             rules={[{ required: true, message: "Please select your class or form" }]}
           >
-            <Select
-              className="form-input"
-              placeholder={schoolType ? "Select your class/form" : "Please select education level first"}
+            <select
+              className="form-input mobile-dropdown-fix"
               disabled={!schoolType}
+              onChange={(e) => {
+                form.setFieldsValue({ class: e.target.value });
+              }}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                fontSize: '16px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                backgroundColor: schoolType ? 'white' : '#f9fafb',
+                minHeight: '48px',
+                appearance: 'none',
+                backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 12px center',
+                backgroundSize: '16px',
+                paddingRight: '40px',
+                cursor: schoolType ? 'pointer' : 'not-allowed',
+                opacity: schoolType ? 1 : 0.6
+              }}
             >
+              <option value="">{schoolType ? "Select your class/form" : "Please select education level first"}</option>
               {schoolType === "Primary" && [1, 2, 3, 4, 5, 6, 7].map((i) => (
-                <Option key={i} value={i}>{`Class ${i}`}</Option>
+                <option key={i} value={i}>{`Class ${i}`}</option>
               ))}
               {schoolType === "Primary_Kiswahili" && [1, 2, 3, 4, 5, 6, 7].map((i) => (
-                <Option key={i} value={i}>{`Darasa la ${i}`}</Option>
+                <option key={i} value={i}>{`Darasa la ${i}`}</option>
               ))}
               {schoolType === "Secondary" && [1, 2, 3, 4].map((i) => (
-                <Option key={i} value={i}>{i}</Option>
+                <option key={i} value={i}>{`Form ${i}`}</option>
               ))}
               {schoolType === "Advance" && [5, 6].map((i) => (
-                <Option key={i} value={i}>{i}</Option>
+                <option key={i} value={i}>{`Form ${i}`}</option>
               ))}
-            </Select>
+            </select>
           </Form.Item>
 
           {/* Phone Number */}

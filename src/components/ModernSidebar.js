@@ -20,12 +20,23 @@ import {
   TbStar
 } from 'react-icons/tb';
 
-const ModernSidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+const ModernSidebar = ({ isOpen = false, setIsOpen = () => {} }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSelector((state) => state.user);
   const { t, isKiswahili } = useLanguage();
+
+  // Mock notification counts - in real app, these would come from API
+  const notificationCounts = {
+    hub: 0, // No notifications for hub
+    ranking: 0, // No notifications for ranking
+    videoLessons: 3, // 3 new video lessons
+    forum: 5, // 5 new forum posts
+    takeQuiz: 2, // 2 new quizzes available
+    profile: 0, // No notifications for profile
+    subscription: 0, // No notifications for subscription
+    logout: 0 // No notifications for logout
+  };
 
   // Handle keyboard events
   useEffect(() => {
@@ -55,78 +66,64 @@ const ModernSidebar = () => {
       description: isKiswahili ? 'Dashibodi kuu' : 'Main dashboard',
       icon: TbHome,
       path: '/user/hub',
-      color: 'from-blue-500 to-blue-600'
+      color: 'from-blue-500 to-blue-600',
+      notificationCount: notificationCounts.hub
     },
     {
-      title: isKiswahili ? 'Fanya Mtihani' : 'Take Quiz',
-      description: isKiswahili ? 'Jaribu maarifa yako' : 'Test your knowledge',
-      icon: TbBrain,
-      path: '/user/quiz',
-      color: 'from-purple-500 to-purple-600'
-    },
-    {
-      title: isKiswahili ? 'Vifaa vya Kusoma' : 'Study Materials',
-      description: isKiswahili ? 'Vitabu, video na maelezo' : 'Books, videos & notes',
-      icon: TbBook,
-      path: '/user/study-material',
-      color: 'from-green-500 to-green-600'
+      title: isKiswahili ? 'Uongozi' : 'Ranking',
+      description: isKiswahili ? 'Jedwali la uongozi' : 'Leaderboard rankings',
+      icon: TbTrophy,
+      path: '/user/ranking',
+      color: 'from-yellow-500 to-yellow-600',
+      notificationCount: notificationCounts.ranking
     },
     {
       title: isKiswahili ? 'Masomo ya Video' : 'Video Lessons',
-      description: isKiswahili ? 'Tazama video za kielimu' : 'Watch educational videos',
+      description: isKiswahili ? 'Masomo ya video' : 'Educational videos',
       icon: TbVideo,
       path: '/user/video-lessons',
-      color: 'from-red-500 to-red-600'
+      color: 'from-green-500 to-green-600',
+      notificationCount: notificationCounts.videoLessons
     },
     {
-      title: isKiswahili ? 'Ujuzi wa Video' : 'Skills',
-      description: isKiswahili ? 'Jifunze ujuzi mpya' : 'Learn new skills',
-      icon: TbStar,
-      path: '/user/skills',
-      color: 'from-yellow-500 to-yellow-600'
+      title: isKiswahili ? 'Jukwaa' : 'Forum',
+      description: isKiswahili ? 'Mazungumzo na wanafunzi' : 'Student discussions',
+      icon: TbMessageCircle,
+      path: '/forum',
+      color: 'from-pink-500 to-pink-600',
+      notificationCount: notificationCounts.forum
     },
     {
-      title: isKiswahili ? 'Ripoti' : 'Reports',
-      description: isKiswahili ? 'Fuatilia maendeleo' : 'Track progress',
-      icon: TbChartLine,
-      path: '/user/reports',
-      color: 'from-orange-500 to-orange-600'
-    },
-    {
-      title: isKiswahili ? 'Orodha ya Ushindi' : 'Ranking',
-      description: isKiswahili ? 'Ona nafasi yako' : 'See your position',
-      icon: TbTrophy,
-      path: '/user/ranking',
-      color: 'from-yellow-500 to-yellow-600'
+      title: isKiswahili ? 'Fanya Jaribio' : 'Take Quiz',
+      description: isKiswahili ? 'Jaribu ujuzi wako' : 'Test your knowledge',
+      icon: TbBrain,
+      path: '/user/quiz',
+      color: 'from-emerald-500 to-emerald-600',
+      notificationCount: notificationCounts.takeQuiz
     },
     {
       title: isKiswahili ? 'Wasifu' : 'Profile',
       description: isKiswahili ? 'Simamia akaunti' : 'Manage account',
       icon: TbUser,
       path: '/profile',
-      color: 'from-indigo-500 to-indigo-600'
+      color: 'from-indigo-500 to-indigo-600',
+      notificationCount: notificationCounts.profile
     },
     {
       title: isKiswahili ? 'Uanachama' : 'Subscription',
       description: isKiswahili ? 'Simamia mpango wako' : 'Manage your plan',
-      icon: TbStar,
+      icon: TbCreditCard,
       path: '/subscription',
-      color: 'from-purple-500 to-purple-600'
+      color: 'from-purple-500 to-purple-600',
+      notificationCount: notificationCounts.subscription
     },
-    {
-      title: isKiswahili ? 'Jukwaa' : 'Forum',
-      description: isKiswahili ? 'Unganisha na wenzako' : 'Connect with peers',
-      icon: TbMessageCircle,
-      path: '/forum',
-      color: 'from-pink-500 to-pink-600'
-    },
-
     {
       title: isKiswahili ? 'Ondoka' : 'Logout',
       description: isKiswahili ? 'Toka kwenye akaunti' : 'Sign out of account',
       icon: TbLogout,
       path: 'logout',
-      color: 'from-red-500 to-red-600'
+      color: 'from-red-500 to-red-600',
+      notificationCount: notificationCounts.logout
     }
   ];
 
@@ -152,35 +149,7 @@ const ModernSidebar = () => {
 
   return (
     <>
-      {/* Toggle Button - Responsive */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed z-50 bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 hover:scale-105"
-        style={{
-          top: window.innerWidth <= 768 ? '8px' : '16px',
-          left: window.innerWidth <= 768 ? '8px' : '16px',
-          padding: window.innerWidth <= 768 ? '8px' : '12px'
-        }}
-        title={isOpen ? "Close Menu" : "Open Menu"}
-      >
-        {isOpen ? (
-          <TbX
-            className="text-gray-700"
-            style={{
-              width: window.innerWidth <= 768 ? '20px' : '24px',
-              height: window.innerWidth <= 768 ? '20px' : '24px'
-            }}
-          />
-        ) : (
-          <TbMenu2
-            className="text-gray-700"
-            style={{
-              width: window.innerWidth <= 768 ? '20px' : '24px',
-              height: window.innerWidth <= 768 ? '20px' : '24px'
-            }}
-          />
-        )}
-      </button>
+
 
       {/* Backdrop */}
       {isOpen && (
@@ -229,7 +198,8 @@ const ModernSidebar = () => {
               <div
                 className="text-center"
                 style={{
-                  paddingRight: window.innerWidth <= 768 ? '32px' : '48px'
+                  paddingRight: window.innerWidth <= 768 ? '32px' : '48px',
+                  marginTop: window.innerWidth <= 768 ? '20px' : '24px'
                 }}
               >
                 <h1
@@ -290,7 +260,7 @@ const ModernSidebar = () => {
                       }}
                     >
                       <div
-                        className={`rounded-lg bg-gradient-to-r ${item.color} flex items-center justify-center`}
+                        className={`relative rounded-lg bg-gradient-to-r ${item.color} flex items-center justify-center`}
                         style={{
                           width: window.innerWidth <= 768 ? '32px' : '40px',
                           height: window.innerWidth <= 768 ? '32px' : '40px'
@@ -303,15 +273,27 @@ const ModernSidebar = () => {
                             height: window.innerWidth <= 768 ? '16px' : '20px'
                           }}
                         />
+                        {/* Notification Badge */}
+                        {item.notificationCount > 0 && (
+                          <div
+                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-xs shadow-lg"
+                            style={{
+                              width: window.innerWidth <= 768 ? '16px' : '18px',
+                              height: window.innerWidth <= 768 ? '16px' : '18px',
+                              fontSize: window.innerWidth <= 768 ? '10px' : '11px',
+                              minWidth: window.innerWidth <= 768 ? '16px' : '18px'
+                            }}
+                          >
+                            {item.notificationCount > 99 ? '99+' : item.notificationCount}
+                          </div>
+                        )}
                       </div>
                       <div className="text-left flex-1">
                         <p
                           className={`font-medium ${
                             isActive
-                              ? 'text-blue-700'
-                              : isLogout
-                              ? 'text-red-700'
-                              : 'text-gray-900'
+                              ? 'text-blue-200'
+                              : 'text-white'
                           }`}
                           style={{
                             fontSize: window.innerWidth <= 768 ? '14px' : '16px'
@@ -322,10 +304,8 @@ const ModernSidebar = () => {
                         <p
                           className={`${
                             isActive
-                              ? 'text-blue-600'
-                              : isLogout
-                              ? 'text-red-600'
-                              : 'text-gray-500'
+                              ? 'text-blue-100'
+                              : 'text-gray-200'
                           }`}
                           style={{
                             fontSize: window.innerWidth <= 768 ? '11px' : '14px'
@@ -338,10 +318,10 @@ const ModernSidebar = () => {
                     <TbChevronRight
                       className={`${
                         isActive
-                          ? 'text-blue-600'
+                          ? 'text-blue-200'
                           : isLogout
-                          ? 'text-red-400'
-                          : 'text-gray-400'
+                          ? 'text-red-200'
+                          : 'text-gray-300'
                       }`}
                       style={{
                         width: window.innerWidth <= 768 ? '16px' : '20px',

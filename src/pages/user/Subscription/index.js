@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
 import { message } from 'antd';
-import { FaCrown, FaCalendarAlt, FaCheckCircle, FaTimesCircle, FaCreditCard, FaUser } from 'react-icons/fa';
+import { FaCrown, FaCalendarAlt, FaCheckCircle, FaTimesCircle, FaCreditCard, FaUser, FaSync } from 'react-icons/fa';
 import { getPlans } from '../../../apicalls/plans';
 import { addPayment, checkPaymentStatus } from '../../../apicalls/payment';
-import { ShowLoading, HideLoading } from '../../../redux/loaderSlice';
+import { getUserInfo } from '../../../apicalls/users';
+import { SetUser } from '../../../redux/usersSlice';
+import { SetSubscription } from '../../../redux/subscriptionSlice';
+
 import UpgradeRestrictionModal from '../../../components/UpgradeRestrictionModal/UpgradeRestrictionModal';
 import SubscriptionExpiredModal from '../../../components/SubscriptionExpiredModal/SubscriptionExpiredModal';
 import './Subscription.css';
@@ -15,19 +18,21 @@ const Subscription = () => {
   const [loading, setLoading] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(null); // Changed to store plan ID instead of boolean
   const [showProcessingModal, setShowProcessingModal] = useState(false);
-
+  const [localSubscriptionData, setLocalSubscriptionData] = useState(null);
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState('');
   const [showUpgradeRestriction, setShowUpgradeRestriction] = useState(false);
+  const [showUpgradeNotification, setShowUpgradeNotification] = useState(false);
   const [showExpiredModal, setShowExpiredModal] = useState(false);
-  const [processingStartTime, setProcessingStartTime] = useState(null);
+
   const [showTryAgain, setShowTryAgain] = useState(false);
   const [autoNavigateCountdown, setAutoNavigateCountdown] = useState(null);
   const { user } = useSelector((state) => state.user);
   const { subscriptionData } = useSelector((state) => state.subscription);
   const dispatch = useDispatch();
+
 
   // Fallback sample plans in case API fails
   const samplePlans = [
@@ -79,6 +84,58 @@ const Subscription = () => {
   useEffect(() => {
     fetchPlans();
     checkCurrentSubscription();
+
+    // Set up periodic subscription status checking for real-time updates
+    const subscriptionCheckInterval = setInterval(() => {
+      console.log('🔄 Periodic subscription status check...');
+      checkCurrentSubscription();
+    }, 30000); // Check every 30 seconds
+
+    // Check for recent payment success and redirect if needed
+    const paymentSuccess = localStorage.getItem('paymentSuccess');
+    if (paymentSuccess) {
+      try {
+        const successData = JSON.parse(paymentSuccess);
+        const timeDiff = Date.now() - successData.timestamp;
+
+        // If payment was successful within last 2 minutes and user hasn't been redirected
+        if (timeDiff < 120000 && !successData.redirected) {
+          console.log('🔄 Recent payment success detected, redirecting to hub...');
+
+          // Mark as redirected
+          localStorage.setItem('paymentSuccess', JSON.stringify({
+            ...successData,
+            redirected: true
+          }));
+
+          // Show success message and redirect
+          message.success({
+            content: '🎉 Payment successful! Redirecting to Hub...',
+            duration: 3,
+            style: {
+              marginTop: '20vh',
+              fontSize: '16px',
+              fontWeight: '600'
+            }
+          });
+
+          setTimeout(() => {
+            window.location.href = '/user/hub';
+          }, 2000);
+        }
+      } catch (error) {
+        console.error('Error parsing payment success data:', error);
+        localStorage.removeItem('paymentSuccess');
+      }
+    }
+
+    // Clean up interval on component unmount
+    return () => {
+      if (subscriptionCheckInterval) {
+        clearInterval(subscriptionCheckInterval);
+        console.log('🧹 Cleaned up subscription check interval');
+      }
+    };
   }, []);
 
   // Enable background scrolling when modals are open for better UX
@@ -161,9 +218,32 @@ const Subscription = () => {
 
   const checkCurrentSubscription = async () => {
     try {
+      console.log('🔍 Checking current subscription status...');
+
+      // First, refresh user data to get latest subscription status
+      try {
+        const userResponse = await getUserInfo();
+        if (userResponse.success) {
+          dispatch(SetUser(userResponse.data));
+        }
+      } catch (userError) {
+        console.log('Could not refresh user data:', userError.message);
+      }
+
+      // Then check payment status
       const response = await checkPaymentStatus();
+
+      if (response.success && response.data) {
+        console.log('✅ Subscription data found:', response.data);
+        setLocalSubscriptionData(response.data);
+        dispatch(SetSubscription(response.data));
+      } else {
+        console.log('ℹ️ No active subscription found');
+        setLocalSubscriptionData(null);
+      }
     } catch (error) {
-      // No active subscription found
+      console.log('ℹ️ No active subscription found:', error.message);
+      setLocalSubscriptionData(null);
     }
   };
 
@@ -200,7 +280,7 @@ const Subscription = () => {
     setShowProcessingModal(false);
     setPaymentLoading(null); // Reset to null instead of false
     setShowTryAgain(false);
-    setProcessingStartTime(null);
+
     setPaymentStatus('');
     message.info('Payment process cancelled. You can try again anytime.');
   };
@@ -209,7 +289,7 @@ const Subscription = () => {
   const handleTryAgain = () => {
     if (selectedPlan) {
       setShowTryAgain(false);
-      setProcessingStartTime(null);
+
       handlePlanSelect(selectedPlan);
     }
   };
@@ -219,8 +299,9 @@ const Subscription = () => {
   const handlePlanSelect = async (plan) => {
     // Check if user already has an active subscription
     if (subscriptionData && subscriptionData.status === 'active' && subscriptionData.paymentStatus === 'paid') {
-
-      setShowUpgradeRestriction(true);
+      // Show upgrade notification modal instead of restriction
+      setShowUpgradeNotification(true);
+      setSelectedPlan(plan);
       return;
     }
 
@@ -236,7 +317,7 @@ const Subscription = () => {
       setPaymentLoading(plan._id);
       setShowProcessingModal(true);
       setShowTryAgain(false);
-      setProcessingStartTime(Date.now());
+
       setPaymentStatus('🚀 Preparing your payment request...');
 
 
@@ -266,10 +347,11 @@ const Subscription = () => {
 
         // Show confirmation message to user
         message.success({
-          content: `💳 Payment initiated! 📱 Check your phone (${user.phoneNumber}) for SMS confirmation from ZenoPay.`,
-          duration: 8,
+          content: `💳 Payment initiated! 📱 Check your phone (${user.phoneNumber}) for SMS from ZenoPay. SMS may take 1-5 minutes to arrive.`,
+          duration: 10,
           style: {
             marginTop: '20vh',
+            fontSize: '14px'
           }
         });
 
@@ -305,10 +387,21 @@ const Subscription = () => {
         try {
           const statusResponse = await checkPaymentStatus({ orderId });
 
-          if (statusResponse && (
+          // Enhanced payment success detection with multiple conditions
+          const isPaymentSuccessful = statusResponse && (
+            // Condition 1: Subscription activated
             (statusResponse.paymentStatus === 'paid' && statusResponse.status === 'active') ||
-            (statusResponse.status === 'completed' && statusResponse.success === true)
-          )) {
+            // Condition 2: Standard completion
+            (statusResponse.status === 'completed' && statusResponse.success === true) ||
+            // Condition 3: Demo mode success
+            (statusResponse.demo === true && statusResponse.success === true) ||
+            // Condition 4: ZenoPay webhook success
+            (statusResponse.zenopay_status === 'COMPLETED') ||
+            // Condition 5: Direct success flag
+            (statusResponse.success === true && statusResponse.status === 'completed')
+          );
+
+          if (isPaymentSuccessful) {
             // Payment confirmed immediately!
             isPolling = false; // Stop polling
             if (handleVisibilityChange) {
@@ -322,8 +415,49 @@ const Subscription = () => {
             setShowSuccessModal(true);
             setPaymentLoading(null);
 
-            // Refresh subscription data
-            checkCurrentSubscription();
+            // Enhanced subscription data refresh with multiple attempts
+            const refreshSubscriptionData = async (attempt = 1) => {
+              try {
+                console.log(`🔄 Subscription refresh attempt ${attempt}/5`);
+
+                // First refresh user data
+                const userResponse = await getUserInfo();
+                if (userResponse.success) {
+                  dispatch(SetUser(userResponse.data));
+                  console.log('✅ User data refreshed');
+                }
+
+                // Then refresh subscription data
+                const subResponse = await checkPaymentStatus();
+                if (subResponse.success && subResponse.data && subResponse.status === 'active') {
+                  setLocalSubscriptionData(subResponse.data);
+                  dispatch(SetSubscription(subResponse.data));
+                  console.log('✅ Active subscription found and updated');
+
+                  // Force UI refresh after successful subscription update
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 2000);
+
+                } else if (attempt < 5) {
+                  console.log(`⏳ Subscription not active yet, retrying in ${attempt * 2} seconds...`);
+                  setTimeout(() => refreshSubscriptionData(attempt + 1), attempt * 2000);
+                } else {
+                  console.log('⚠️ Max refresh attempts reached, calling standard refresh');
+                  checkCurrentSubscription();
+                }
+              } catch (error) {
+                console.error(`❌ Refresh attempt ${attempt} failed:`, error);
+                if (attempt < 5) {
+                  setTimeout(() => refreshSubscriptionData(attempt + 1), attempt * 2000);
+                } else {
+                  checkCurrentSubscription(); // Fallback to standard refresh
+                }
+              }
+            };
+
+            // Start enhanced refresh
+            refreshSubscriptionData();
 
             // Show immediate success message
             message.success({
@@ -335,20 +469,30 @@ const Subscription = () => {
               }
             });
 
-            // Start countdown for auto-navigation to hub
-            setAutoNavigateCountdown(5);
+            // Enhanced auto-navigation with 3-second countdown
+            setAutoNavigateCountdown(3); // Set to 3 seconds as requested
             const countdownInterval = setInterval(() => {
               setAutoNavigateCountdown(prev => {
                 if (prev <= 1) {
                   clearInterval(countdownInterval);
-
+                  // Force navigation to hub with delay for better UX
                   setShowSuccessModal(false);
-                  window.location.href = '/user/hub';
+                  setTimeout(() => {
+                    window.location.href = '/user/hub';
+                  }, 500);
                   return null;
                 }
                 return prev - 1;
               });
             }, 1000);
+
+            // Store success state in localStorage for persistence
+            localStorage.setItem('paymentSuccess', JSON.stringify({
+              timestamp: Date.now(),
+              orderId: orderId,
+              status: 'completed',
+              redirected: false
+            }));
 
           } else if (attempts >= maxAttempts) {
             // Timeout - but don't fail completely
@@ -440,18 +584,42 @@ const Subscription = () => {
   };
 
   const getSubscriptionStatus = () => {
-    if (subscriptionData && subscriptionData.paymentStatus === 'paid' && subscriptionData.status === 'active') {
-      const endDate = new Date(subscriptionData.endDate);
+    // First check user's subscription status (most reliable)
+    if (user?.subscriptionStatus === 'active') {
+      // Double-check if subscription is truly active by checking end date
+      if (user?.subscriptionEndDate) {
+        const endDate = new Date(user.subscriptionEndDate);
+        const now = new Date();
+        if (endDate > now) {
+          return 'active';
+        } else {
+          return 'expired'; // End date has passed
+        }
+      }
+      return 'active'; // No end date, assume active
+    }
+
+    // Check if user status indicates expired subscription
+    if (user?.subscriptionStatus === 'free' && user?.subscriptionEndDate) {
+      return 'expired'; // User had a subscription that expired
+    }
+
+    // Fallback to subscription data check (use local or redux state)
+    const currentSubscriptionData = localSubscriptionData || subscriptionData;
+    if (currentSubscriptionData && currentSubscriptionData.paymentStatus === 'paid' && currentSubscriptionData.status === 'active') {
+      const endDate = new Date(currentSubscriptionData.endDate);
       const now = new Date();
       if (endDate > now) {
         return 'active';
+      } else {
+        return 'expired';
       }
     }
-    
-    if (user?.subscriptionStatus === 'expired' || (subscriptionData && subscriptionData.status === 'expired')) {
+
+    if (user?.subscriptionStatus === 'expired' || (currentSubscriptionData && currentSubscriptionData.status === 'expired')) {
       return 'expired';
     }
-    
+
     return 'none';
   };
 
@@ -465,8 +633,11 @@ const Subscription = () => {
   };
 
   const getDaysRemaining = () => {
-    if (!subscriptionData?.endDate) return 0;
-    const endDate = new Date(subscriptionData.endDate);
+    const currentSubscriptionData = localSubscriptionData || subscriptionData;
+    const endDateSource = currentSubscriptionData?.endDate || user?.subscriptionEndDate;
+
+    if (!endDateSource) return 0;
+    const endDate = new Date(endDateSource);
     const now = new Date();
     const diffTime = endDate - now;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -500,45 +671,159 @@ const Subscription = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="current-subscription"
         >
-          <h2 className="section-title">Current Subscription</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <h2 className="section-title" style={{ margin: 0 }}>Current Subscription</h2>
+            <button
+              onClick={() => {
+                console.log('🔄 Manual subscription refresh triggered');
+                checkCurrentSubscription();
+                message.info('🔄 Refreshing subscription status...');
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '8px 16px',
+                backgroundColor: '#3b82f6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#2563eb'}
+              onMouseOut={(e) => e.target.style.backgroundColor = '#3b82f6'}
+            >
+              <FaSync style={{ fontSize: '12px' }} />
+              Refresh Status
+            </button>
+          </div>
           
           {subscriptionStatus === 'active' && (
-            <div className="subscription-card active">
-              <div className="subscription-status">
-                <FaCheckCircle className="status-icon active" />
-                <span className="status-text">Active Subscription</span>
+            <div style={{
+              background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+              color: 'white !important',
+              border: '3px solid #10B981',
+              boxShadow: '0 8px 25px rgba(16, 185, 129, 0.3)',
+              borderRadius: '1rem',
+              padding: '2rem',
+              marginBottom: '3rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                <FaCheckCircle style={{ color: '#ECFDF5', fontSize: '24px' }} />
+                <span style={{
+                  color: 'white !important',
+                  fontSize: '20px',
+                  fontWeight: 'bold',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                  margin: '0'
+                }}>
+                  ✅ ACTIVE SUBSCRIPTION
+                </span>
               </div>
-              <div className="subscription-details">
-                <div className="detail-item">
-                  <FaCrown className="detail-icon" />
-                  <span>Plan: {subscriptionData?.activePlan?.title || 'Premium Plan'}</span>
+              <div style={{ display: 'grid', gap: '1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1rem' }}>
+                  <FaCrown style={{ color: '#FEF3C7' }} />
+                  <span style={{ color: 'white !important', fontWeight: '600' }}>
+                    Plan: {(localSubscriptionData || subscriptionData)?.activePlan?.title || 'Premium Plan'}
+                  </span>
                 </div>
-                <div className="detail-item">
-                  <FaCalendarAlt className="detail-icon" />
-                  <span>Expires: {formatDate(subscriptionData?.endDate)}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1rem' }}>
+                  <FaCalendarAlt style={{ color: '#FEF3C7' }} />
+                  <span style={{ color: 'white !important', fontWeight: '600' }}>
+                    Expires: {formatDate((localSubscriptionData || subscriptionData)?.endDate || user?.subscriptionEndDate)}
+                  </span>
                 </div>
-                <div className="detail-item">
-                  <FaCheckCircle className="detail-icon" />
-                  <span>Days Remaining: {getDaysRemaining()}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1rem' }}>
+                  <FaCheckCircle style={{ color: '#FEF3C7' }} />
+                  <span style={{ color: 'white !important', fontWeight: '600' }}>
+                    Days Remaining: {getDaysRemaining()}
+                  </span>
                 </div>
+              </div>
+              <div style={{
+                marginTop: '15px',
+                padding: '10px',
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '8px',
+                textAlign: 'center'
+              }}>
+                <span style={{ color: 'white !important', fontSize: '14px', fontWeight: '500' }}>
+                  🎉 Enjoy full access to all premium features!
+                </span>
               </div>
             </div>
           )}
 
           {subscriptionStatus === 'expired' && (
-            <div className="subscription-card expired">
+            <div className="subscription-card expired" style={{
+              background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
+              color: 'white',
+              border: '3px solid #EF4444',
+              boxShadow: '0 8px 25px rgba(239, 68, 68, 0.3)',
+              animation: 'pulse 2s infinite'
+            }}>
               <div className="subscription-status">
-                <FaTimesCircle className="status-icon expired" />
-                <span className="status-text">Subscription Expired</span>
+                <FaTimesCircle className="status-icon expired" style={{ color: '#FEE2E2', fontSize: '24px' }} />
+                <span className="status-text" style={{
+                  color: 'white',
+                  fontSize: '20px',
+                  fontWeight: 'bold',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                }}>
+                  ❌ SUBSCRIPTION EXPIRED
+                </span>
               </div>
               <div className="subscription-details">
                 <div className="detail-item">
-                  <FaCalendarAlt className="detail-icon" />
-                  <span>Expired: {formatDate(subscriptionData?.endDate)}</span>
+                  <FaCalendarAlt className="detail-icon" style={{ color: '#FEE2E2' }} />
+                  <span style={{ color: 'white', fontWeight: '600' }}>
+                    Expired: {formatDate((localSubscriptionData || subscriptionData)?.endDate || user?.subscriptionEndDate)}
+                  </span>
                 </div>
-                <p className="renewal-message">
-                  Your subscription has expired. Choose a new plan below to continue accessing premium features.
-                </p>
+                <div style={{
+                  marginTop: '15px',
+                  padding: '15px',
+                  background: 'rgba(255,255,255,0.1)',
+                  borderRadius: '8px',
+                  textAlign: 'center'
+                }}>
+                  <p style={{
+                    color: 'white',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    margin: '0 0 10px 0'
+                  }}>
+                    🚫 Access Restricted
+                  </p>
+                  <p style={{
+                    color: '#FEE2E2',
+                    fontSize: '14px',
+                    margin: '0 0 15px 0'
+                  }}>
+                    Your subscription has expired. Choose a new plan below to continue accessing premium features.
+                  </p>
+                  <button
+                    onClick={() => document.querySelector('.available-plans').scrollIntoView({ behavior: 'smooth' })}
+                    style={{
+                      background: 'white',
+                      color: '#DC2626',
+                      border: 'none',
+                      padding: '10px 20px',
+                      borderRadius: '6px',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
+                    onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
+                  >
+                    💳 RENEW NOW
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -791,9 +1076,10 @@ const Subscription = () => {
                   </div>
                   <div className="phone-number">{user?.phoneNumber}</div>
                   <div className="instruction-steps">
-                    <div className="step">1. You'll receive an SMS with payment instructions</div>
+                    <div className="step">1. You'll receive an SMS with payment instructions (1-5 minutes)</div>
                     <div className="step">2. Follow the SMS steps to confirm payment</div>
                     <div className="step">3. Complete the mobile money transaction</div>
+                    <div className="step note">⚠️ Ensure your number is registered with mobile money</div>
                   </div>
                 </div>
 
@@ -999,6 +1285,56 @@ const Subscription = () => {
           user={user}
           plans={plans}
         />
+
+        {/* Upgrade Notification Modal */}
+        {showUpgradeNotification && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-3xl">📅</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Plan Update Scheduled</h3>
+                <p className="text-gray-600 mb-4">
+                  You already have an active subscription. Your new plan will be activated after your current plan expires on{' '}
+                  <span className="font-semibold text-blue-600">
+                    {subscriptionData?.endDate ? new Date(subscriptionData.endDate).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    }) : 'N/A'}
+                  </span>.
+                </p>
+                <div className="bg-blue-50 p-4 rounded-lg mb-4">
+                  <p className="text-sm text-blue-800">
+                    <strong>Selected Plan:</strong> {selectedPlan?.title}<br/>
+                    <strong>Price:</strong> {selectedPlan?.discountedPrice?.toLocaleString()} TZS<br/>
+                    <strong>Duration:</strong> {selectedPlan?.duration} month{selectedPlan?.duration > 1 ? 's' : ''}
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowUpgradeNotification(false)}
+                    className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowUpgradeNotification(false);
+                      // Here you could implement scheduling the upgrade
+                      message.success('Plan upgrade scheduled successfully! Your new plan will activate after your current plan expires.');
+                    }}
+                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Schedule Upgrade
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -49,15 +49,27 @@ function Login() {
 
       if (response.success) {
         message.success(response.message);
+
+        console.log('🔐 Login successful, storing token and user data');
+        console.log('Token to store:', response.data);
+        console.log('User to store:', response.response);
+
         localStorage.setItem("token", response.data);
+        console.log('✅ Token stored in localStorage');
 
         // Store user data in localStorage for consistency
         if (response.response) {
           localStorage.setItem("user", JSON.stringify(response.response));
+          console.log('✅ User data stored in localStorage');
 
           // IMPORTANT: Set user data in Redux immediately to prevent redirect issues
           dispatch(SetUser(response.response));
+          console.log('✅ User data set in Redux');
         }
+
+        // Verify storage immediately
+        console.log('🔍 Verification - Token in localStorage:', localStorage.getItem('token'));
+        console.log('🔍 Verification - User in localStorage:', localStorage.getItem('user'));
 
         // Check admin status from response.response (user object)
         if (response.response?.isAdmin) {

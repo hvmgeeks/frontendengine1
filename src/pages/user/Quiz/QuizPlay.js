@@ -75,13 +75,16 @@ const QuizPlay = () => {
   const [answers, setAnswers] = useState([]);
   const [timeLeft, setTimeLeft] = useState(0);
   const [startTime, setStartTime] = useState(null);
+  const [navigatingToResults, setNavigatingToResults] = useState(false);
 
-  // Load quiz data
+  // Load quiz data with optimized caching
   useEffect(() => {
     const loadQuizData = async () => {
       try {
-        console.log('Loading quiz with ID:', id);
+        const loadStartTime = performance.now();
+        console.log('🚀 Loading quiz with ID:', id);
 
+        // Quick user validation without blocking
         if (!user || !user._id) {
           const token = localStorage.getItem('token');
           if (!token) {
@@ -94,14 +97,15 @@ const QuizPlay = () => {
           }
         }
 
-        // Check for instant cached data first
+        // Check for instant cached data first (highest priority)
         const instantCacheKey = `quiz_instant_${id}`;
         const instantCached = localStorage.getItem(instantCacheKey);
 
         if (instantCached) {
           try {
             const cachedQuiz = JSON.parse(instantCached);
-            console.log('📚 Using instant cached quiz data');
+            const cacheLoadTime = performance.now() - loadStartTime;
+            console.log(`⚡ Using instant cached quiz data (${cacheLoadTime.toFixed(1)}ms)`);
 
             setQuiz(cachedQuiz);
             setQuestions(cachedQuiz.questions);
@@ -115,10 +119,11 @@ const QuizPlay = () => {
             return;
           } catch (error) {
             console.error('Error parsing instant cache:', error);
+            localStorage.removeItem(instantCacheKey); // Clean up corrupted cache
           }
         }
 
-        // Check regular cache
+        // Check regular cache (second priority)
         const cacheKey = `quiz_data_${id}`;
         const cachedData = localStorage.getItem(cacheKey);
         const cacheTime = localStorage.getItem(`${cacheKey}_time`);
@@ -127,7 +132,8 @@ const QuizPlay = () => {
         if (cachedData && cacheTime && (now - parseInt(cacheTime)) < 600000) {
           try {
             const cachedQuiz = JSON.parse(cachedData);
-            console.log('📚 Using cached quiz data');
+            const cacheLoadTime = performance.now() - loadStartTime;
+            console.log(`📚 Using cached quiz data (${cacheLoadTime.toFixed(1)}ms)`);
 
             setQuiz(cachedQuiz);
             setQuestions(cachedQuiz.questions);
@@ -138,13 +144,20 @@ const QuizPlay = () => {
             return;
           } catch (error) {
             console.error('Error parsing cached data:', error);
+            // Clean up corrupted cache
+            localStorage.removeItem(cacheKey);
+            localStorage.removeItem(`${cacheKey}_time`);
           }
         }
 
+        // Last resort: fetch from server
+        console.log('🌐 Fetching quiz from server...');
         setLoading(true);
 
+        const apiStartTime = performance.now();
         const response = await getExamById({ examId: id });
-        console.log('Quiz API response:', response);
+        const apiTime = performance.now() - apiStartTime;
+        console.log(`🌐 Quiz API response received in ${apiTime.toFixed(1)}ms:`, response);
         
         if (response.success) {
           if (!response.data) {
@@ -175,7 +188,8 @@ const QuizPlay = () => {
           localStorage.setItem(cacheKey, JSON.stringify(response.data));
           localStorage.setItem(`${cacheKey}_time`, Date.now().toString());
 
-          console.log('Quiz loaded successfully:', response.data);
+          const totalLoadTime = performance.now() - loadStartTime;
+          console.log(`✅ Quiz loaded successfully in ${totalLoadTime.toFixed(1)}ms:`, response.data);
           console.log('Quiz duration (seconds):', response.data.duration);
         } else {
           console.error('Quiz API error:', response.message);
@@ -228,6 +242,14 @@ const QuizPlay = () => {
       console.log('✅ setSubmitting(true) called');
       console.log('📝 Starting quiz marking process...');
 
+      // Check if quiz data is available
+      if (!quiz || !questions || questions.length === 0) {
+        console.error('❌ Quiz data not available for submission');
+        message.error('Quiz data not loaded. Please refresh and try again.');
+        setSubmitting(false);
+        return;
+      }
+
       let currentUser = user;
       if (!currentUser || !currentUser._id) {
         const storedUser = localStorage.getItem('user');
@@ -256,13 +278,16 @@ const QuizPlay = () => {
       const timeTaken = Math.floor((endTime - startTime) / 1000);
 
       let correctAnswers = 0;
+      console.log('📝 Processing quiz answers:', answers);
       const resultDetails = questions.map((question, index) => {
         const userAnswer = answers[index];
+        console.log(`Question ${index + 1}: userAnswer =`, userAnswer, typeof userAnswer);
         let isCorrect = false;
         let actualCorrectAnswer = '';
 
         // Determine the correct answer based on question type
         const questionType = question.type || question.answerType || 'mcq';
+        console.log(`Question ${index + 1} type:`, questionType, 'Raw question:', question);
 
         if (questionType.toLowerCase() === 'mcq' || questionType === 'Options') {
           // For MCQ questions, check both correctAnswer and correctOption
@@ -290,7 +315,10 @@ const QuizPlay = () => {
         } else {
           // For fill-in-the-blank and other types, direct comparison
           actualCorrectAnswer = question.correctAnswer || '';
-          isCorrect = userAnswer?.toLowerCase().trim() === actualCorrectAnswer?.toLowerCase().trim();
+          const userAnswerStr = userAnswer ? String(userAnswer).toLowerCase().trim() : '';
+          const correctAnswerStr = actualCorrectAnswer ? String(actualCorrectAnswer).toLowerCase().trim() : '';
+          isCorrect = userAnswerStr === correctAnswerStr && userAnswerStr !== '';
+          console.log(`Fill-in comparison: "${userAnswerStr}" === "${correctAnswerStr}" = ${isCorrect}`);
         }
 
         if (isCorrect) correctAnswers++;
@@ -299,7 +327,7 @@ const QuizPlay = () => {
           questionId: question._id || `question_${index}`,
           questionName: typeof question.name === 'string' ? question.name : `Question ${index + 1}`,
           questionText: question.name || `Question ${index + 1}`,
-          userAnswer: typeof userAnswer === 'string' ? userAnswer : String(userAnswer || ''),
+          userAnswer: userAnswer !== null && userAnswer !== undefined ? String(userAnswer).trim() : '',
           correctAnswer: actualCorrectAnswer,
           isCorrect,
           questionType: questionType,
@@ -310,8 +338,8 @@ const QuizPlay = () => {
       });
 
       const percentage = Math.round((correctAnswers / questions.length) * 100);
-      // Use the exam's actual passing marks instead of hardcoded 60%
-      const passingPercentage = quiz.passingMarks || quiz.passingPercentage || 60;
+      // Use the exam's actual passing marks instead of hardcoded 60% with proper null checks
+      const passingPercentage = (quiz && (quiz.passingMarks || quiz.passingPercentage)) || 60;
       const verdict = percentage >= passingPercentage ? 'Pass' : 'Fail';
 
       const reportData = {
@@ -347,8 +375,8 @@ const QuizPlay = () => {
             timeTaken,
             resultDetails,
             xpData: response.xpData || null, // Include XP data from server response
-            quizName: quiz.name,
-            quizSubject: quiz.subject || quiz.category,
+            quizName: (quiz && quiz.name) || 'Quiz',
+            quizSubject: (quiz && (quiz.subject || quiz.category)) || 'General',
             passingPercentage: passingPercentage, // Include actual passing marks
             verdict: verdict // Include calculated verdict
           };
@@ -358,14 +386,19 @@ const QuizPlay = () => {
           // Refresh user data to get updated XP
           await refreshUserData();
 
-          // Brief delay to show loading screen
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          // Set navigating state to prevent quiz component flicker
+          setNavigatingToResults(true);
+          console.log('🎯 Preparing for results navigation...');
+
+          // Longer delay to ensure marking window is fully processed
+          await new Promise(resolve => setTimeout(resolve, 1500));
 
           console.log('🎯 Navigating to results page...');
-          startTransition(() => {
-            navigate(`/quiz/${id}/result`, {
-              state: navigationState
-            });
+
+          // Use replace instead of push to prevent back navigation issues
+          navigate(`/quiz/${id}/result`, {
+            state: navigationState,
+            replace: true
           });
         } else {
           console.error('❌ Quiz submission failed:', response.message);
@@ -401,9 +434,13 @@ const QuizPlay = () => {
   // Timer countdown with auto-submit
   useEffect(() => {
     if (timeLeft <= 0) {
-      // Auto-submit when timer reaches 0
-      console.log('⏰ Time up! Auto-submitting quiz...');
-      handleSubmitQuiz();
+      // Auto-submit when timer reaches 0, but only if quiz data is available
+      if (quiz && questions && questions.length > 0) {
+        console.log('⏰ Time up! Auto-submitting quiz...');
+        handleSubmitQuiz();
+      } else {
+        console.log('⏰ Time up but quiz data not available, skipping auto-submit');
+      }
       return;
     }
 
@@ -412,13 +449,15 @@ const QuizPlay = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft, handleSubmitQuiz]);
+  }, [timeLeft, handleSubmitQuiz, quiz, questions]);
 
   // Handle answer selection
   const handleAnswerSelect = (answer) => {
+    console.log(`📝 Answer selected for question ${currentQuestion + 1}:`, answer, typeof answer);
     const newAnswers = [...answers];
     newAnswers[currentQuestion] = answer;
     setAnswers(newAnswers);
+    console.log('📝 Updated answers array:', newAnswers);
   };
 
   // Navigation functions
@@ -447,8 +486,7 @@ const QuizPlay = () => {
   // Render different answer sections based on question type
   const renderAnswerSection = () => {
     const questionType = currentQ.type || currentQ.answerType || 'mcq';
-
-
+    console.log(`🎯 Rendering question ${currentQuestion + 1} with type:`, questionType, 'Current question:', currentQ);
 
     switch (questionType.toLowerCase()) {
       case 'mcq':
@@ -574,6 +612,9 @@ const QuizPlay = () => {
 
   // Render fill in the blank input
   const renderFillInTheBlank = () => {
+    const currentAnswer = answers[currentQuestion] || '';
+    console.log(`🎯 Rendering fill-in-blank for question ${currentQuestion + 1}, current answer:`, currentAnswer);
+
     return (
       <div className="space-y-4">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -583,7 +624,7 @@ const QuizPlay = () => {
         <div className="relative">
           <input
             type="text"
-            value={answers[currentQuestion] || ''}
+            value={currentAnswer}
             onChange={(e) => handleAnswerSelect(e.target.value)}
             placeholder="Type your answer here..."
             className="w-full p-4 text-lg border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
@@ -678,8 +719,8 @@ const QuizPlay = () => {
 
 
 
-  // Show enhanced loading screen when submitting
-  if (submitting) {
+  // Show enhanced loading screen when submitting or navigating to results
+  if (submitting || navigatingToResults) {
     return (
       <>
         <style>{`
@@ -722,17 +763,46 @@ const QuizPlay = () => {
             background-size: 400% 400%;
             animation: gradientShift 4s ease infinite;
           }
+
+          /* Enhanced Quiz Modal Centering */
+          .quiz-marking-overlay,
+          .quiz-result-overlay,
+          .quiz-modal-overlay {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            padding: 20px !important;
+            box-sizing: border-box !important;
+          }
+
+          .quiz-marking-modal,
+          .quiz-result-modal,
+          .quiz-modal-content {
+            position: relative !important;
+            margin: 0 auto !important;
+            transform: none !important;
+            max-width: 90vw !important;
+            max-height: 90vh !important;
+          }
         `}</style>
-        <div className="gradient-bg" style={{
+        <div className="gradient-bg quiz-marking-overlay" style={{
           position: 'fixed',
           top: 0,
           left: 0,
-          width: '100%',
-          height: '100%',
+          width: '100vw',
+          height: '100vh',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          zIndex: 9999
+          zIndex: 9999,
+          padding: '20px',
+          boxSizing: 'border-box'
         }}>
           <div style={{
             background: 'rgba(255, 255, 255, 0.98)',
@@ -851,10 +921,10 @@ const QuizPlay = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 relative p-2 sm:p-4 lg:p-6">
-      {/* Responsive Header */}
+      {/* Header removed - using ProtectedRoute header only */}
       <div className="bg-white shadow-sm border-b border-gray-200 rounded-lg mb-3 sm:mb-6">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
-          {/* Responsive Header Layout */}
+          {/* Quiz Content Layout */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
             {/* Quiz Title */}
             <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 text-center sm:text-left truncate">
@@ -1008,9 +1078,9 @@ const QuizPlay = () => {
             {isLastQuestion ? (
               <button
                 onClick={handleSubmitQuiz}
-                disabled={submitting}
+                disabled={submitting || !quiz || !questions || questions.length === 0}
                 className={`flex items-center gap-2 rounded-lg font-semibold transition-colors ${
-                  submitting
+                  submitting || !quiz || !questions || questions.length === 0
                     ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
                     : 'bg-green-600 text-white hover:bg-green-700'
                 }`}

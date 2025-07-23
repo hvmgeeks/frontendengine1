@@ -185,19 +185,7 @@ const Skills = () => {
 
   return (
     <div className="skills-container">
-      {/* Header */}
-      <div className="skills-header">
-        <div className="header-content">
-          <h1 className="skills-title">
-            {isKiswahili ? "Ujuzi wa Video" : "Video Skills"}
-          </h1>
-          <p className="skills-subtitle">
-            {isKiswahili 
-              ? "Jifunze ujuzi mpya kupitia video za kielimu" 
-              : "Learn new skills through educational videos"}
-          </p>
-        </div>
-      </div>
+      {/* Header removed - using ProtectedRoute header only */}
 
       {/* Featured Skills */}
       {featuredSkills.length > 0 && (
@@ -211,10 +199,10 @@ const Skills = () => {
               <div key={skill._id} className="featured-skill-card" onClick={() => handlePlaySkill(skill)}>
                 <div className="skill-thumbnail">
                   <img
-                    src={skill.thumbnailUrl || "/api/placeholder/300/200"}
+                    src={skill.thumbnailUrl || "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjNEE5MEUyIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkJyYWlud2F2ZSBTa2lsbDwvdGV4dD48L3N2Zz4="}
                     alt={skill.title}
                     onError={(e) => {
-                      e.target.src = "/api/placeholder/300/200";
+                      e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjNEE5MEUyIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkJyYWlud2F2ZSBTa2lsbDwvdGV4dD48L3N2Zz4=";
                     }}
                   />
                   <div className="play-overlay">
@@ -331,10 +319,10 @@ const Skills = () => {
               <div key={skill._id} className="skill-card" onClick={() => handlePlaySkill(skill)}>
                 <div className="skill-thumbnail">
                   <img
-                    src={skill.thumbnailUrl || "/api/placeholder/300/200"}
+                    src={skill.thumbnailUrl || "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjNEE5MEUyIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkJyYWlud2F2ZSBTa2lsbDwvdGV4dD48L3N2Zz4="}
                     alt={skill.title}
                     onError={(e) => {
-                      e.target.src = "/api/placeholder/300/200";
+                      e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjNEE5MEUyIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkJyYWlud2F2ZSBTa2lsbDwvdGV4dD48L3N2Zz4=";
                     }}
                   />
                   <div className="play-overlay">

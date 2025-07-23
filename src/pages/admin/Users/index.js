@@ -92,9 +92,8 @@ function Users() {
 
   const getUsersData = async () => {
     try {
-      dispatch(ShowLoading());
+      dispatch(ShowLoading()); // Restore normal loading behavior
       const response = await getAllUsers();
-      dispatch(HideLoading());
       if (response.success) {
         setUsers(response.users);
         console.log("users loaded:", response.users.length);
@@ -102,17 +101,17 @@ function Users() {
         message.error(response.message);
       }
     } catch (error) {
-      dispatch(HideLoading());
       message.error(error.message);
+    } finally {
+      dispatch(HideLoading()); // Restore normal loading behavior
     }
   };
   const blockUser = async (studentId) => {
     try {
-      dispatch(ShowLoading());
+      dispatch(ShowLoading()); // Restore normal loading behavior
       const response = await blockUserById({
         studentId,
       });
-      dispatch(HideLoading());
       if (response.success) {
         message.success(response.message);
         getUsersData();
@@ -120,16 +119,16 @@ function Users() {
         message.error(response.message);
       }
     } catch (error) {
-      dispatch(HideLoading());
       message.error(error.message);
+    } finally {
+      dispatch(HideLoading()); // Restore normal loading behavior
     }
   };
 
   const deleteUser = async (studentId) => {
     try {
-      dispatch(ShowLoading());
+      dispatch(ShowLoading()); // Restore normal loading behavior
       const response = await deleteUserById({ studentId });
-      dispatch(HideLoading());
       if (response.success) {
         message.success("User deleted successfully");
         getUsersData();
@@ -137,8 +136,9 @@ function Users() {
         message.error(response.message);
       }
     } catch (error) {
-      dispatch(HideLoading());
       message.error(error.message);
+    } finally {
+      dispatch(HideLoading()); // Restore normal loading behavior
     }
   };
 

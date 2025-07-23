@@ -222,10 +222,7 @@
   transition: all 0.3s ease;
 }
 
-.subscription-card.active {
-  border-color: #10b981;
-  background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
-}
+/* Removed subscription-card.active styles - using inline styles for better control */
 
 .subscription-card.expired {
   border-color: #ef4444;
@@ -260,11 +257,7 @@
   color: #6b7280;
 }
 
-.status-text {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-}
+/* Removed status-text styles - using inline styles for active subscription */
 
 .subscription-details {
   display: grid;
@@ -2734,12 +2727,7 @@ body.modal-open {
   50% { opacity: 0.5; }
 }
 
-.status-text {
-  margin: 0;
-  color: #1e40af;
-  font-weight: 600;
-  font-size: 15px;
-}
+/* Removed duplicate status-text definition - using the one above with proper active subscription overrides */
 
 /* Plan Info Card */
 .plan-info-card {
@@ -3127,4 +3115,48 @@ body.modal-open {
     align-items: flex-start;
     gap: 4px;
   }
+}
+
+/* Enhanced Subscription Status Styles */
+
+/* Pulse animation for expired subscription */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 12px 35px rgba(239, 68, 68, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+  }
+}
+
+/* Green status indicator styles */
+.subscription-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.subscription-status-indicator.active {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.subscription-status-indicator.expired {
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  animation: pulse 2s infinite;
 }

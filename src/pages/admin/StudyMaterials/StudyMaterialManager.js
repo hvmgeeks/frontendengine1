@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Space, Select, Input, message, Modal, Tag, Tooltip } from "antd";
 import { useDispatch } from "react-redux";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
-import { 
-  getAllStudyMaterials, 
-  deleteVideo, 
-  deleteNote, 
-  deletePastPaper, 
-  deleteBook 
+import {
+  getAllStudyMaterials,
+  deleteVideo,
+  deleteNote,
+  deletePastPaper,
+  deleteBook,
+  deleteLiterature
 } from "../../../apicalls/study";
 import { primarySubjects, secondarySubjects, advanceSubjects } from "../../../data/Subjects";
 import {
@@ -70,10 +71,10 @@ function StudyMaterialManager({ onEdit }) {
   const fetchMaterials = async () => {
     try {
       setLoading(true);
-      dispatch(ShowLoading());
-      
+      dispatch(ShowLoading()); // Restore normal loading behavior
+
       const response = await getAllStudyMaterials(filters);
-      
+
       if (response.status === 200 && response.data.success) {
         setMaterials(response.data.data || []);
       } else {
@@ -86,7 +87,7 @@ function StudyMaterialManager({ onEdit }) {
       setMaterials([]);
     } finally {
       setLoading(false);
-      dispatch(HideLoading());
+      dispatch(HideLoading()); // Restore normal loading behavior
     }
   };
 
@@ -119,8 +120,8 @@ function StudyMaterialManager({ onEdit }) {
       cancelText: "Cancel",
       onOk: async () => {
         try {
-          dispatch(ShowLoading());
-          
+          dispatch(ShowLoading()); // Restore normal loading for delete operations
+
           let response;
           switch (material.type) {
             case "videos":
@@ -134,6 +135,9 @@ function StudyMaterialManager({ onEdit }) {
               break;
             case "books":
               response = await deleteBook(material._id);
+              break;
+            case "literature":
+              response = await deleteLiterature(material._id);
               break;
             default:
               throw new Error("Invalid material type");
@@ -149,7 +153,7 @@ function StudyMaterialManager({ onEdit }) {
           console.error("Error deleting material:", error);
           message.error("Failed to delete material");
         } finally {
-          dispatch(HideLoading());
+          dispatch(HideLoading()); // Restore normal loading behavior
         }
       }
     });

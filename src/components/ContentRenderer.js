@@ -28,9 +28,130 @@ const ContentRenderer = ({ text }) => {
         return <div></div>;
     }
 
+    // Enhanced LaTeX preprocessing for better compatibility
+    const preprocessLatex = (content) => {
+        // Ensure proper LaTeX delimiters
+        let processed = content;
+
+        // Fix common LaTeX delimiter issues
+        processed = processed.replace(/\\\(/g, '\\(');
+        processed = processed.replace(/\\\)/g, '\\)');
+        processed = processed.replace(/\\\[/g, '\\[');
+        processed = processed.replace(/\\\]/g, '\\]');
+
+        // Handle escaped backslashes in LaTeX
+        processed = processed.replace(/\\\\\(/g, '\\(');
+        processed = processed.replace(/\\\\\)/g, '\\)');
+        processed = processed.replace(/\\\\\[/g, '\\[');
+        processed = processed.replace(/\\\\\]/g, '\\]');
+
+        return processed;
+    };
+
+    // Preprocess the text for better LaTeX handling
+    const processedText = preprocessLatex(text);
+
+    // Enhanced formatting for AI responses
+    const formatAIResponse = (content) => {
+        // First remove all ** symbols globally
+        const cleanContent = content.replace(/\*\*/g, '');
+
+        // Split into lines for processing
+        const lines = cleanContent.split('\n');
+        const formattedLines = [];
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+
+            // Skip empty lines but preserve spacing
+            if (!line) {
+                formattedLines.push(<br key={`br-${i}`} />);
+                continue;
+            }
+
+            // Handle numbered lists (1., 2., etc.)
+            if (/^\d+\.\s/.test(line)) {
+                const content = line.replace(/^\d+\.\s/, '');
+                formattedLines.push(
+                    <div key={`numbered-${i}`} style={{
+                        margin: '8px 0',
+                        paddingLeft: '16px',
+                        position: 'relative',
+                        lineHeight: '1.6'
+                    }}>
+                        <span style={{
+                            position: 'absolute',
+                            left: '0',
+                            fontWeight: 'bold',
+                            color: '#3b82f6'
+                        }}>
+                            {line.match(/^\d+/)[0]}.
+                        </span>
+                        <span>{content}</span>
+                    </div>
+                );
+                continue;
+            }
+
+            // Handle bullet points (-, *, •)
+            if (/^[-*•]\s/.test(line)) {
+                const content = line.replace(/^[-*•]\s/, '');
+                formattedLines.push(
+                    <div key={`bullet-${i}`} style={{
+                        margin: '6px 0',
+                        paddingLeft: '16px',
+                        position: 'relative',
+                        lineHeight: '1.6'
+                    }}>
+                        <span style={{
+                            position: 'absolute',
+                            left: '0',
+                            color: '#3b82f6',
+                            fontWeight: 'bold'
+                        }}>
+                            •
+                        </span>
+                        <span>{content}</span>
+                    </div>
+                );
+                continue;
+            }
+
+            // Handle headers (##, ###)
+            if (/^#{2,3}\s/.test(line)) {
+                const level = line.match(/^#+/)[0].length;
+                const content = line.replace(/^#+\s/, '');
+                formattedLines.push(
+                    <div key={`header-${i}`} style={{
+                        fontSize: level === 2 ? '18px' : '16px',
+                        fontWeight: 'bold',
+                        color: '#1f2937',
+                        margin: '16px 0 8px 0',
+                        borderBottom: level === 2 ? '2px solid #e5e7eb' : 'none',
+                        paddingBottom: level === 2 ? '4px' : '0'
+                    }}>
+                        {content}
+                    </div>
+                );
+                continue;
+            }
+
+            // Regular text - already cleaned of ** symbols
+            formattedLines.push(
+                <div key={`text-${i}`} style={{
+                    margin: '4px 0',
+                    lineHeight: '1.6'
+                }}>
+                    {line}
+                </div>
+            );
+        }
+
+        return formattedLines;
+    };
+
     const inlineMathRegex = /\\\(.*?\\\)/g;
     const blockMathRegex = /\\\[.*?\\\]/gs;
-    // const boldTextRegex = /(?:\*\*.*?\*\*)/g;
     const boldTextRegex = /\*\*.*?\*\*/g;
     // console.log('Text: ', text);
     let modifiedText = text.replace(blockMathRegex, match => match.replace(/\n/g, '~~NEWLINE~~'));
@@ -46,7 +167,7 @@ const ContentRenderer = ({ text }) => {
     const blockMathSymbol = "~~BLOCKMATH~~";
     const boldSymbol = "~~BOLD~~";
 
-    let newModifiedText = text.replace(blockMathRegex, match => {
+    let newModifiedText = processedText.replace(blockMathRegex, match => {
         return `~~BLOCKMATH~~${match.replace(/\n/g, '~~NEWLINE~~')}~~BLOCKMATH~~`;
     });
 
@@ -69,6 +190,19 @@ const ContentRenderer = ({ text }) => {
 
     // Debug logging removed to prevent React rendering issues
 
+    // Check if text contains mathematical expressions using processed text
+    const hasMath = inlineMathRegex.test(processedText) || blockMathRegex.test(processedText);
+
+    // If no math, use enhanced AI formatting
+    if (!hasMath) {
+        return (
+            <div style={{ fontSize: 'inherit', lineHeight: 'inherit' }}>
+                {formatAIResponse(processedText)}
+            </div>
+        );
+    }
+
+    // Original math rendering logic for mathematical content
     return (
         <div>
             {newRestoredLines.map((line, lineIndex) => (

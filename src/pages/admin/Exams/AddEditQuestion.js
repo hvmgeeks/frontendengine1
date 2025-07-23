@@ -262,7 +262,7 @@ function AddEditQuestion({
                   <div className="space-y-2">
                     <input
                       type="text"
-                      placeholder={`Enter option ${option} (use LaTeX for math: \\\\(x^2\\\\))`}
+                      placeholder={`Enter option ${option} (use LaTeX: \\(x^2\\) for inline, \\[E=mc^2\\] for block)`}
                       value={optionTexts[index]}
                       onChange={(e) => {
                         const newOptions = [...optionTexts];

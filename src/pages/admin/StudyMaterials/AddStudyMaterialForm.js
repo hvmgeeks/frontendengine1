@@ -85,23 +85,13 @@ function AddStudyMaterialForm({ materialType, onSuccess, onCancel }) {
   };
 
   const handleSubmit = async (values) => {
-    let timeoutId;
     try {
       setLoading(true);
       setUploadProgress(0);
       setUploadStatus("");
       dispatch(ShowLoading());
 
-      // Set a timeout to prevent infinite loading
-      timeoutId = setTimeout(() => {
-        if (uploadProgress === 100) {
-          setLoading(false);
-          setUploadProgress(0);
-          setUploadStatus("");
-          dispatch(HideLoading());
-          message.success("Video uploaded successfully! Thumbnail generation continues in background.");
-        }
-      }, 10000); // 10 seconds after upload completes
+      // Remove artificial timeout - let the actual API response control loading state
 
       let response;
 
@@ -232,7 +222,7 @@ function AddStudyMaterialForm({ materialType, onSuccess, onCancel }) {
         }
       }
 
-      if (response.status === 201 && response.data.success) {
+      if (response && response.status === 201 && response.data.success) {
         message.success(response.data.message);
         form.resetFields();
         setFileList([]);
@@ -243,16 +233,37 @@ function AddStudyMaterialForm({ materialType, onSuccess, onCancel }) {
         setUploadProgress(0);
         setUploadStatus("");
         onSuccess(materialType);
-      } else {
+      } else if (response) {
         const errorMessage = response.data?.message || "Failed to add material";
         message.error(errorMessage);
+      } else {
+        // Show a more helpful message for timeout issues
+        message.warning({
+          content: "Request timed out, but material may have been added successfully. Please check the materials list to verify.",
+          duration: 8,
+        });
+        console.log("⚠️ Request timeout - material may have been added successfully");
       }
     } catch (error) {
       console.error("Error adding material:", error);
 
+      // Handle authentication errors specifically
+      if (error.response && error.response.status === 401) {
+        message.error("Authentication failed. Please login again.");
+        // Redirect to login
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 1000);
+        return;
+      }
+
       // Provide specific error messages based on error type
-      if (error.code === 'ECONNABORTED') {
-        message.error("Upload timeout. Please try with a smaller file or check your internet connection.");
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        message.warning({
+          content: "Request timed out. The material may have been added successfully. Please refresh the materials list to check.",
+          duration: 10,
+        });
+        console.log("⚠️ Timeout error - material may have been added successfully");
       } else if (error.response?.status === 413) {
         message.error("File too large. Please use a file smaller than 500MB.");
       } else if (error.response?.status === 400) {
@@ -263,9 +274,7 @@ function AddStudyMaterialForm({ materialType, onSuccess, onCancel }) {
         message.error("Upload failed. Please check your internet connection and try again.");
       }
     } finally {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
+      // Restore normal loading behavior - only hide loading when request actually completes
       setLoading(false);
       setUploadProgress(0);
       setUploadStatus("");
@@ -333,7 +342,16 @@ function AddStudyMaterialForm({ materialType, onSuccess, onCancel }) {
           form={form}
           layout="vertical"
           onFinish={handleSubmit}
-          initialValues={{ level: "primary" }}
+          initialValues={{
+            level: "primary",
+            className: "",
+            subject: "",
+            title: "",
+            year: "",
+            videoID: "",
+            videoUrl: "",
+            thumbnailUrl: ""
+          }}
           className="material-form"
         >
           <div className="form-row">

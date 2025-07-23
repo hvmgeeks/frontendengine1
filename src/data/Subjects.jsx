@@ -12,6 +12,12 @@ export const primarySubjects = [
   "Civic and Moral",
   "French",
   "Historia ya Tanzania",
+  // New subjects added - avoiding duplicates
+  "Arts and Sports",
+  "Learn English",
+  "Social Studies",
+  "Historia ya Tanzania na Maadili",
+  "Vocational Skills",
 ];
 
 export const primaryKiswahiliSubjects = [
@@ -28,6 +34,12 @@ export const primaryKiswahiliSubjects = [
   "Uraia na Maadili",
   "Kifaransa",
   "Historia ya Tanzania",
+  // New subjects added - Kiswahili translations
+  "Sanaa na Michezo",
+  "Jifunze Kiingereza",
+  "Maarifa ya Kijamii",
+  "Historia ya Tanzania na Maadili",
+  "Ujuzi wa Kitaaluma",
 ];
 
 export const secondarySubjects = [
@@ -50,20 +62,25 @@ export const secondarySubjects = [
 ];
 
 export const advanceSubjects = [
-  "Physics",
-  "Mathematics",
-  "Biology",
-  "Chemistry",
-  "Geography",
-  "Civics",
-  "History",
-  "Computer",
-  "English language",
-  "Kiswahili",
-  "Commerce",
-  "Economics",
+  "English Language",
+  "Microeconomics",
+  "Organic Chemistry",
+  "General and Inorganic Chemistry",
+  "Physical Geography",
+  "Human Geography",
+  "Practical Geography",
   "Advanced Mathematics",
-  "Basic Applied Mathematics",
+  "Kiswahili",
+  "Physics",
+  "Computer Science",
+  "Kiswahili Lugha na Sarufi",
   "Accountancy",
   "Agriculture",
+  "Biology",
+  "History",
+  "Literature in English",
+  "Historia ya Tanzania na Maadili",
+  "Business Studies",
+  "Physical Chemistry",
+  "Fasihi ya Kiswahili",
 ];

@@ -320,25 +320,10 @@ function UserReports() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      <PageTitle title="Performance Reports" />
+
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-        {/* Header Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8 sm:mb-10 lg:mb-12"
-        >
-          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl sm:rounded-2xl mb-4 sm:mb-6 shadow-lg">
-            <TbChartBar className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
-          </div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4 px-4">
-            Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Performance</span> Journey
-          </h1>
-          <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-xl sm:max-w-2xl mx-auto px-4">
-            Track your progress, analyze your performance, and celebrate your achievements
-          </p>
-        </motion.div>
+
 
         {/* Stats Cards */}
         <motion.div
@@ -347,44 +332,53 @@ function UserReports() {
           transition={{ delay: 0.1 }}
           className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8"
         >
-          <Card className="text-center hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-blue-50 to-blue-100">
-            <div className="flex flex-col items-center p-2 sm:p-4">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-blue-500 rounded-full flex items-center justify-center mb-2 sm:mb-3">
-                <TbTarget className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
+          <Card className="text-center hover:shadow-xl hover:scale-105 transition-all duration-300 border-0 bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-blue-600/10"></div>
+            <div className="relative flex flex-col items-center p-3 sm:p-4 lg:p-6">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-3 sm:mb-4 shadow-lg">
+                <TbTarget className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
               </div>
               <Statistic
                 title="Total Exams"
                 value={stats.totalExams}
                 valueStyle={{
                   color: '#1e40af',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  fontSize: window.innerWidth < 640 ? '18px' : window.innerWidth < 1024 ? '20px' : '24px',
+                  textAlign: 'center'
                 }}
-                className="responsive-statistic"
+                className="responsive-statistic text-center"
+                style={{ textAlign: 'center' }}
               />
             </div>
           </Card>
 
-          <Card className="text-center hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-green-50 to-green-100">
-            <div className="flex flex-col items-center p-2 sm:p-4">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-green-500 rounded-full flex items-center justify-center mb-2 sm:mb-3">
-                <TbCheck className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
+          <Card className="text-center hover:shadow-xl hover:scale-105 transition-all duration-300 border-0 bg-gradient-to-br from-green-50 via-green-100 to-green-200 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-600/10"></div>
+            <div className="relative flex flex-col items-center p-3 sm:p-4 lg:p-6">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-3 sm:mb-4 shadow-lg">
+                <TbCheck className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
               </div>
               <Statistic
                 title="Passed"
                 value={stats.passedExams}
                 valueStyle={{
                   color: '#059669',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  fontSize: window.innerWidth < 640 ? '18px' : window.innerWidth < 1024 ? '20px' : '24px',
+                  textAlign: 'center'
                 }}
-                className="responsive-statistic"
+                className="responsive-statistic text-center"
+                style={{ textAlign: 'center' }}
               />
             </div>
           </Card>
 
-          <Card className="text-center hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-purple-50 to-purple-100">
-            <div className="flex flex-col items-center p-2 sm:p-4">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-purple-500 rounded-full flex items-center justify-center mb-2 sm:mb-3">
-                <TbTrendingUp className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
+          <Card className="text-center hover:shadow-xl hover:scale-105 transition-all duration-300 border-0 bg-gradient-to-br from-purple-50 via-purple-100 to-purple-200 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-purple-600/10"></div>
+            <div className="relative flex flex-col items-center p-3 sm:p-4 lg:p-6">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-3 sm:mb-4 shadow-lg">
+                <TbTrendingUp className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
               </div>
               <Statistic
                 title="Average Score"
@@ -392,17 +386,21 @@ function UserReports() {
                 suffix="%"
                 valueStyle={{
                   color: '#7c3aed',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  fontSize: window.innerWidth < 640 ? '18px' : window.innerWidth < 1024 ? '20px' : '24px',
+                  textAlign: 'center'
                 }}
-                className="responsive-statistic"
+                className="responsive-statistic text-center"
+                style={{ textAlign: 'center' }}
               />
             </div>
           </Card>
 
-          <Card className="text-center hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-orange-50 to-orange-100">
-            <div className="flex flex-col items-center p-2 sm:p-4">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-orange-500 rounded-full flex items-center justify-center mb-2 sm:mb-3">
-                <TbTrophy className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
+          <Card className="text-center hover:shadow-xl hover:scale-105 transition-all duration-300 border-0 bg-gradient-to-br from-orange-50 via-orange-100 to-orange-200 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-orange-600/10"></div>
+            <div className="relative flex flex-col items-center p-3 sm:p-4 lg:p-6">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mb-3 sm:mb-4 shadow-lg">
+                <TbTrophy className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
               </div>
               <Statistic
                 title="Best Score"
@@ -410,26 +408,33 @@ function UserReports() {
                 suffix="%"
                 valueStyle={{
                   color: '#ea580c',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  fontSize: window.innerWidth < 640 ? '18px' : window.innerWidth < 1024 ? '20px' : '24px',
+                  textAlign: 'center'
                 }}
-                className="responsive-statistic"
+                className="responsive-statistic text-center"
+                style={{ textAlign: 'center' }}
               />
             </div>
           </Card>
 
-          <Card className="text-center hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-pink-50 to-pink-100 sm:col-span-3 lg:col-span-1">
-            <div className="flex flex-col items-center p-2 sm:p-4">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-pink-500 rounded-full flex items-center justify-center mb-2 sm:mb-3">
-                <TbFlame className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
+          <Card className="text-center hover:shadow-xl hover:scale-105 transition-all duration-300 border-0 bg-gradient-to-br from-pink-50 via-pink-100 to-pink-200 relative overflow-hidden sm:col-span-3 lg:col-span-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-pink-600/10"></div>
+            <div className="relative flex flex-col items-center p-3 sm:p-4 lg:p-6">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl flex items-center justify-center mb-3 sm:mb-4 shadow-lg">
+                <TbFlame className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
               </div>
               <Statistic
                 title="Best Streak"
                 value={stats.streak}
                 valueStyle={{
                   color: '#db2777',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  fontSize: window.innerWidth < 640 ? '18px' : window.innerWidth < 1024 ? '20px' : '24px',
+                  textAlign: 'center'
                 }}
-                className="responsive-statistic"
+                className="responsive-statistic text-center"
+                style={{ textAlign: 'center' }}
               />
             </div>
           </Card>

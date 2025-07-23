@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { TbRobot } from 'react-icons/tb';
+import { TbRobot, TbMinus, TbMaximize, TbX } from 'react-icons/tb';
 import { chatWithChatGPT, uploadImg } from '../apicalls/chat';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useSelector } from 'react-redux';
@@ -11,6 +11,7 @@ const FloatingBrainwaveAI = () => {
   const { user } = useSelector(state => state.user);
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -20,6 +21,27 @@ const FloatingBrainwaveAI = () => {
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const inputRef = useRef(null);
+  const isMobile = window.innerWidth <= 768;
+
+  // Load saved chat history on component mount
+  useEffect(() => {
+    const savedMessages = localStorage.getItem('brainwave_chat_history');
+    if (savedMessages) {
+      try {
+        const parsedMessages = JSON.parse(savedMessages);
+        setMessages(parsedMessages);
+      } catch (error) {
+        console.error('Error loading chat history:', error);
+      }
+    }
+  }, []);
+
+  // Save chat history whenever messages change
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem('brainwave_chat_history', JSON.stringify(messages));
+    }
+  }, [messages]);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -73,20 +95,30 @@ const FloatingBrainwaveAI = () => {
     if (imageFile) {
       try {
         setIsLoading(true);
+        console.log('Uploading image:', imageFile.name, imageFile.size);
 
         // Create FormData for image upload
         const formData = new FormData();
         formData.append('image', imageFile);
 
+        console.log('Sending image upload request...');
         const uploadResponse = await uploadImg(formData);
+        console.log('Upload response:', uploadResponse);
 
         if (uploadResponse.success) {
-          imageUrl = uploadResponse.data.url;
+          imageUrl = uploadResponse.data?.url || uploadResponse.url;
+          console.log('Image uploaded successfully:', imageUrl);
         } else {
           throw new Error(uploadResponse.message || 'Image upload failed');
         }
       } catch (error) {
         console.error('Error uploading image:', error);
+        const errorMessage = isKiswahili
+          ? "Kuna tatizo la kupakia picha. Tafadhali jaribu tena."
+          : "There was an error uploading the image. Please try again.";
+        setMessages(prev => [...prev, { role: "assistant", content: errorMessage }]);
+        setIsLoading(false);
+        return;
       }
     }
 
@@ -102,10 +134,10 @@ const FloatingBrainwaveAI = () => {
 
     setMessages(prev => [...prev, newUserMessage]);
 
-    // Enhanced system prompt
+    // Enhanced system prompt with formatting instructions
     const systemPrompt = isKiswahili
-      ? 'Jibu kwa lugha ya Kiswahili tu. Wewe ni msaidizi wa masomo wa Tanzania. Tumia lugha rahisi na ya kielimu. Ikiwa ni swali la picha, soma picha kwa makini na ueleze hatua kwa hatua.'
-      : 'You are an educational assistant for Tanzanian students. Be helpful and provide clear, step-by-step explanations. If this is an image question, carefully analyze the image content and provide detailed solutions.';
+      ? 'Jibu kwa lugha ya Kiswahili tu. Wewe ni msaidizi wa masomo wa Tanzania. Tumia lugha rahisi na ya kielimu. Ikiwa ni swali la picha, soma picha kwa makini na ueleze hatua kwa hatua. Tumia:\n- Nukta za bullet (-) kwa orodha\n- Nambari (1., 2., 3.) kwa hatua\n- **Herufi nzito** kwa mambo muhimu\n- ## kwa vichwa vikuu'
+      : 'You are an educational assistant for Tanzanian students. Be helpful and provide clear, step-by-step explanations. If this is an image question, carefully analyze the image content and provide detailed solutions. Format your responses using:\n- Bullet points (-) for lists\n- Numbers (1., 2., 3.) for steps\n- **Bold text** for important points\n- ## for main headings\n- Organize information clearly with proper spacing';
 
     const chatPayload = {
       messages: [
@@ -141,7 +173,10 @@ const FloatingBrainwaveAI = () => {
     }
   };
 
-  const isMobile = window.innerWidth <= 768;
+  const clearChatHistory = () => {
+    setMessages([]);
+    localStorage.removeItem('brainwave_chat_history');
+  };
 
   // Hide on subscription page
   if (!user || location.pathname.includes('/subscription')) return null;
@@ -171,7 +206,7 @@ const FloatingBrainwaveAI = () => {
             backdropFilter: 'blur(10px)'
           }}
         >
-          <TbRobot style={{ color: 'white', fontSize: isMobile ? '24px' : '28px' }} />
+          <TbRobot style={{ color: 'white !important', fontSize: isMobile ? '24px' : '28px' }} />
         </div>
       )}
 
@@ -180,19 +215,22 @@ const FloatingBrainwaveAI = () => {
         <>
           <div style={{
             position: 'fixed',
-            bottom: isMobile ? '20px' : '30px',
-            right: isMobile ? '20px' : '30px',
-            width: isMobile ? '320px' : '380px',
-            height: isMobile ? '500px' : '600px',
+            bottom: isMaximized ? '20px' : (isMobile ? '20px' : '30px'),
+            right: isMaximized ? '20px' : (isMobile ? '20px' : '30px'),
+            left: isMaximized ? '20px' : 'auto',
+            top: isMaximized ? '20px' : 'auto',
+            width: isMaximized ? 'calc(100vw - 40px)' : (isMobile ? '320px' : '380px'),
+            height: isMaximized ? 'calc(100vh - 40px)' : (isMobile ? '500px' : '600px'),
             background: 'rgba(255, 255, 255, 0.95)',
-            borderRadius: '20px',
+            borderRadius: isMaximized ? '16px' : '20px',
             boxShadow: '0 20px 60px rgba(0, 0, 0, 0.15)',
             zIndex: 1000,
             display: 'flex',
             flexDirection: 'column',
             border: '1px solid rgba(255, 255, 255, 0.2)',
             backdropFilter: 'blur(20px)',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            transition: 'all 0.3s ease'
           }}>
             {/* Header */}
             <div style={{
@@ -204,7 +242,7 @@ const FloatingBrainwaveAI = () => {
               justifyContent: 'space-between'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <TbRobot style={{ fontSize: isMobile ? '20px' : '24px' }} />
+                <TbRobot style={{ color: 'white !important', fontSize: isMobile ? '20px' : '24px' }} />
                 <div>
                   <h3 style={{ margin: 0, fontSize: isMobile ? '16px' : '18px', fontWeight: '600' }}>
                     Brainwave AI
@@ -214,30 +252,74 @@ const FloatingBrainwaveAI = () => {
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => {
-                  setIsOpen(false);
-                  setMessages([]);
-                  setInput('');
-                  setSelectedImage(null);
-                  setImagePreview(null);
-                }}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  border: 'none',
-                  borderRadius: isMobile ? '6px' : '8px',
-                  width: isMobile ? '28px' : '32px',
-                  height: isMobile ? '28px' : '32px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  backdropFilter: 'blur(10px)'
-                }}
-              >
-                <span style={{ color: 'white', fontSize: isMobile ? '16px' : '18px', fontWeight: 'bold' }}>×</span>
-              </button>
+              <div style={{ display: 'flex', gap: '6px' }}>
+                {messages.length > 0 && (
+                  <button
+                    onClick={clearChatHistory}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.2)',
+                      border: 'none',
+                      borderRadius: isMobile ? '6px' : '8px',
+                      width: isMobile ? '28px' : '32px',
+                      height: isMobile ? '28px' : '32px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      backdropFilter: 'blur(10px)'
+                    }}
+                    title={isKiswahili ? 'Futa mazungumzo' : 'Clear chat'}
+                  >
+                    <span style={{ color: '#ffffff', fontSize: isMobile ? '14px' : '16px', filter: 'brightness(0) invert(1)' }}>🗑️</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsMaximized(!isMaximized)}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.2)',
+                    border: 'none',
+                    borderRadius: isMobile ? '6px' : '8px',
+                    width: isMobile ? '28px' : '32px',
+                    height: isMobile ? '28px' : '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    backdropFilter: 'blur(10px)'
+                  }}
+                  title={isMaximized ? (isKiswahili ? 'Punguza' : 'Minimize') : (isKiswahili ? 'Kubwa' : 'Maximize')}
+                >
+                  {isMaximized ? (
+                    <span style={{ color: '#ffffff', fontSize: isMobile ? '16px' : '18px' }}>➖</span>
+                  ) : (
+                    <span style={{ color: '#ffffff', fontSize: isMobile ? '16px' : '18px' }}>⬜</span>
+                  )}
+                </button>
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    setIsMaximized(false);
+                  }}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.2)',
+                    border: 'none',
+                    borderRadius: isMobile ? '6px' : '8px',
+                    width: isMobile ? '28px' : '32px',
+                    height: isMobile ? '28px' : '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    backdropFilter: 'blur(10px)'
+                  }}
+                  title={isKiswahili ? 'Funga' : 'Close'}
+                >
+                  <span style={{ color: '#ffffff', fontSize: isMobile ? '16px' : '18px' }}>✕</span>
+                </button>
+              </div>
             </div>
 
             {/* Messages */}
@@ -330,7 +412,11 @@ const FloatingBrainwaveAI = () => {
                       ))
                     ) : (
                       <div style={{ color: 'inherit', fontSize: 'inherit', lineHeight: 'inherit' }}>
-                        {message.content || 'AI response'}
+                        {message.role === 'assistant' ? (
+                          <ContentRenderer text={message.content || 'AI response'} />
+                        ) : (
+                          message.content || 'Message content'
+                        )}
                       </div>
                     )}
                   </div>
@@ -417,7 +503,7 @@ const FloatingBrainwaveAI = () => {
                 }}
                 title={isKiswahili ? "Pakia picha" : "Upload image"}
               >
-                <span style={{ color: 'white', fontSize: '14px', fontWeight: 'bold' }}>+</span>
+                <span style={{ color: 'white !important', fontSize: '14px', fontWeight: 'bold' }}>+</span>
               </button>
 
 
@@ -445,7 +531,7 @@ const FloatingBrainwaveAI = () => {
                 onClick={sendMessage}
                 disabled={!input.trim() && !selectedImage}
                 style={{
-                  background: (input.trim() || selectedImage) ? '#3b82f6' : '#e2e8f0',
+                  background: '#3b82f6',
                   border: 'none',
                   borderRadius: '6px',
                   width: '24px',
@@ -454,10 +540,11 @@ const FloatingBrainwaveAI = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: (input.trim() || selectedImage) ? 'pointer' : 'not-allowed',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  opacity: (input.trim() || selectedImage) ? 1 : 0.5
                 }}
               >
-                <span style={{ color: (input.trim() || selectedImage) ? 'white' : '#9ca3af', fontSize: '12px' }}>→</span>
+                <span style={{ color: 'white !important', fontSize: '12px' }}>→</span>
               </button>
             </div>
 

@@ -28,6 +28,18 @@ const Hub = () => {
   const { user } = useSelector((state) => state.user);
   const { t, isKiswahili } = useLanguage();
   const [currentQuote, setCurrentQuote] = useState(0);
+  const [currentWelcome, setCurrentWelcome] = useState(0);
+
+  // Notification counts for Hub navigation
+  const hubNotificationCounts = {
+    takeQuiz: 2, // 2 new quizzes
+    studyMaterials: 4, // 4 new study materials (past papers)
+    videoLessons: 3, // 3 new video lessons
+    reports: 0, // No notifications for reports
+    forum: 5, // 5 new forum posts
+    ranking: 0, // No notifications for ranking
+    skills: 1 // 1 new skill video
+  };
 
 
 
@@ -57,13 +69,46 @@ const Hub = () => {
     "The harder you work for something, the greater you'll feel when you achieve it."
   ];
 
-  // Rotate quotes every 4 seconds
+  // Different welcome messages that rotate
+  const welcomeMessages = isKiswahili ? [
+    "Karibu tena",
+    "Habari za asubuhi",
+    "Umefika salama",
+    "Karibu sana",
+    "Hujambo",
+    "Habari za leo",
+    "Karibu kwenye mafunzo",
+    "Umekuja vizuri",
+    "Karibu darasani",
+    "Habari za masomo"
+  ] : [
+    "Welcome back",
+    "Great to see you",
+    "Hello there",
+    "Good to have you here",
+    "Nice to see you again",
+    "Ready to learn",
+    "Let's get started",
+    "Time to shine",
+    "Here we go",
+    "Ready for success"
+  ];
+
+  // Rotate quotes every 6 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentQuote((prev) => (prev + 1) % inspiringQuotes.length);
-    }, 4000);
+    }, 6000);
     return () => clearInterval(interval);
   }, [inspiringQuotes.length]);
+
+  // Rotate welcome messages every 4 seconds
+  useEffect(() => {
+    const welcomeInterval = setInterval(() => {
+      setCurrentWelcome((prev) => (prev + 1) % welcomeMessages.length);
+    }, 4000);
+    return () => clearInterval(welcomeInterval);
+  }, [welcomeMessages.length]);
 
   // Logout function
   const handleLogout = () => {
@@ -87,7 +132,8 @@ const Hub = () => {
       icon: FaQuestionCircle,
       path: '/user/quiz',
       color: 'from-blue-500 to-blue-600',
-      hoverColor: 'from-blue-600 to-blue-700'
+      hoverColor: 'from-blue-600 to-blue-700',
+      notificationCount: hubNotificationCounts.takeQuiz
     },
     {
       title: isKiswahili ? 'Vifaa vya Kusoma' : 'Study Materials',
@@ -95,7 +141,8 @@ const Hub = () => {
       icon: FaBook,
       path: '/user/study-material',
       color: 'from-purple-500 to-purple-600',
-      hoverColor: 'from-purple-600 to-purple-700'
+      hoverColor: 'from-purple-600 to-purple-700',
+      notificationCount: hubNotificationCounts.studyMaterials
     },
     {
       title: isKiswahili ? 'Masomo ya Video' : 'Video Lessons',
@@ -103,7 +150,8 @@ const Hub = () => {
       icon: FaVideo,
       path: '/user/video-lessons',
       color: 'from-red-500 to-red-600',
-      hoverColor: 'from-red-600 to-red-700'
+      hoverColor: 'from-red-600 to-red-700',
+      notificationCount: hubNotificationCounts.videoLessons
     },
     {
       title: isKiswahili ? 'Ripoti' : 'Reports',
@@ -111,7 +159,8 @@ const Hub = () => {
       icon: FaChartLine,
       path: '/user/reports',
       color: 'from-green-500 to-green-600',
-      hoverColor: 'from-green-600 to-green-700'
+      hoverColor: 'from-green-600 to-green-700',
+      notificationCount: hubNotificationCounts.reports
     },
     {
       title: isKiswahili ? 'Orodha ya Ushindi' : 'Ranking',
@@ -119,7 +168,8 @@ const Hub = () => {
       icon: FaTrophy,
       path: '/user/ranking',
       color: 'from-yellow-500 to-yellow-600',
-      hoverColor: 'from-yellow-600 to-yellow-700'
+      hoverColor: 'from-yellow-600 to-yellow-700',
+      notificationCount: hubNotificationCounts.ranking
     },
     {
       title: isKiswahili ? 'Ujuzi' : 'Skills',
@@ -127,15 +177,8 @@ const Hub = () => {
       icon: FaStar,
       path: '/user/skills',
       color: 'from-yellow-500 to-yellow-600',
-      hoverColor: 'from-yellow-600 to-yellow-700'
-    },
-    {
-      title: isKiswahili ? 'Wasifu' : 'Profile',
-      description: isKiswahili ? 'Simamia akaunti yako' : 'Manage your account',
-      icon: FaUser,
-      path: '/profile',
-      color: 'from-indigo-500 to-indigo-600',
-      hoverColor: 'from-indigo-600 to-indigo-700'
+      hoverColor: 'from-yellow-600 to-yellow-700',
+      notificationCount: hubNotificationCounts.skills
     },
     {
       title: 'Forum',
@@ -143,18 +186,19 @@ const Hub = () => {
       icon: FaComments,
       path: '/forum',
       color: 'from-pink-500 to-pink-600',
-      hoverColor: 'from-pink-600 to-pink-700'
+      hoverColor: 'from-pink-600 to-pink-700',
+      notificationCount: hubNotificationCounts.forum
     }
   ];
 
   return (
     <div className="hub-container">
+
+
       <div className="hub-content">
-
-
         <div className="hub-header">
           <h1 className="hub-welcome">
-            {isKiswahili ? 'Karibu' : 'Welcome'}, {user?.firstName || user?.name || (isKiswahili ? 'Mwanafunzi' : 'Student')}
+            {welcomeMessages[currentWelcome]}, {user?.firstName || user?.name || (isKiswahili ? 'Mwanafunzi' : 'Student')}
           </h1>
           <p className="hub-subtitle">
             {isKiswahili ? 'Chagua njia yako ya kujifunza hapa chini' : 'Choose your learning path below'}
@@ -200,8 +244,32 @@ const Hub = () => {
                 >
 
 
-                  <div className="hub-card-icon">
+                  <div className="hub-card-icon" style={{ position: 'relative' }}>
                     <IconComponent />
+                    {/* Notification Badge */}
+                    {item.notificationCount > 0 && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '-8px',
+                          right: '-8px',
+                          backgroundColor: '#ef4444',
+                          color: 'white',
+                          borderRadius: '50%',
+                          width: '20px',
+                          height: '20px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          boxShadow: '0 2px 8px rgba(239, 68, 68, 0.4)',
+                          zIndex: 10
+                        }}
+                      >
+                        {item.notificationCount > 99 ? '99+' : item.notificationCount}
+                      </div>
+                    )}
                   </div>
 
                   <h3 className="hub-card-title">
@@ -232,6 +300,7 @@ const Hub = () => {
 
 
       </div>
+
     </div>
   );
 };

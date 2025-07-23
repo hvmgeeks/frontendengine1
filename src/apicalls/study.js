@@ -40,14 +40,14 @@ export const addVideo = async (videoData, onUploadProgress = null) => {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
-            timeout: 600000, // 10 minutes timeout for large files
+            timeout: 900000, // 15 minutes timeout for large files
             onUploadProgress: onUploadProgress ? (progressEvent) => {
                 const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
                 // Pass additional information for better progress tracking
                 onUploadProgress(percentCompleted, progressEvent.loaded, progressEvent.total);
             } : undefined,
         } : {
-            timeout: 60000, // 1 minute for YouTube videos
+            timeout: 180000, // 3 minutes for YouTube videos (increased from 1 minute)
         };
 
         const response = await axiosInstance.post("/api/study/add-video", videoData, config);
@@ -64,6 +64,7 @@ export const addNote = async (formData) => {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
+            timeout: 180000, // 3 minutes timeout
         });
         return response;
     } catch (error) {
@@ -78,6 +79,7 @@ export const addPastPaper = async (formData) => {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
+            timeout: 180000, // 3 minutes timeout
         });
         return response;
     } catch (error) {
@@ -92,6 +94,7 @@ export const addBook = async (formData) => {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
+            timeout: 180000, // 3 minutes timeout
         });
         return response;
     } catch (error) {
@@ -164,6 +167,20 @@ export const updateBook = async (id, formData) => {
     }
 }
 
+// Update literature
+export const updateLiterature = async (id, formData) => {
+    try {
+        const response = await axiosInstance.put(`/api/study/update-literature/${id}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response;
+    } catch (error) {
+        return error.response;
+    }
+}
+
 // Delete study material functions
 
 // Delete video
@@ -200,6 +217,35 @@ export const deletePastPaper = async (id) => {
 export const deleteBook = async (id) => {
     try {
         const response = await axiosInstance.delete(`/api/study/delete-book/${id}`);
+        return response;
+    } catch (error) {
+        return error.response;
+    }
+}
+
+// Literature API functions
+
+// Add literature
+export const addLiterature = async (formData) => {
+    try {
+        const response = await axiosInstance.post("/api/study/add-literature", formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            timeout: 180000, // 3 minutes timeout
+        });
+        return response;
+    } catch (error) {
+        return error.response;
+    }
+}
+
+
+
+// Delete literature
+export const deleteLiterature = async (id) => {
+    try {
+        const response = await axiosInstance.delete(`/api/study/delete-literature/${id}`);
         return response;
     } catch (error) {
         return error.response;

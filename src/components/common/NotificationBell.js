@@ -22,7 +22,7 @@ const NotificationBell = ({ className = '' }) => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 });
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
 
@@ -43,10 +43,25 @@ const NotificationBell = ({ className = '' }) => {
   useEffect(() => {
     if (isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
-      setDropdownPosition({
-        top: rect.bottom + 8,
-        right: window.innerWidth - rect.right
-      });
+
+      const dropdownWidth = 384; // 24rem
+      const dropdownHeight = 500;
+
+      // Calculate position to ensure dropdown stays within viewport
+      let top = rect.bottom + 8;
+      let left = rect.left;
+
+      // Adjust if dropdown would go off right edge
+      if (left + dropdownWidth > window.innerWidth) {
+        left = window.innerWidth - dropdownWidth - 16;
+      }
+
+      // Adjust if dropdown would go off bottom edge
+      if (top + dropdownHeight > window.innerHeight) {
+        top = rect.top - dropdownHeight - 8;
+      }
+
+      setDropdownPosition({ top, left });
     }
   }, [isOpen]);
 
@@ -78,29 +93,31 @@ const NotificationBell = ({ className = '' }) => {
 
   const fetchNotifications = async (pageNum = 1, reset = false) => {
     if (loading) return;
-    
+
     setLoading(true);
     try {
       const response = await getUserNotifications({
         page: pageNum,
         limit: 10
       });
-      
+
       if (response.success) {
         const newNotifications = response.data.notifications;
-        
+
         if (reset || pageNum === 1) {
           setNotifications(newNotifications);
         } else {
           setNotifications(prev => [...prev, ...newNotifications]);
         }
-        
+
         setHasMore(newNotifications.length === 10);
         setPage(pageNum);
         setUnreadCount(response.data.unreadCount);
+      } else {
+        console.error('❌ Notifications fetch failed:', response.message);
       }
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      console.error('❌ Error fetching notifications:', error);
     } finally {
       setLoading(false);
     }
@@ -184,17 +201,17 @@ const NotificationBell = ({ className = '' }) => {
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className="notification-bell-button relative p-2 text-gray-700 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50"
+        className="notification-bell-button relative p-2 text-gray-700 hover:text-blue-600 transition-colors"
         style={{ zIndex: 10001 }}
       >
         {unreadCount > 0 ? (
           <TbBellRinging
-            className="w-6 h-6"
+            className="w-5 h-5"
             style={{ color: '#ef4444' }}
           />
         ) : (
           <TbBell
-            className="w-6 h-6"
+            className="w-5 h-5"
             style={{ color: '#374151' }}
           />
         )}
@@ -231,18 +248,24 @@ const NotificationBell = ({ className = '' }) => {
 
       {/* Dropdown Portal */}
       {isOpen && createPortal(
-        <div
-          ref={dropdownRef}
-          className="notification-dropdown w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 max-h-[500px] overflow-hidden backdrop-blur-sm"
-            style={{
-              position: 'fixed',
-              top: dropdownPosition.top,
-              right: dropdownPosition.right,
-              zIndex: 99999,
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)'
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div
+            ref={dropdownRef}
+            className="notification-dropdown"
+              style={{
+                position: 'fixed',
+                top: dropdownPosition.top,
+                left: dropdownPosition.left,
+                zIndex: 99999,
+                width: '384px',
+                maxHeight: '500px',
+                backgroundColor: 'white',
+                borderRadius: '16px',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+                border: '1px solid #e5e7eb',
+                overflow: 'hidden'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
             {/* Header */}
             <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50">
               <div className="flex items-center space-x-2">

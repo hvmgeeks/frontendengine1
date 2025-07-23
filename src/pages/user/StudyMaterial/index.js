@@ -17,6 +17,7 @@ import {
   FaChevronDown,
   FaSearch,
   FaTimes,
+  FaCertificate,
 } from "react-icons/fa";
 import {
   TbFileText,
@@ -44,6 +45,43 @@ function StudyMaterial() {
   const { user } = useSelector((state) => state.user);
   const { t, isKiswahili, getSubjectName } = useLanguage();
   const dispatch = useDispatch();
+
+  // Simplified CSS - no header conflicts
+  const inlineStyles = `
+    /* Mobile Layout Fixes for Study Materials */
+    @media (max-width: 768px) {
+      /* Reduce Bell Icon Size */
+      .notification-bell-button .w-5,
+      .notification-bell-button .h-5 {
+        width: 14px !important;
+        height: 14px !important;
+      }
+
+      /* Study Materials content positioning - no header conflicts */
+      .study-material-modern,
+      .container-modern {
+        padding-top: 16px !important;
+      }
+
+      /* Tabs positioning */
+      .ant-tabs-nav {
+        margin-bottom: 8px !important;
+      }
+    }
+
+    }
+  `;
+
+  // Add styles to document head
+  React.useEffect(() => {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = inlineStyles;
+    document.head.appendChild(styleElement);
+
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
 
   // Get user level and subjects list (case-insensitive)
   const userLevel = user?.level || 'Primary';
@@ -76,9 +114,9 @@ function StudyMaterial() {
         : ['Form-5', 'Form-6'];
   }, [userLevelLower]);
 
-  // Simplified state management - initialize with user's class if available
+  // Simplified state management - initialize with "all" to show all materials by default
   const [activeTab, setActiveTab] = useState("study-notes");
-  const [selectedClass, setSelectedClass] = useState(user?.class || user?.className || "all");
+  const [selectedClass, setSelectedClass] = useState("all");
   const [selectedSubject, setSelectedSubject] = useState("all");
 
   // Get user's current class for highlighting
@@ -140,7 +178,8 @@ function StudyMaterial() {
       const data = {
         content: activeTab,
         className: normalizedClassName,
-        subject: selectedSubject, // This can be "all" or a specific subject
+        // Use subject filter for past papers and notes, always "all" for books and literature
+        subject: (activeTab === 'past-papers' || activeTab === 'study-notes') ? selectedSubject : 'all',
       };
       if (userLevel) {
         data.level = userLevel;
@@ -174,8 +213,8 @@ function StudyMaterial() {
 
   // Fetch materials when filters change or component mounts
   useEffect(() => {
-    // Only fetch if we have a valid activeTab, selectedClass, and user
-    if (user && userLevel && activeTab && selectedClass && selectedClass !== "default") {
+    // Only fetch if we have a valid activeTab and user (allow "all" for selectedClass)
+    if (user && userLevel && activeTab && selectedClass !== "default") {
       fetchMaterials();
     }
   }, [user, userLevel, activeTab, selectedClass, selectedSubject, fetchMaterials]);
@@ -186,6 +225,10 @@ function StudyMaterial() {
     setActiveTab(tab);
     setSearchTerm("");
     setSortBy("newest");
+    // Reset subject filter when switching to tabs that don't use it
+    if (tab !== 'past-papers' && tab !== 'study-notes') {
+      setSelectedSubject("all");
+    }
   };
 
   const handleSubjectChange = (subject) => {
@@ -212,8 +255,8 @@ function StudyMaterial() {
 
     let filtered = materials;
 
-    // Filter by search term (title, subject, or year)
-    if (searchTerm.trim()) {
+    // Filter by search term (title, subject, or year) - For past papers and notes
+    if ((activeTab === 'past-papers' || activeTab === 'study-notes') && searchTerm.trim()) {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(material =>
         material.title.toLowerCase().includes(searchLower) ||
@@ -222,33 +265,38 @@ function StudyMaterial() {
       );
     }
 
-    // Sort by year, creation date, or title
-    filtered.sort((a, b) => {
-      if (sortBy === "newest") {
-        // For materials with year field (books, past papers)
-        if (a.year && b.year) {
-          return parseInt(b.year) - parseInt(a.year);
-        }
+    // Sort by year, creation date, or title - For past papers and notes
+    if (activeTab === 'past-papers' || activeTab === 'study-notes') {
+      filtered.sort((a, b) => {
+        if (sortBy === "newest") {
+          // For materials with year field (books, past papers)
+          if (a.year && b.year) {
+            return parseInt(b.year) - parseInt(a.year);
+          }
 
-        // Fallback: materials with year come first
-        else if (a.year && !b.year) return -1;
-        else if (!a.year && b.year) return 1;
-        else return 0;
-      } else if (sortBy === "oldest") {
-        // For materials with year field
-        if (a.year && b.year) {
-          return parseInt(a.year) - parseInt(b.year);
-        }
+          // Fallback: materials with year come first
+          else if (a.year && !b.year) return -1;
+          else if (!a.year && b.year) return 1;
+          else return 0;
+        } else if (sortBy === "oldest") {
+          // For materials with year field
+          if (a.year && b.year) {
+            return parseInt(a.year) - parseInt(b.year);
+          }
 
-        // Fallback: materials with year come first
-        else if (a.year && !b.year) return -1;
-        else if (!a.year && b.year) return 1;
-        else return 0;
-      } else {
-        // Sort by title alphabetically
-        return a.title.localeCompare(b.title);
-      }
-    });
+          // Fallback: materials with year come first
+          else if (a.year && !b.year) return -1;
+          else if (!a.year && b.year) return 1;
+          else return 0;
+        } else {
+          // Sort by title alphabetically
+          return a.title.localeCompare(b.title);
+        }
+      });
+    } else {
+      // For other tabs, just sort by title alphabetically
+      filtered.sort((a, b) => a.title.localeCompare(b.title));
+    }
 
 
 
@@ -317,44 +365,35 @@ function StudyMaterial() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      {/* Modern Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-primary-600 to-blue-600 text-white"
-      >
-        <div className="container-modern py-12">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-6">
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-                <TbBooks className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h1 className="text-4xl font-bold mb-2">Study Materials</h1>
-                <p className="text-xl text-blue-100">
-                  Access comprehensive learning resources for {userLevel} education
-                </p>
-              </div>
-            </div>
-            <div className="hidden md:block">
-              <div className="bg-white/20 backdrop-blur-sm rounded-xl px-6 py-3">
-                <div className="text-sm text-blue-100 mb-1">Current Level</div>
-                <div className="text-lg font-bold">{userLevel?.toUpperCase()}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.div>
+    <div
+      className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50"
+      style={{
+        marginTop: window.innerWidth <= 768 ? '48px' : '0px',
+        paddingTop: window.innerWidth <= 768 ? '0px' : '0px'
+      }}
+    >
+      {/* Header removed - using ProtectedRoute header only */}
 
-      <div className="container-modern py-8">
+      <div
+        className="container-modern py-8"
+        style={{
+          paddingTop: window.innerWidth <= 768 ? '8px' : '32px',
+          marginTop: window.innerWidth <= 768 ? '0px' : '0px'
+        }}
+      >
         {/* Study Material Tabs */}
         <div className="mb-6">
           <div className="study-tabs">
             {[
               { key: 'study-notes', label: isKiswahili ? 'Maelezo' : 'Notes', icon: TbFileText },
               { key: 'past-papers', label: isKiswahili ? 'Karatasi za Zamani' : 'Past Papers', icon: TbCertificate },
-              { key: 'books', label: isKiswahili ? 'Vitabu' : 'Books', icon: TbBookIcon }
+              { key: 'books', label: isKiswahili ? 'Vitabu' : 'Books', icon: TbBookIcon },
+              // Only show for secondary level
+              ...(userLevelLower === 'secondary' ? [{
+                key: 'literature',
+                label: isKiswahili ? 'Mchezo, Riwaya na Mashairi' : 'Plays, Novel and Poetry',
+                icon: TbBookIcon
+              }] : [])
             ].map((tab) => (
               <button
                 key={tab.key}
@@ -375,23 +414,29 @@ function StudyMaterial() {
           transition={{ delay: 0.4 }}
           className="mb-8"
         >
-          <div className="card p-6">
+          <div className="card filter-card p-6">
             <div className="flex flex-col lg:flex-row gap-6 items-end">
-              {/* Search */}
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {isKiswahili ? 'Tafuta Vifaa' : 'Search Materials'}
-                </label>
-                <input
-                  placeholder={isKiswahili ? `Tafuta ${activeTab === 'study-notes' ? 'maelezo' : activeTab === 'past-papers' ? 'karatasi za zamani' : 'vitabu'}...` : `Search ${activeTab.replace('-', ' ')}...`}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="form-input"
-                />
-              </div>
+              {/* Search - For past papers and notes */}
+              {(activeTab === 'past-papers' || activeTab === 'study-notes') && (
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {isKiswahili ? 'Tafuta Vifaa' : 'Search Materials'}
+                  </label>
+                  <input
+                    placeholder={
+                      activeTab === 'past-papers'
+                        ? (isKiswahili ? 'Tafuta karatasi za zamani...' : 'Search past papers...')
+                        : (isKiswahili ? 'Tafuta maelezo...' : 'Search notes...')
+                    }
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="form-input"
+                  />
+                </div>
+              )}
 
               {/* Class Filter */}
-              <div className="w-full lg:w-64">
+              <div className={`w-full lg:w-64 class-filter-container ${showClassSelector ? 'dropdown-open' : ''}`}>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   {isKiswahili ? 'Chuja kwa Darasa' : 'Filter by Class'}
                   {userCurrentClass && (
@@ -411,7 +456,7 @@ function StudyMaterial() {
                         {selectedClass === 'all' ? 'All Classes' :
                           userLevelLower === 'primary'
                             ? `Class ${selectedClass}`
-                            : `Form ${selectedClass}`
+                            : selectedClass.replace('Form-', '')
                         }
                       </span>
                       {selectedClass === userCurrentClass && (
@@ -423,16 +468,19 @@ function StudyMaterial() {
 
                   <AnimatePresence>
                     {showClassSelector && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto"
-                      >
+                      <>
+                        <div
+                          className="dropdown-backdrop"
+                          onClick={() => setShowClassSelector(false)}
+                        />
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="class-selector-dropdown"
+                        >
                         <button
-                          className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
-                            selectedClass === 'all' ? 'bg-primary-50 text-primary-700 font-medium' : 'text-gray-700'
-                          }`}
+                          className={`class-option ${selectedClass === 'all' ? 'selected' : ''}`}
                           onClick={() => handleClassChange('all')}
                         >
                           All Classes
@@ -440,76 +488,81 @@ function StudyMaterial() {
                         {availableClasses.map((className, index) => (
                           <button
                             key={index}
-                            className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center justify-between ${
-                              selectedClass === className ? 'bg-primary-50 text-primary-700 font-medium' : 'text-gray-700'
-                            }`}
+                            className={`class-option ${selectedClass === className ? 'selected' : ''} ${className === userCurrentClass ? 'current' : ''}`}
                             onClick={() => handleClassChange(className)}
                           >
                             <span>
-                              {userLevelLower === 'primary' ? `Class ${className}` : `Form ${className}`}
+                              {userLevelLower === 'primary' ? `Class ${className}` : className.replace('Form-', '')}
                             </span>
                             {className === userCurrentClass && (
                               <span className="badge-success text-xs">Your Class</span>
                             )}
                           </button>
                         ))}
-                      </motion.div>
+                        </motion.div>
+                      </>
                     )}
                   </AnimatePresence>
                 </div>
               </div>
 
-              {/* Subject Filter */}
-              <div className="w-full lg:w-64">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {isKiswahili ? 'Chuja kwa Somo' : 'Filter by Subject'}
-                </label>
-                <select
-                  value={selectedSubject}
-                  onChange={(e) => handleSubjectChange(e.target.value)}
-                  className="input-modern"
-                >
-                  <option value="all">{isKiswahili ? 'Masomo Yote' : 'All Subjects'}</option>
-                  {subjectsList.map((subject, index) => (
-                    <option key={index} value={subject}>
-                      {getSubjectName(subject)}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {/* Subject Filter - For past papers and notes */}
+              {(activeTab === 'past-papers' || activeTab === 'study-notes') && (
+                <div className="w-full lg:w-64">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {isKiswahili ? 'Chuja kwa Somo' : 'Filter by Subject'}
+                  </label>
+                  <select
+                    value={selectedSubject}
+                    onChange={(e) => handleSubjectChange(e.target.value)}
+                    className="input-modern"
+                  >
+                    <option value="all">{isKiswahili ? 'Masomo Yote' : 'All Subjects'}</option>
+                    {subjectsList.map((subject, index) => (
+                      <option key={index} value={subject}>
+                        {getSubjectName(subject)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
-              {/* Sort */}
-              <div className="w-full lg:w-48">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {isKiswahili ? 'Panga kwa' : 'Sort by'}
-                </label>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="input-modern"
-                >
-                  <option value="newest">Newest First</option>
-                  <option value="oldest">Oldest First</option>
-                  <option value="title">By Title</option>
-                </select>
-              </div>
+              {/* Sort - For past papers and notes */}
+              {(activeTab === 'past-papers' || activeTab === 'study-notes') && (
+                <div className="w-full lg:w-48">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {isKiswahili ? 'Panga kwa' : 'Sort by'}
+                  </label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="input-modern"
+                  >
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="title">By Title</option>
+                  </select>
+                </div>
+              )}
 
-              {/* Clear Filters */}
-              <button
-                className="btn btn-secondary"
-                onClick={() => {
-                  setSearchTerm("");
-                  setSelectedClass("all");
-                  setSelectedSubject("all");
-                  setSortBy("newest");
-                }}
-              >
-                Clear Filters
-              </button>
+              {/* Clear Filters - For past papers and notes */}
+              {(activeTab === 'past-papers' || activeTab === 'study-notes') && (
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    setSearchTerm("");
+                    setSelectedClass("all");
+                    setSelectedSubject("all");
+                    setSortBy("newest");
+                  }}
+                >
+                  Clear Filters
+                </button>
+              )}
             </div>
 
-            {/* Results Count */}
-            {(searchTerm || selectedClass !== "all" || selectedSubject !== "all") && (
+            {/* Results Count - For past papers and notes */}
+            {(activeTab === 'past-papers' || activeTab === 'study-notes') && (searchTerm || selectedClass !== "all" || selectedSubject !== "all") && (
               <div className="mt-4 pt-4 border-t border-gray-100">
                 <span className="text-sm text-gray-600">
                   Showing {filteredAndSortedMaterials.length} of {materials.length} {activeTab.replace('-', ' ')}
@@ -542,117 +595,165 @@ function StudyMaterial() {
             </button>
           </div>
         ) : filteredAndSortedMaterials.length > 0 ? (
-          <div className={activeTab === 'past-papers'
+          <div className={`materials-grid ${activeTab === 'past-papers'
             ? "flex flex-wrap gap-3 justify-start"
             : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-          }>
+          }`}>
             {filteredAndSortedMaterials.map((material, index) => (
-              <div key={index} className={activeTab === 'past-papers'
-                ? "past-paper-square-card"
-                : "study-card"
+              <div key={index} className={
+                activeTab === 'past-papers'
+                  ? "past-paper-square-card"
+                  : (activeTab === 'books' || activeTab === 'literature')
+                    ? "study-card has-thumbnail"
+                    : "study-card"
               }>
-                {activeTab === 'past-papers' ? (
-                  // Past Papers Layout - Buttons below tags
-                  <>
-                    <div className="study-card-header">
-                      <div className="study-card-meta">
-                        <FaFileAlt />
-                        <span>{isKiswahili ? 'Karatasi ya Zamani' : 'Past Paper'}</span>
-                      </div>
-                      <div className="study-card-title">
-                        {material.title}
-                      </div>
-                    </div>
-
-                    <div className="card-content">
-                      <div className="material-meta">
-                        <span className="material-subject">{material.subject}</span>
-                        {material.className && (
-                          <span className="material-class">
-                            {userLevelLower === 'primary' ? `Class ${material.className}` : `Form ${material.className}`}
-                          </span>
-                        )}
-                        {material.year && (
-                          <span className="badge badge-secondary">{material.year}</span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="card-actions">
-                      {material.documentUrl ? (
-                        <>
-                          <button
-                            className="btn-primary"
-                            onClick={() => handleDocumentPreview(material.documentUrl)}
-                          >
-                            <FaEye /> {isKiswahili ? 'Ona' : 'View'}
-                          </button>
-                          <button
-                            className="btn-primary"
-                            onClick={() => handleDocumentDownload(material.documentUrl)}
-                          >
-                            <FaDownload /> {isKiswahili ? 'Pakua' : 'Download'}
-                          </button>
-                        </>
+                {/* Unified Layout for All Materials */}
+                <>
+                  {/* Thumbnail section for books and literature */}
+                  {(activeTab === 'books' || activeTab === 'literature') && (
+                    <div className="study-card-thumbnail">
+                      {material.thumbnail ? (
+                        <img
+                          src={material.thumbnail}
+                          alt={material.title}
+                          className="thumbnail-image"
+                        />
                       ) : (
-                        <span className="unavailable">{isKiswahili ? 'Haipatikani' : 'Not available'}</span>
+                        <div className="thumbnail-placeholder">
+                          <div style={{ textAlign: 'center', color: '#495057', padding: '20px' }}>
+                            <FaBook style={{ fontSize: '48px', marginBottom: '12px', color: '#6c757d' }} />
+                            <div style={{
+                              fontSize: '14px',
+                              fontWeight: 'bold',
+                              lineHeight: '1.3',
+                              marginBottom: '8px',
+                              maxWidth: '180px'
+                            }}>
+                              {material.title}
+                            </div>
+                            {material.author && (
+                              <div style={{
+                                fontSize: '12px',
+                                fontStyle: 'italic',
+                                color: '#6c757d',
+                                lineHeight: '1.2'
+                              }}>
+                                by {material.author}
+                              </div>
+                            )}
+                            {material.genre && (
+                              <div style={{
+                                fontSize: '10px',
+                                marginTop: '8px',
+                                padding: '2px 8px',
+                                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                                color: '#007bff',
+                                borderRadius: '12px',
+                                display: 'inline-block',
+                                textTransform: 'capitalize'
+                              }}>
+                                {material.genre}
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       )}
                     </div>
-                  </>
-                ) : (
-                  // Regular Layout for other tabs
-                  <>
+                  )}
+
+                  {/* Content wrapper for horizontal layout */}
+                  <div className={(activeTab === 'books' || activeTab === 'literature') ? "study-card-content" : ""}>
                     <div className="study-card-header">
-                      <div className="study-card-meta">
-                        {activeTab === 'study-notes' && <FaFileAlt />}
-                        {activeTab === 'books' && <FaBook />}
-                        <span>
-                          {activeTab === 'study-notes' ? (isKiswahili ? 'Maelezo' : 'Note') :
-                           (isKiswahili ? 'Kitabu' : 'Book')}
+                    <div className="study-card-meta">
+                      {activeTab === 'study-notes' && <FaFileAlt />}
+                      {activeTab === 'past-papers' && <FaCertificate />}
+                      {activeTab === 'books' && <FaBook />}
+                      {activeTab === 'literature' && <FaBook />}
+                      <span>
+                        {activeTab === 'study-notes' ? (isKiswahili ? 'Maelezo' : 'Note') :
+                         activeTab === 'past-papers' ? (isKiswahili ? 'Karatasi ya Zamani' : 'Past Paper') :
+                         activeTab === 'literature' ? (isKiswahili ? 'Fasihi' : 'Literature') :
+                         (isKiswahili ? 'Kitabu' : 'Book')}
+                      </span>
+                    </div>
+                    <div className="study-card-title">
+                      {material.title}
+                    </div>
+                  </div>
+
+                  <div className="card-content">
+                    <div className="material-meta">
+                      <span className="material-subject">{material.subject}</span>
+                      {material.className && (
+                        <span className="material-class">
+                          {userLevelLower === 'primary' ? `Class ${material.className}` : `Form ${material.className}`}
                         </span>
-                      </div>
-                      <div className="study-card-title">
-                        {material.title}
-                      </div>
+                      )}
                       {material.year && (
-                        <span className="badge badge-secondary mt-2">{material.year}</span>
+                        <span className="badge badge-secondary">{material.year}</span>
+                      )}
+                      {material.author && activeTab === 'literature' && (
+                        <span className="material-author">
+                          {isKiswahili ? 'Mwandishi' : 'Author'}: {material.author}
+                        </span>
+                      )}
+                      {material.genre && activeTab === 'literature' && (
+                        <span className="badge badge-primary" style={{ textTransform: 'capitalize' }}>
+                          {material.genre}
+                        </span>
+                      )}
+                      {/* Show multiple class tags for literature */}
+                      {activeTab === 'literature' && material.additionalClasses && material.additionalClasses.length > 0 && (
+                        <div style={{ marginTop: '8px' }}>
+                          <span style={{ fontSize: '12px', color: '#666', marginRight: '8px' }}>
+                            {isKiswahili ? 'Madarasa mengine:' : 'Also for:'}
+                          </span>
+                          {material.additionalClasses.map((cls, index) => (
+                            <span
+                              key={index}
+                              className="badge badge-outline-primary"
+                              style={{
+                                fontSize: '10px',
+                                marginRight: '4px',
+                                border: '1px solid #007bff',
+                                color: '#007bff',
+                                backgroundColor: 'transparent'
+                              }}
+                            >
+                              Form {cls}
+                            </span>
+                          ))}
+                        </div>
                       )}
                     </div>
+                  </div>
 
-                    <div className="card-content">
-                      <h3 className="material-title">{material.title}</h3>
-                      <div className="material-meta">
-                        <span className="material-subject">{material.subject}</span>
-                        {material.className && (
-                          <span className="material-class">
-                            {userLevelLower === 'primary' ? `Class ${material.className}` : `Form ${material.className}`}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="card-actions">
-                      {material.documentUrl ? (
-                        <>
+                  <div className="card-actions">
+                    {material.documentUrl ? (
+                      <>
+                        <button
+                          className="btn-primary"
+                          onClick={() => handleDocumentPreview(material.documentUrl)}
+                        >
+                          <FaEye /> {isKiswahili ? 'Soma' : 'Read'}
+                        </button>
+                        {/* Show download button for past-papers and books only */}
+                        {(activeTab === 'past-papers' || activeTab === 'books') && (
                           <button
-                            className="action-btn secondary"
-                            onClick={() => handleDocumentPreview(material.documentUrl)}
-                          >
-                            <FaEye /> {isKiswahili ? 'Ona' : 'View'}
-                          </button>
-                          <button
-                            className="action-btn primary"
+                            className="btn-primary"
                             onClick={() => handleDocumentDownload(material.documentUrl)}
                           >
                             <FaDownload /> {isKiswahili ? 'Pakua' : 'Download'}
                           </button>
-                        </>
-                      ) : (
-                        <span className="unavailable">{isKiswahili ? 'Haipatikani' : 'Not available'}</span>
-                      )}
-                    </div>
-                  </>
-                )}
+                        )}
+                      </>
+                    ) : (
+                      <span className="unavailable">{isKiswahili ? 'Haipatikani' : 'Not available'}</span>
+                    )}
+                  </div>
+                  </div> {/* Close study-card-content wrapper */}
+                </>
+
               </div>
             ))}
           </div>

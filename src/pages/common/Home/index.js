@@ -435,7 +435,7 @@ const Home = () => {
                 ))}
 
                 <motion.h1
-                  className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-center lg:text-left relative px-2 sm:px-4 md:px-6 lg:px-0"
+                  className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-center lg:text-left relative px-2 sm:px-4 md:px-6 lg:px-0"
                   style={{
                     fontFamily: "'Inter', 'SF Pro Display', 'Helvetica Neue', sans-serif",
                     letterSpacing: '-0.02em',
@@ -817,7 +817,7 @@ const Home = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.8 }}
-                className="relative inline-flex items-center px-6 py-3 rounded-full text-sm font-bold mb-6 overflow-hidden"
+                className="relative inline-flex items-center px-3 xs:px-4 sm:px-6 py-2 xs:py-2.5 sm:py-3 rounded-full text-xs xs:text-sm sm:text-sm font-bold mb-4 xs:mb-5 sm:mb-6 overflow-hidden"
                 style={{
                   background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%)',
                   boxShadow: '0 8px 25px rgba(255, 215, 0, 0.4), 0 0 20px rgba(255, 215, 0, 0.3)',
@@ -837,7 +837,7 @@ const Home = () => {
                   }}
                 />
 
-                <TbSchool className="w-5 h-5 mr-2 text-orange-800 relative z-10" />
+                <TbSchool className="w-3 h-3 xs:w-4 xs:h-4 sm:w-5 sm:h-5 mr-1.5 xs:mr-2 text-orange-800 relative z-10" />
                 <span className="text-orange-900 relative z-10 font-black">
                   #1 Educational Platform in Tanzania
                 </span>
@@ -865,7 +865,7 @@ const Home = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
-                className="text-sm xs:text-base sm:text-lg md:text-xl lg:text-xl text-gray-600 leading-relaxed max-w-full sm:max-w-2xl mx-auto lg:mx-0 px-2 sm:px-4 lg:px-0"
+                className="text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-full sm:max-w-2xl mx-auto lg:mx-0 px-2 sm:px-4 lg:px-0"
               >
                 Discover limitless learning opportunities with our comprehensive
                 online study platform. Study anywhere, anytime, and achieve your
@@ -887,26 +887,26 @@ const Home = () => {
                     <div className="flex flex-col xs:flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
                       <Link to="/register" className="w-full sm:w-auto">
                         <motion.button
-                          className="w-full sm:w-auto px-4 xs:px-6 sm:px-8 md:px-10 py-3 xs:py-3.5 sm:py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 min-h-[48px]"
+                          className="w-full sm:w-auto px-3 xs:px-4 sm:px-6 md:px-8 py-2.5 xs:py-3 sm:py-3.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 min-h-[44px]"
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                         >
                           <div className="flex items-center justify-center space-x-2">
-                            <TbUserPlus className="w-4 h-4 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
-                            <span className="text-sm xs:text-sm sm:text-base">Register Now</span>
+                            <TbUserPlus className="w-3 h-3 xs:w-4 xs:h-4 sm:w-4 sm:h-4" />
+                            <span className="text-xs xs:text-sm sm:text-sm">Register Now</span>
                           </div>
                         </motion.button>
                       </Link>
 
                       <Link to="/login" className="w-full sm:w-auto">
                         <motion.button
-                          className="w-full sm:w-auto px-4 xs:px-6 sm:px-8 md:px-10 py-3 xs:py-3.5 sm:py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 min-h-[48px]"
+                          className="w-full sm:w-auto px-3 xs:px-4 sm:px-6 md:px-8 py-2.5 xs:py-3 sm:py-3.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 min-h-[44px]"
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                         >
                           <div className="flex items-center justify-center space-x-2">
-                            <TbLogin className="w-4 h-4 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
-                            <span className="text-sm xs:text-sm sm:text-base">Login</span>
+                            <TbLogin className="w-3 h-3 xs:w-4 xs:h-4 sm:w-4 sm:h-4" />
+                            <span className="text-xs xs:text-sm sm:text-sm">Login</span>
                           </div>
                         </motion.button>
                       </Link>
@@ -915,7 +915,7 @@ const Home = () => {
                 ) : (
                   <Link to="/user/hub" className="w-full sm:w-auto">
                     <motion.button
-                      className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                      className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -1038,11 +1038,11 @@ const Home = () => {
                 whileHover={{ scale: 1.05, y: -5 }}
                 className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 text-center group border border-gray-100"
               >
-                <div className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-gradient-to-r ${stat.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                  <stat.icon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 mx-auto mb-2 sm:mb-3 md:mb-4 rounded-full bg-gradient-to-r ${stat.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                  <stat.icon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
                 </div>
-                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-1 sm:mb-2">{stat.number}</div>
-                <div className="text-xs sm:text-sm md:text-base text-gray-600 font-medium">{stat.text}</div>
+                <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-800 mb-1 sm:mb-2">{stat.number}</div>
+                <div className="text-xs sm:text-xs md:text-sm lg:text-base text-gray-600 font-medium">{stat.text}</div>
               </motion.div>
             ))}
           </motion.div>

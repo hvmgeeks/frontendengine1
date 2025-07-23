@@ -60,39 +60,7 @@
   z-index: 1;
 }
 
-.header-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.header-main {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.header-icon {
-  font-size: 3rem;
-  color: #e2e8f0;
-  opacity: 0.9;
-}
-
-.header-text h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin: 0 0 0.5rem 0;
-  color: white;
-}
-
-.header-text p {
-  font-size: 1.1rem;
-  margin: 0;
-  color: #e2e8f0;
-  opacity: 0.9;
-}
+/* Header styles removed - using ProtectedRoute header only */
 
 .level-badge {
   background: rgba(255, 255, 255, 0.2);
@@ -285,15 +253,15 @@
 }
 
 .subject-btn:hover {
-  border-color: #3182ce;
-  color: #2b6cb0;
-  background: #ebf8ff;
+  border-color: #22c55e;
+  color: #16a34a;
+  background: #dcfce7;
 }
 
 .subject-btn.active {
-  background: #3182ce;
+  background: #22c55e;
   color: white;
-  border-color: #3182ce;
+  border-color: #22c55e;
 }
 
 /* Class Selection Modal */
@@ -374,14 +342,14 @@
 }
 
 .class-option:hover {
-  border-color: #3182ce;
-  background: #ebf8ff;
+  border-color: #22c55e;
+  background: #dcfce7;
 }
 
 .class-option.active {
-  background: #3182ce;
+  background: #22c55e;
   color: white;
-  border-color: #3182ce;
+  border-color: #22c55e;
 }
 
 /* Show Materials Section */
@@ -454,15 +422,15 @@
 }
 
 .option-btn:hover {
-  border-color: #3182ce;
-  color: #2b6cb0;
-  background: #ebf8ff;
+  border-color: #22c55e;
+  color: #16a34a;
+  background: #dcfce7;
 }
 
 .option-btn.active {
-  background: #3182ce;
+  background: #22c55e;
   color: white;
-  border-color: #3182ce;
+  border-color: #22c55e;
 }
 
 .option-info {
@@ -690,15 +658,15 @@
 }
 
 .subject-btn:hover {
-  border-color: #3182ce;
-  color: #2b6cb0;
-  background: #ebf8ff;
+  border-color: #22c55e;
+  color: #16a34a;
+  background: #dcfce7;
 }
 
 .subject-btn.active {
-  background: #3182ce;
+  background: #22c55e;
   color: white;
-  border-color: #3182ce;
+  border-color: #22c55e;
 }
 
 /* Class Selection Modal */
@@ -784,15 +752,15 @@
 }
 
 .class-option:hover {
-  border-color: #3182ce;
-  color: #2b6cb0;
-  background: #ebf8ff;
+  border-color: #22c55e;
+  color: #16a34a;
+  background: #dcfce7;
 }
 
 .class-option.active {
-  background: #3182ce;
+  background: #22c55e;
   color: white;
-  border-color: #3182ce;
+  border-color: #22c55e;
 }
 
 /* Professional Materials Display Section */
@@ -2115,8 +2083,12 @@
 }
 
 .class-option.active {
-  background: #3b82f6;
+  background: linear-gradient(135deg, #15803d 0%, #166534 100%);
   color: white;
+  font-weight: 700;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(21, 128, 61, 0.6);
+  border-color: #15803d;
 }
 
 .class-option.user-current {
@@ -2171,26 +2143,33 @@
 }
 
 .subject-pill {
-  padding: 0.5rem 1rem;
-  background: #f1f5f9;
-  border: 1px solid #d1d5db;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  border: 3px solid #e2e8f0;
   border-radius: 50px;
-  color: #374151;
-  font-size: 0.875rem;
-  font-weight: 500;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .subject-pill:hover {
-  border-color: #3b82f6;
-  color: #3b82f6;
+  border-color: #16a34a;
+  color: #15803d;
+  background: #dcfce7;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(22, 163, 74, 0.2);
 }
 
 .subject-pill.active {
-  background: #3b82f6;
-  border-color: #3b82f6;
+  background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+  border-color: #15803d;
   color: white;
+  font-weight: 700;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(21, 128, 61, 0.6);
 }
 
 /* Search and Sort Container */
@@ -3574,7 +3553,7 @@
 .past-paper-square-card {
   width: 280px;
   height: 320px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  background: linear-gradient(135deg, #007BFF 0%, #0056D2 50%, #4338CA 100%);
   border: 2px solid #e2e8f0;
   border-radius: 16px;
   padding: 20px;
@@ -3615,13 +3594,14 @@
 .past-paper-square-card .study-card-meta {
   font-size: 12px;
   margin-bottom: 12px;
+  color: #28a745;
 }
 
 .past-paper-square-card .study-card-title {
   font-size: 16px;
   font-weight: 600;
   line-height: 1.4;
-  color: #1f2937;
+  color: white;
   margin-bottom: 12px;
   display: -webkit-box;
   -webkit-line-clamp: 4;
@@ -3631,14 +3611,14 @@
 
 .past-paper-square-card .material-subject {
   font-size: 13px;
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.9);
   font-weight: 500;
 }
 
 .past-paper-square-card .material-class {
   font-size: 11px;
-  background: #eff6ff;
-  color: #1d4ed8;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
   padding: 4px 8px;
   border-radius: 6px;
   font-weight: 500;
@@ -3647,6 +3627,9 @@
 .past-paper-square-card .badge {
   font-size: 11px;
   padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .past-paper-square-card .card-actions {
@@ -3670,33 +3653,693 @@
 /* Mobile past paper cards */
 @media (max-width: 768px) {
   .past-paper-square-card {
-    width: 240px;
-    height: 280px;
-    padding: 16px;
+    width: 300px;
+    height: 340px;
+    padding: 20px;
   }
 
   .past-paper-square-card .study-card-title {
     font-size: 14px;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
+    margin-bottom: 8px;
   }
 
   .past-paper-square-card .btn-primary {
-    font-size: 11px;
-    padding: 6px 12px;
-    min-height: 32px;
+    font-size: 13px;
+    padding: 12px 16px;
+    min-height: 44px;
+    flex: 1;
+    min-width: 100px;
+    font-weight: 600;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+  }
+
+  .past-paper-square-card .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  }
+
+  .past-paper-square-card .card-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
   }
 }
 
 @media (max-width: 480px) {
   .past-paper-square-card {
-    width: 200px;
-    height: 240px;
-    padding: 14px;
+    width: 280px;
+    height: 320px;
+    padding: 18px;
   }
 
   .past-paper-square-card .study-card-title {
     font-size: 13px;
     -webkit-line-clamp: 2;
+    margin-bottom: 8px;
+  }
+
+  .past-paper-square-card .btn-primary {
+    font-size: 12px;
+    padding: 10px 14px;
+    min-height: 40px;
+    flex: 1;
+    min-width: 95px;
+    font-weight: 600;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.2);
+  }
+
+  .past-paper-square-card .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0, 123, 255, 0.3);
+  }
+
+  .past-paper-square-card .card-actions {
+    margin-top: 18px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
   }
 }
-  
+
+/* Extra small mobile screens */
+@media (max-width: 360px) {
+  .past-paper-square-card {
+    width: 260px;
+    height: 300px;
+    padding: 16px;
+  }
+
+  .past-paper-square-card .study-card-title {
+    font-size: 12px;
+    -webkit-line-clamp: 2;
+    margin-bottom: 6px;
+  }
+
+  .past-paper-square-card .btn-primary {
+    font-size: 11px;
+    padding: 8px 12px;
+    min-height: 36px;
+    flex: 1;
+    min-width: 90px;
+    font-weight: 600;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0, 123, 255, 0.2);
+  }
+
+  .past-paper-square-card .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+  }
+
+  .past-paper-square-card .card-actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+}
+
+/* Book-style thumbnail styles for books and literature */
+.study-card-thumbnail {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.thumbnail-image {
+  transition: all 0.3s ease;
+  display: block;
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  border-radius: 8px 8px 0 0;
+  /* Book-like appearance */
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.study-card:hover .thumbnail-image {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 4px 16px rgba(0, 0, 0, 0.25),
+    0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.thumbnail-placeholder {
+  transition: all 0.3s ease;
+  width: 100%;
+  height: 280px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px 8px 0 0;
+  border: 2px solid #dee2e6;
+  position: relative;
+  /* Book spine effect */
+  box-shadow:
+    inset -3px 0 6px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.thumbnail-placeholder::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.1), transparent);
+  border-radius: 8px 0 0 0;
+}
+
+.study-card:hover .thumbnail-placeholder {
+  background: linear-gradient(135deg, #f1f3f4 0%, #e1e5e9 100%);
+  transform: translateY(-2px);
+  box-shadow:
+    inset -3px 0 6px rgba(0, 0, 0, 0.15),
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.study-card-author {
+  font-style: italic;
+  color: #666;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+/* Responsive book thumbnail adjustments */
+@media (max-width: 1024px) {
+  .thumbnail-image,
+  .thumbnail-placeholder {
+    height: 240px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .thumbnail-image,
+  .thumbnail-placeholder {
+    height: 200px !important;
+  }
+
+  .thumbnail-placeholder div {
+    font-size: 12px !important;
+  }
+
+  .thumbnail-placeholder svg {
+    font-size: 32px !important;
+  }
+
+  .study-card-author {
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .thumbnail-image,
+  .thumbnail-placeholder {
+    height: 160px !important;
+  }
+
+  .thumbnail-placeholder div {
+    font-size: 10px !important;
+    padding: 8px;
+  }
+
+  .thumbnail-placeholder svg {
+    font-size: 24px !important;
+  }
+
+  .study-card-author {
+    font-size: 11px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .thumbnail-image,
+  .thumbnail-placeholder {
+    height: 140px !important;
+  }
+
+  .thumbnail-placeholder div {
+    font-size: 9px !important;
+    padding: 6px;
+  }
+
+  .thumbnail-placeholder svg {
+    font-size: 20px !important;
+  }
+}
+
+/* Unified Layout for All Study Materials */
+.study-card {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
+  background: white;
+  border-radius: 16px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(0, 123, 255, 0.1);
+  position: relative;
+}
+
+/* Horizontal layout for tablets and laptops */
+@media (min-width: 768px) {
+  .study-card.has-thumbnail {
+    flex-direction: row;
+    min-height: 200px;
+    max-height: 250px;
+  }
+
+  .study-card.has-thumbnail .study-card-thumbnail {
+    flex: 0 0 180px;
+    height: 100%;
+  }
+
+  .study-card.has-thumbnail .study-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .study-card.has-thumbnail .study-card-header {
+    padding: 0 0 12px 0;
+  }
+
+  .study-card.has-thumbnail .card-content {
+    padding: 0;
+    flex-grow: 1;
+  }
+
+  .study-card.has-thumbnail .card-actions {
+    padding: 12px 0 0 0;
+    margin-top: auto;
+  }
+}
+
+.study-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 123, 255, 0.15),
+    0 10px 10px -5px rgba(0, 123, 255, 0.1);
+  border-color: rgba(0, 123, 255, 0.2);
+}
+
+.study-card .study-card-header {
+  padding: 20px;
+  flex-grow: 1;
+}
+
+.study-card .card-content {
+  padding: 0 20px;
+  flex-grow: 1;
+}
+
+.study-card .card-actions {
+  padding: 0 20px 20px 20px;
+  margin-top: auto;
+}
+
+/* Consistent button styling for all materials */
+.card-actions .btn-primary {
+  background: linear-gradient(135deg, #007BFF 0%, #0056D2 100%);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-actions .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.card-actions .btn-primary:last-child {
+  margin-right: 0;
+}
+
+/* Material meta styling */
+.material-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.material-subject {
+  background: rgba(0, 123, 255, 0.1);
+  color: #007BFF;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.material-class {
+  background: rgba(108, 117, 125, 0.1);
+  color: #495057;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.material-author {
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Badge styles for additional classes */
+.badge.badge-outline-primary {
+  background: transparent;
+  border: 1px solid #007bff;
+  color: #007bff;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+/* Study card meta icons */
+.study-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #28a745;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.study-card-meta svg {
+  font-size: 16px;
+}
+
+/* Study card title */
+.study-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+/* Thumbnail styling */
+.study-card-thumbnail {
+  position: relative;
+  overflow: hidden;
+}
+
+.study-card-thumbnail .thumbnail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.study-card-thumbnail .thumbnail-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-right: 1px solid rgba(0, 123, 255, 0.1);
+}
+
+/* Mobile thumbnail styling */
+@media (max-width: 767px) {
+  .study-card-thumbnail {
+    height: 120px;
+    width: 100%;
+  }
+}
+
+/* Tablet and laptop thumbnail styling */
+@media (min-width: 768px) {
+  .study-card-thumbnail {
+    width: 180px;
+    height: 100%;
+    min-height: 200px;
+  }
+
+  .study-card-thumbnail .thumbnail-placeholder {
+    border-right: 1px solid rgba(0, 123, 255, 0.1);
+    border-bottom: none;
+  }
+}
+
+/* Unavailable state */
+.unavailable {
+  color: #6c757d;
+  font-style: italic;
+  font-size: 14px;
+}
+
+/* Fix dropdown z-index issues */
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+/* Ensure dropdown container has proper stacking context */
+.class-filter-container {
+  position: relative;
+  z-index: 100;
+}
+
+.class-filter-container .relative {
+  position: relative;
+  z-index: 101;
+}
+
+/* Class selector dropdown */
+.class-selector-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 4px;
+  min-width: 200px;
+}
+
+.class-selector-dropdown .class-option {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  font-size: 14px;
+}
+
+.class-selector-dropdown .class-option:last-child {
+  border-bottom: none;
+}
+
+.class-selector-dropdown .class-option:hover {
+  background-color: #f8fafc;
+}
+
+.class-selector-dropdown .class-option.current {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 500;
+}
+
+.class-selector-dropdown .class-option.selected {
+  background-color: #3b82f6;
+  color: white;
+}
+
+/* Dropdown backdrop to prevent interference */
+.dropdown-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9998;
+  background: transparent;
+}
+
+/* Force dropdown to be visible */
+.class-selector-dropdown {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Ensure dropdown appears above everything */
+.class-filter-container.dropdown-open {
+  z-index: 10000;
+}
+
+.class-filter-container.dropdown-open .class-selector-dropdown {
+  z-index: 10001;
+}
+
+/* Study Material Tabs - Enhanced Visibility */
+.study-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  background: white;
+  padding: 8px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.study-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border: 3px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.study-tab:hover {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  color: #15803d;
+  border-color: #16a34a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(22, 163, 74, 0.3);
+}
+
+.study-tab.active {
+  background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+  color: white;
+  border-color: #15803d;
+  box-shadow: 0 8px 25px rgba(21, 128, 61, 0.8);
+  transform: translateY(-4px);
+  font-weight: 700;
+  position: relative;
+  z-index: 10;
+}
+
+.study-tab.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.study-tab.active::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(135deg, #22c55e, #16a34a, #15803d);
+  border-radius: 14px;
+  z-index: -1;
+  opacity: 0.7;
+  filter: blur(4px);
+}
+
+.study-tab svg {
+  font-size: 16px;
+  transition: transform 0.3s ease;
+}
+
+.study-tab.active svg {
+  transform: scale(1.1);
+}
+
+/* Mobile responsive tabs */
+@media (max-width: 768px) {
+  .study-tabs {
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .study-tab {
+    padding: 10px 16px;
+    font-size: 13px;
+    flex: 1;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .study-tab span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* Ensure filter cards don't interfere with dropdowns */
+.card {
+  position: relative;
+  z-index: 1;
+}
+
+.card.filter-card {
+  overflow: visible;
+  z-index: 10;
+}
+
+/* Ensure materials grid doesn't interfere with dropdowns */
+.materials-grid {
+  position: relative;
+  z-index: 1;
+}

@@ -87,11 +87,6 @@
   text-align: center;
   margin-bottom: 1rem;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 1rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
   position: relative;
   max-width: 800px;
   margin-left: auto;
@@ -103,7 +98,6 @@
   .hub-header {
     margin-bottom: 1.5rem;
     padding: 1.25rem;
-    border-radius: 1.25rem;
   }
 }
 
@@ -111,8 +105,6 @@
   .hub-header {
     margin-bottom: 2rem;
     padding: 1.5rem;
-    border-radius: 1.5rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -636,7 +628,6 @@
   .hub-header {
     padding: 1rem;
     margin-bottom: 1.5rem;
-    border-radius: 1rem;
   }
 
   .hub-welcome {
@@ -1034,7 +1025,6 @@
 
   .hub-header {
     padding: 1rem;
-    border-radius: 0.75rem;
   }
 
   .hub-welcome {

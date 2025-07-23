@@ -2,8 +2,8 @@ import axios from 'axios';
 import { message } from 'antd';
 
 const axiosInstance = axios.create({
-    baseURL: 'https://server-fmff.onrender.com',
-    timeout: 30000, // 30 seconds timeout for better user experience
+    baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000',
+    timeout: 60000, // 60 seconds timeout for file uploads
 });
 
 // Add a request interceptor to dynamically set the authorization header
@@ -30,6 +30,8 @@ axiosInstance.interceptors.request.use(
             }
 
             config.headers.Authorization = `Bearer ${token}`;
+        } else {
+            console.log('❌ No token found in localStorage - please login again');
         }
         return config;
     },

@@ -406,3 +406,123 @@
         padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
     }
 }
+
+/* ===== MODERN RESPONSIVE ENHANCEMENTS ===== */
+
+/* Modern Mobile Enhancements */
+@media (max-width: 640px) {
+    /* Improve touch targets */
+    .form-input, .login-btn {
+        min-height: 44px; /* Apple's recommended minimum touch target */
+    }
+
+    /* Better spacing for mobile */
+    .login-form .ant-form-item {
+        margin-bottom: 1.25rem;
+    }
+
+    /* Optimize for mobile keyboards */
+    .login-container {
+        padding-bottom: 2rem;
+    }
+
+    /* Improve readability */
+    .login-subtitle {
+        line-height: 1.6;
+    }
+
+    /* Better button styling for mobile */
+    .login-btn {
+        font-weight: 600;
+        letter-spacing: 0.025em;
+        transition: all 0.2s ease;
+    }
+
+    .login-btn:active {
+        transform: scale(0.98);
+    }
+
+    /* Improve form field focus states */
+    .form-input:focus {
+        border-width: 2px;
+        padding: calc(0.875rem - 1px); /* Compensate for border width change */
+    }
+}
+
+/* Tablet Portrait Optimization */
+@media (min-width: 641px) and (max-width: 768px) {
+    .login-card {
+        max-width: 440px;
+        padding: 2.25rem;
+    }
+
+    .login-form .ant-form-item {
+        margin-bottom: 1.375rem;
+    }
+
+    /* Better touch targets for tablets */
+    .form-input, .login-btn {
+        min-height: 40px;
+    }
+}
+
+/* Modern Laptop/Desktop Enhancements */
+@media (min-width: 1025px) {
+    .login-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+        transform: translateY(-1px);
+    }
+
+    .login-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 25px rgba(0, 123, 255, 0.3);
+    }
+}
+
+/* High DPI Display Optimization */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .login-logo {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}
+
+/* Dark Mode Support (if needed in future) */
+@media (prefers-color-scheme: dark) {
+    .login-container {
+        background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    }
+
+    .login-card {
+        background: rgba(31, 41, 55, 0.95);
+        border-color: rgba(75, 85, 99, 0.3);
+    }
+}
+
+/* Mobile Input and Form Enhancements */
+@media (max-width: 768px) {
+    /* Prevent zoom on iOS when focusing inputs */
+    .form-input {
+        font-size: 16px !important; /* Prevents zoom on iOS */
+        min-height: 44px !important; /* Touch-friendly minimum */
+    }
+
+    .login-btn {
+        min-height: 48px !important; /* Touch-friendly button */
+        font-size: 16px !important;
+    }
+
+    /* Any select elements */
+    select {
+        font-size: 16px !important;
+        min-height: 44px !important;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+}

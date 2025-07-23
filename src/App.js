@@ -96,6 +96,9 @@ const FastLoader = () => (
 
 function App() {
   const { loading } = useSelector((state) => state.loader);
+
+  // All mobile header styles removed - using new design in ProtectedRoute
+
   return (
     <ErrorBoundary>
       <ThemeProvider>
@@ -109,13 +112,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/ranking-demo" element={<RankingDemo />} />
 
-
-
-          <Route path="/test" element={
-            <Suspense fallback={<FastLoader />}>
-              <Test />
-            </Suspense>
-          } />
+          {/* User Routes */}
           <Route
             path="/forum"
             element={
@@ -127,7 +124,6 @@ function App() {
             }
           />
 
-          {/* User Routes */}
           <Route
             path="/profile"
             element={
@@ -192,15 +188,16 @@ function App() {
           />
 
           <Route
-            path="/user/write-exam/:id"
+            path="/quiz/:id/play"
             element={
               <ProtectedRoute>
                 <Suspense fallback={<FastLoader />}>
-                  <WriteExam />
+                  <QuizPlay />
                 </Suspense>
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/quiz/:id/result"
             element={
@@ -212,24 +209,14 @@ function App() {
             }
           />
 
-          {/* New Quiz Routes */}
-
           <Route
-            path="/quiz/:id/play"
+            path="/user/write-exam/:id"
             element={
               <ProtectedRoute>
-                <QuizPlay />
+                <Suspense fallback={<FastLoader />}>
+                  <WriteExam />
+                </Suspense>
               </ProtectedRoute>
-            }
-          />
-
-          {/* Math Test Route */}
-          <Route
-            path="/math-test"
-            element={
-              <Suspense fallback={<FastLoader />}>
-                <MathTest />
-              </Suspense>
             }
           />
 
@@ -243,6 +230,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/user/study-material"
             element={
@@ -253,6 +241,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/user/video-lessons"
             element={
@@ -263,6 +252,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/user/skills"
             element={
@@ -273,6 +263,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/user/ranking"
             element={
@@ -286,155 +277,177 @@ function App() {
             }
           />
 
-
           {/* Admin Routes */}
+          <Route
+            path="/admin"
+            element={
+              <AdminProtectedRoute>
+                <Suspense fallback={<FastLoader />}>
+                  <AdminDashboard />
+                </Suspense>
+              </AdminProtectedRoute>
+            }
+          />
+
           <Route
             path="/admin/dashboard"
             element={
-              <ProtectedRoute>
-                <AdminProtectedRoute>
+              <AdminProtectedRoute>
+                <Suspense fallback={<FastLoader />}>
                   <AdminDashboard />
-                </AdminProtectedRoute>
-              </ProtectedRoute>
+                </Suspense>
+              </AdminProtectedRoute>
             }
           />
+
           <Route
             path="/admin/users"
             element={
-              <ProtectedRoute>
-                <AdminProtectedRoute>
+              <AdminProtectedRoute>
+                <Suspense fallback={<FastLoader />}>
                   <Users />
-                </AdminProtectedRoute>
-              </ProtectedRoute>
+                </Suspense>
+              </AdminProtectedRoute>
             }
           />
+
           <Route
             path="/admin/exams"
             element={
-              <ProtectedRoute>
-                <AdminProtectedRoute>
+              <AdminProtectedRoute>
+                <Suspense fallback={<FastLoader />}>
                   <Exams />
-                </AdminProtectedRoute>
-              </ProtectedRoute>
+                </Suspense>
+              </AdminProtectedRoute>
             }
           />
+
           <Route
             path="/admin/exams/add"
             element={
-              <ProtectedRoute>
-                <AdminProtectedRoute>
+              <AdminProtectedRoute>
+                <Suspense fallback={<FastLoader />}>
                   <AddEditExam />
-                </AdminProtectedRoute>
-              </ProtectedRoute>
+                </Suspense>
+              </AdminProtectedRoute>
             }
           />
 
           <Route
             path="/admin/exams/edit/:id"
             element={
-              <ProtectedRoute>
-                <AdminProtectedRoute>
+              <AdminProtectedRoute>
+                <Suspense fallback={<FastLoader />}>
                   <AddEditExam />
-                </AdminProtectedRoute>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/admin/study-materials"
-            element={
-              <ProtectedRoute>
-                <AdminProtectedRoute>
-                  <AdminStudyMaterials />
-                </AdminProtectedRoute>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/skills"
-            element={
-              <ProtectedRoute>
-                <AdminProtectedRoute>
-                  <AdminSkills />
-                </AdminProtectedRoute>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/admin/videos"
-            element={
-              <ProtectedRoute>
-                <AdminProtectedRoute>
-                  <AdminVideos />
-                </AdminProtectedRoute>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/admin/video-lessons"
-            element={
-              <ProtectedRoute>
-                <AdminProtectedRoute>
-                  <AdminVideoLessons />
-                </AdminProtectedRoute>
-              </ProtectedRoute>
+                </Suspense>
+              </AdminProtectedRoute>
             }
           />
 
           <Route
             path="/admin/reports"
             element={
-              <ProtectedRoute>
-                <AdminProtectedRoute>
+              <AdminProtectedRoute>
+                <Suspense fallback={<FastLoader />}>
                   <AdminReports />
-                </AdminProtectedRoute>
-              </ProtectedRoute>
+                </Suspense>
+              </AdminProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/study-materials"
+            element={
+              <AdminProtectedRoute>
+                <Suspense fallback={<FastLoader />}>
+                  <AdminStudyMaterials />
+                </Suspense>
+              </AdminProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/skills"
+            element={
+              <AdminProtectedRoute>
+                <Suspense fallback={<FastLoader />}>
+                  <AdminSkills />
+                </Suspense>
+              </AdminProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/videos"
+            element={
+              <AdminProtectedRoute>
+                <Suspense fallback={<FastLoader />}>
+                  <AdminVideos />
+                </Suspense>
+              </AdminProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/video-lessons"
+            element={
+              <AdminProtectedRoute>
+                <Suspense fallback={<FastLoader />}>
+                  <AdminVideoLessons />
+                </Suspense>
+              </AdminProtectedRoute>
             }
           />
 
           <Route
             path="/admin/notifications"
             element={
-              <ProtectedRoute>
-                <AdminProtectedRoute>
+              <AdminProtectedRoute>
+                <Suspense fallback={<FastLoader />}>
                   <AdminNotifications />
-                </AdminProtectedRoute>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/admin/profile"
-            element={
-              <ProtectedRoute>
-                <AdminProtectedRoute>
-                  <AdminProfile />
-                </AdminProtectedRoute>
-              </ProtectedRoute>
+                </Suspense>
+              </AdminProtectedRoute>
             }
           />
 
           <Route
             path="/admin/forum"
             element={
-              <ProtectedRoute>
-                <AdminProtectedRoute>
+              <AdminProtectedRoute>
+                <Suspense fallback={<FastLoader />}>
                   <AdminForum />
-                </AdminProtectedRoute>
-              </ProtectedRoute>
+                </Suspense>
+              </AdminProtectedRoute>
             }
           />
 
           <Route
-            path="/admin/debug"
+            path="/admin/profile"
             element={
-              <ProtectedRoute>
-                <AdminProtectedRoute>
-                  <DebugAuth />
-                </AdminProtectedRoute>
-              </ProtectedRoute>
+              <AdminProtectedRoute>
+                <Suspense fallback={<FastLoader />}>
+                  <AdminProfile />
+                </Suspense>
+              </AdminProtectedRoute>
+            }
+          />
+
+          {/* Debug and Test Routes */}
+          <Route
+            path="/debug-auth"
+            element={
+              <Suspense fallback={<FastLoader />}>
+                <DebugAuth />
+              </Suspense>
+            }
+          />
+
+          <Route
+            path="/math-test"
+            element={
+              <Suspense fallback={<FastLoader />}>
+                <MathTest />
+              </Suspense>
             }
           />
         </Routes>

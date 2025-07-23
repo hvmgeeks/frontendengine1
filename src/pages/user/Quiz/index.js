@@ -8,20 +8,71 @@ import {
   TbFilter,
   TbClock,
   TbQuestionMark,
-  TbTrophy,
   TbPlayerPlay,
   TbBrain,
   TbTarget,
   TbCheck,
-  TbX,
+
   TbStar,
   TbHome,
-  TbBolt
+  TbBolt,
+  TbX,
+  TbBook
 } from 'react-icons/tb';
 import { getAllExams, getExamById } from '../../../apicalls/exams';
 import { getAllReportsByUser } from '../../../apicalls/reports';
 import { HideLoading, ShowLoading } from '../../../redux/loaderSlice';
 import './animations.css';
+
+// Function to normalize subject names for primary level
+const normalizeSubjectName = (category, userLevel) => {
+  if (!category || userLevel !== 'primary') return category;
+
+  const categoryLower = category.toLowerCase().trim();
+
+  // Primary level subject name mappings
+  const subjectMappings = {
+    // Civics variations
+    'civics': 'Civic and Moral',
+    'civic': 'Civic and Moral',
+    'civic and moral': 'Civic and Moral',
+    'civic and moral education': 'Civic and Moral',
+    'moral': 'Civic and Moral',
+
+    // Social Studies variations
+    'social studies': 'Social Studies',
+    'social': 'Social Studies',
+    'social science': 'Social Studies',
+
+    // Science variations
+    'science': 'Science and Technology',
+    'science and technology': 'Science and Technology',
+    'science & technology': 'Science and Technology',
+    'technology': 'Science and Technology',
+
+    // Mathematics variations
+    'math': 'Mathematics',
+    'maths': 'Mathematics',
+    'mathematics': 'Mathematics',
+    'arithmetic': 'Mathematics',
+
+    // English variations
+    'english': 'English',
+    'english language': 'English',
+
+    // Kiswahili variations
+    'kiswahili': 'Kiswahili',
+    'swahili': 'Kiswahili',
+
+    // Vocational Skills variations
+    'vocational': 'Vocational Skills',
+    'vocational skills': 'Vocational Skills',
+    'life skills': 'Vocational Skills',
+    'practical skills': 'Vocational Skills'
+  };
+
+  return subjectMappings[categoryLower] || category;
+};
 
 const Quiz = () => {
   const [exams, setExams] = useState([]);
@@ -29,6 +80,11 @@ const Quiz = () => {
   const [searchTerm, setSearchTerm] = useState(() => {
     // Restore search term from localStorage
     return localStorage.getItem('quiz-search-term') || '';
+  });
+
+  const [selectedSubject, setSelectedSubject] = useState(() => {
+    // Restore subject filter from localStorage
+    return localStorage.getItem('quiz-selected-subject') || 'all';
   });
   const [selectedClass, setSelectedClass] = useState(() => {
     // Restore selected class from localStorage
@@ -38,12 +94,13 @@ const Quiz = () => {
   const [loading, setLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useState(null);
   const [quizCache, setQuizCache] = useState({});
+  const [examCache, setExamCache] = useState({}); // Memory cache for exam listings
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
   const { t, isKiswahili, getClassName } = useLanguage();
 
-  // Function to clear all quiz caches
+  // Function to clear all quiz caches (manual refresh)
   const clearAllQuizCaches = () => {
     const allLevels = ['primary', 'secondary', 'advance'];
     allLevels.forEach(level => {
@@ -61,15 +118,30 @@ const Quiz = () => {
         localStorage.removeItem(key);
       }
     });
+
+    // Clear memory cache
+    setExamCache({});
+    console.log('🗑️ All quiz caches cleared manually');
   };
 
-  // Preload quiz data for instant loading
+  // Function to force refresh quizzes (bypass cache)
+  const forceRefreshQuizzes = async () => {
+    console.log('🔄 Force refreshing quizzes...');
+    clearAllQuizCaches();
+    setLoading(true);
+    await getExams();
+    message.success('Quizzes refreshed successfully!');
+  };
+
+  // Enhanced preload quiz data for instant loading
   const preloadQuizData = async (quizId) => {
     if (quizCache[quizId]) {
       return; // Already cached
     }
 
     try {
+      const startTime = performance.now();
+
       // Check localStorage cache first
       const cacheKey = `quiz_data_${quizId}`;
       const cachedData = localStorage.getItem(cacheKey);
@@ -80,11 +152,17 @@ const Quiz = () => {
       if (cachedData && cacheTime && (now - parseInt(cacheTime)) < 600000) {
         const parsed = JSON.parse(cachedData);
         setQuizCache(prev => ({ ...prev, [quizId]: parsed }));
+        console.log(`📚 Quiz ${quizId} loaded from cache in ${(performance.now() - startTime).toFixed(1)}ms`);
         return;
       }
 
-      // Fetch from server
+      // Fetch from server with timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+
       const response = await getExamById({ examId: quizId });
+      clearTimeout(timeoutId);
+
       if (response.success && response.data) {
         // Cache in memory
         setQuizCache(prev => ({ ...prev, [quizId]: response.data }));
@@ -93,10 +171,14 @@ const Quiz = () => {
         localStorage.setItem(cacheKey, JSON.stringify(response.data));
         localStorage.setItem(`${cacheKey}_time`, now.toString());
 
-        console.log(`📚 Quiz ${quizId} preloaded and cached`);
+        console.log(`📚 Quiz ${quizId} preloaded and cached in ${(performance.now() - startTime).toFixed(1)}ms`);
       }
     } catch (error) {
-      console.error('Error preloading quiz:', error);
+      if (error.name === 'AbortError') {
+        console.warn(`⏰ Quiz ${quizId} preload timed out after 3s`);
+      } else {
+        console.error('Error preloading quiz:', error);
+      }
     }
   };
 
@@ -113,10 +195,25 @@ const Quiz = () => {
     };
   }, []);
 
-  // Clear search when user changes (logout scenario)
+  // Set default class to user's class and clear search when user changes
   useEffect(() => {
     if (!user) {
-      clearSearchAndFilters();
+      // User logged out - clear everything
+      setSearchTerm('');
+      setSelectedClass('');
+      localStorage.removeItem('quiz-search-term');
+      localStorage.removeItem('quiz-selected-class');
+    } else if (user.class) {
+      // User logged in and has a class - set it as default if no class is currently selected
+      const userClass = String(user.class);
+      const savedClass = localStorage.getItem('quiz-selected-class');
+
+      // Only set user's class as default if no class is explicitly selected
+      if (!savedClass || savedClass === '') {
+        setSelectedClass(''); // This will trigger the filtering to use user's class by default
+        localStorage.removeItem('quiz-selected-class'); // Remove any saved "All Classes" selection
+        console.log(`🎯 Setting default filter to user's class: ${userClass} (will be applied in filtering)`);
+      }
     }
   }, [user]);
 
@@ -130,19 +227,45 @@ const Quiz = () => {
   const handleClassChange = (value) => {
     setSelectedClass(value);
     localStorage.setItem('quiz-selected-class', value);
+
+    // Clear category filter when class changes to show all categories of the selected class
+    setSelectedSubject('all');
+    localStorage.setItem('quiz-selected-subject', 'all');
+    console.log(`🔄 Class changed to "${value}" - cleared category filter to show all categories`);
   };
 
-  // Clear search and filters (for manual refresh)
-  const clearSearchAndFilters = () => {
-    setSearchTerm('');
-    setSelectedClass('');
-    localStorage.removeItem('quiz-search-term');
-    localStorage.removeItem('quiz-selected-class');
+  // Handle subject selection change with localStorage persistence
+  const handleSubjectChange = (value) => {
+    setSelectedSubject(value);
+    localStorage.setItem('quiz-selected-subject', value);
   };
+
+
 
   const getUserResults = useCallback(async () => {
     try {
       if (!user?._id) return;
+
+      const startTime = performance.now();
+      console.log('📊 Loading user quiz results...');
+
+      // Check cache for user results
+      const resultsCacheKey = `user_results_${user._id}`;
+      const cachedResults = localStorage.getItem(resultsCacheKey);
+      const cacheTime = localStorage.getItem(`${resultsCacheKey}_time`);
+
+      // Use cache if less than 5 minutes old (results change less frequently)
+      if (cachedResults && cacheTime && (Date.now() - parseInt(cacheTime)) < 300000) {
+        try {
+          const parsed = JSON.parse(cachedResults);
+          setUserResults(parsed);
+          const loadTime = performance.now() - startTime;
+          console.log(`📦 User results loaded from cache in ${loadTime.toFixed(1)}ms`);
+          return;
+        } catch (error) {
+          console.warn('Failed to parse cached results:', error);
+        }
+      }
 
       const response = await getAllReportsByUser({ userId: user._id });
 
@@ -173,13 +296,21 @@ const Quiz = () => {
           }
         });
         setUserResults(resultsMap);
+
+        // Cache the results
+        const currentTime = Date.now();
+        localStorage.setItem(resultsCacheKey, JSON.stringify(resultsMap));
+        localStorage.setItem(`${resultsCacheKey}_time`, currentTime.toString());
+
+        const loadTime = performance.now() - startTime;
+        console.log(`✅ User results loaded and cached from API in ${loadTime.toFixed(1)}ms`);
       }
     } catch (error) {
       console.error('Error fetching user results:', error);
     }
   }, [user?._id]);
 
-  // Define getExams function to load exams once
+  // Optimized exam fetching with multi-level caching and performance tracking
   const getExams = useCallback(async () => {
       try {
         // Safety check: ensure user exists before proceeding
@@ -188,35 +319,58 @@ const Quiz = () => {
           return;
         }
 
+        const startTime = performance.now();
+        console.log('🚀 Starting quiz fetch...');
+
         // Level-specific cache to prevent cross-level contamination
         const userLevel = user?.level || 'primary';
         const cacheKey = `user_exams_cache_${userLevel}`;
         const cacheTimeKey = `user_exams_cache_time_${userLevel}`;
+        const memoryCacheKey = `exams_${userLevel}`;
 
-        // Clear caches for other levels
-        const allLevels = ['primary', 'secondary', 'advance'];
-        allLevels.forEach(level => {
-          if (level !== userLevel) {
-            localStorage.removeItem(`user_exams_cache_${level}`);
-            localStorage.removeItem(`user_exams_cache_time_${level}`);
-          }
-        });
+        // Check memory cache first for instant loading
+        const memoryCache = examCache[memoryCacheKey];
+        if (memoryCache && (Date.now() - memoryCache.timestamp) < 600000) {
+          setExams(memoryCache.data);
+          setLastRefresh(new Date(memoryCache.timestamp));
+          setLoading(false);
+          const cacheTime = performance.now() - startTime;
+          console.log(`⚡ Quizzes loaded from memory cache in ${cacheTime.toFixed(1)}ms - ${memoryCache.data.length} quizzes`);
+          return;
+        }
 
-        // Check level-specific cache first
+        // Check localStorage cache
         const cachedExams = localStorage.getItem(cacheKey);
         const cacheTime = localStorage.getItem(cacheTimeKey);
         const now = Date.now();
 
-        // Use cache if less than 10 minutes old (increased cache time)
+        // Use localStorage cache if less than 10 minutes old
         if (cachedExams && cacheTime && (now - parseInt(cacheTime)) < 600000) {
-          const cached = JSON.parse(cachedExams);
-          setExams(cached);
-          setLastRefresh(new Date(parseInt(cacheTime)));
-          setLoading(false);
-          console.log(`📋 Using cached exams for ${userLevel} level:`, cached.length);
-          return;
+          try {
+            const cached = JSON.parse(cachedExams);
+            setExams(cached);
+            setLastRefresh(new Date(parseInt(cacheTime)));
+            setLoading(false);
+
+            // Also store in memory cache for next time
+            setExamCache(prev => ({
+              ...prev,
+              [memoryCacheKey]: {
+                data: cached,
+                timestamp: parseInt(cacheTime)
+              }
+            }));
+
+            const loadTime = performance.now() - startTime;
+            console.log(`📦 Quizzes loaded from localStorage cache in ${loadTime.toFixed(1)}ms - ${cached.length} quizzes`);
+            return;
+          } catch (error) {
+            console.warn('Failed to parse cached quiz data:', error);
+          }
         }
 
+        // Fetch from API as last resort
+        console.log('🌐 Loading quizzes from API...');
         dispatch(ShowLoading());
         const response = await getAllExams();
         dispatch(HideLoading());
@@ -236,9 +390,23 @@ const Quiz = () => {
           setExams(sortedExams);
           setLastRefresh(new Date());
 
-          // Cache the exams data with level-specific key
+          const currentTime = Date.now();
+
+          // Cache in memory for instant access
+          setExamCache(prev => ({
+            ...prev,
+            [memoryCacheKey]: {
+              data: sortedExams,
+              timestamp: currentTime
+            }
+          }));
+
+          // Cache in localStorage for persistence
           localStorage.setItem(cacheKey, JSON.stringify(sortedExams));
-          localStorage.setItem(cacheTimeKey, Date.now().toString());
+          localStorage.setItem(cacheTimeKey, currentTime.toString());
+
+          const loadTime = performance.now() - startTime;
+          console.log(`✅ Quizzes loaded and cached from API in ${loadTime.toFixed(1)}ms - ${sortedExams.length} quizzes`);
 
           // Set default class filter to user's class
           if (user?.class) {
@@ -256,10 +424,11 @@ const Quiz = () => {
   }, [dispatch, user]);
 
   useEffect(() => {
-    // Clear ALL caches when component mounts to ensure fresh data
-    clearAllQuizCaches();
+    // Don't clear caches on mount - let caching work for performance
+    // Only clear caches manually when needed (e.g., user action)
+    console.log('🎯 Quiz component mounted - using cached data if available');
 
-    getExams(); // Initial load only
+    getExams(); // Initial load with caching
     getUserResults();
   }, [getExams, getUserResults]);
 
@@ -300,9 +469,20 @@ const Quiz = () => {
 
   // Optimized filtering with useMemo to prevent unnecessary recalculations
   const filteredExams = useMemo(() => {
-    console.log('Filtering exams:', { exams: exams.length, searchTerm, selectedClass });
+    console.log('Filtering exams:', { exams: exams.length, searchTerm, selectedClass, userClass: user?.class, userLevel: user?.level });
+    console.log('📊 All exams by level:', exams.reduce((acc, exam) => {
+      const level = exam.level || 'unknown';
+      acc[level] = (acc[level] || 0) + 1;
+      return acc;
+    }, {}));
+    console.log('📊 All exams by class:', exams.reduce((acc, exam) => {
+      const cls = exam.class || 'unknown';
+      acc[cls] = (acc[cls] || 0) + 1;
+      return acc;
+    }, {}));
     let filtered = exams;
 
+    // Apply search filter first
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(exam => {
@@ -326,19 +506,266 @@ const Quiz = () => {
       });
     }
 
+    // Apply subject/category filter - use same field as orange tags with normalization
+    if (selectedSubject && selectedSubject !== 'all') {
+      const userLevel = user?.level?.toLowerCase();
+      filtered = filtered.filter(exam => {
+        const examCategory = exam.category || 'General';
+        const normalizedExamCategory = normalizeSubjectName(examCategory, userLevel);
+        return normalizedExamCategory.toLowerCase() === selectedSubject.toLowerCase();
+      });
+      console.log(`🎯 Filtering by category: ${selectedSubject}, found ${filtered.length} quizzes`);
+    }
+
+    // Apply class filter - always default to user's class unless explicitly set to "All Classes"
     if (selectedClass) {
-      filtered = filtered.filter(exam => String(exam.class) === String(selectedClass));
+      // User explicitly selected a specific class
+      const userLevel = user?.level?.toLowerCase();
+
+      filtered = filtered.filter(exam => {
+        const examClass = String(exam.class).trim();
+        const examLevel = exam.level ? exam.level.toLowerCase() : '';
+
+        // First check if exam is from the same level
+        if (examLevel !== userLevel) {
+          return false;
+        }
+
+        // Extract class numbers for comparison
+        let selectedClassNumber;
+        if (/^Form[\s-]+(\d+)$/.test(selectedClass)) {
+          selectedClassNumber = parseInt(selectedClass.match(/^Form[\s-]+(\d+)$/)[1]);
+        } else if (/^\d+$/.test(selectedClass)) {
+          selectedClassNumber = parseInt(selectedClass);
+        }
+
+        let examClassNumber;
+        if (/^Form[\s-]+(\d+)$/.test(examClass)) {
+          examClassNumber = parseInt(examClass.match(/^Form[\s-]+(\d+)$/)[1]);
+        } else if (/^\d+$/.test(examClass)) {
+          examClassNumber = parseInt(examClass);
+        }
+
+        const matches = selectedClassNumber === examClassNumber;
+
+        if (matches) {
+          console.log(`✅ Manual selection match: selected="${selectedClass}" (${selectedClassNumber}) matches exam="${examClass}" (${examClassNumber})`);
+        }
+
+        return matches;
+      });
+      console.log(`🎯 Filtering by selected class: ${selectedClass}, found ${filtered.length} quizzes`);
+
+      // If no quizzes found, show debug info (but don't fallback - respect user's manual selection)
+      if (filtered.length === 0) {
+        console.log(`🔍 Debug: No quizzes found for selected class "${selectedClass}"`);
+        console.log(`🔍 User level: ${userLevel}`);
+        console.log(`🔍 Available exam classes for ${userLevel}:`,
+          [...new Set(exams.filter(e => e.level?.toLowerCase() === userLevel).map(e => e.class))]);
+        console.log(`🔍 Sample exams for ${userLevel}:`,
+          exams.filter(e => e.level?.toLowerCase() === userLevel).slice(0, 3).map(e => ({
+            class: e.class,
+            level: e.level,
+            subject: e.subject
+          })));
+        console.log(`ℹ️ Respecting manual class selection - showing empty results for "${selectedClass}"`);
+      }
+    } else if (user?.class) {
+      // No class selected, default to user's class
+      const userClass = String(user.class).trim();
+      const userLevel = user.level?.toLowerCase();
+
+      console.log(`🎯 Filtering by user's class: "${userClass}" (level: ${userLevel})`);
+
+      // Extract class number from user's class (handle "Form 5", "Form-5", "5")
+      let userClassNumber;
+      if (/^Form[\s-]+(\d+)$/.test(userClass)) {
+        userClassNumber = parseInt(userClass.match(/^Form[\s-]+(\d+)$/)[1]);
+      } else if (/^\d+$/.test(userClass)) {
+        userClassNumber = parseInt(userClass);
+      }
+
+      filtered = filtered.filter(exam => {
+        const examClass = String(exam.class).trim();
+        const examLevel = exam.level ? exam.level.toLowerCase() : '';
+
+        // First check if exam is from the same level
+        if (examLevel !== userLevel) {
+          return false;
+        }
+
+        // Extract class number from exam class
+        let examClassNumber;
+        if (/^Form[\s-]+(\d+)$/.test(examClass)) {
+          examClassNumber = parseInt(examClass.match(/^Form[\s-]+(\d+)$/)[1]);
+        } else if (/^\d+$/.test(examClass)) {
+          examClassNumber = parseInt(examClass);
+        }
+
+        // Match by class number
+        const matches = userClassNumber === examClassNumber;
+
+        if (matches) {
+          console.log(`✅ Match found: user="${userClass}" (${userClassNumber}) matches exam="${examClass}" (${examClassNumber})`);
+        }
+
+        return matches;
+      });
+
+      console.log(`🎯 Found ${filtered.length} quizzes for user's class: ${userClass}`);
+
+      // If no quizzes found for specific class, show all quizzes from the same level as fallback
+      if (filtered.length === 0) {
+        console.log(`🔄 No quizzes for class ${userClass}, showing all ${userLevel} level quizzes`);
+        filtered = exams.filter(exam => {
+          const examLevel = exam.level ? exam.level.toLowerCase() : '';
+          return examLevel === userLevel;
+        });
+      }
+    } else {
+      // User has no class, show all quizzes
+      console.log(`⚠️ No user class available, showing all ${filtered.length} quizzes`);
     }
 
     filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    console.log('Filtered exams result:', filtered.length);
+    console.log('Final filtered exams result:', filtered.length);
     return filtered;
-  }, [exams, searchTerm, selectedClass]);
+  }, [exams, searchTerm, selectedClass, selectedSubject, user?.class]);
 
-  // Optimize available classes calculation
+  // Aggressive preloading of visible quizzes for instant access
+  useEffect(() => {
+    if (filteredExams.length > 0) {
+      // Preload first 5 visible quizzes immediately
+      const preloadPromises = filteredExams.slice(0, 5).map(quiz =>
+        preloadQuizData(quiz._id)
+      );
+
+      // Execute preloading in background
+      Promise.allSettled(preloadPromises).then(results => {
+        const successful = results.filter(r => r.status === 'fulfilled').length;
+        console.log(`🚀 Preloaded ${successful}/${results.length} quizzes for instant access`);
+      });
+    }
+  }, [filteredExams]);
+
+  // Optimize available classes calculation - show only relevant classes for user's level
   const availableClasses = useMemo(() => {
-    return [...new Set(exams.map(e => e.class).filter(Boolean))].sort();
-  }, [exams]);
+    if (!user?.level) return [];
+
+    // Define expected classes based on user level only
+    let expectedClasses = [];
+    if (user.level === 'primary') {
+      expectedClasses = ['1', '2', '3', '4', '5', '6', '7'];
+    } else if (user.level === 'secondary') {
+      expectedClasses = ['1', '2', '3', '4'];
+    } else if (user.level === 'advance') {
+      expectedClasses = ['5', '6']; // Only Form 5 and Form 6
+    }
+
+    console.log('📚 Available classes for', user.level, ':', expectedClasses);
+
+    return expectedClasses;
+  }, [user?.level]);
+
+  // Get top 7 quiz categories based on selected class (or user's class if none selected)
+  const topCategories = useMemo(() => {
+    if (!exams.length) return [];
+
+    const userLevel = user?.level?.toLowerCase();
+    // Use selected class if available, otherwise fall back to user's class
+    const targetClass = selectedClass || (user?.class ? String(user.class).trim() : '');
+
+    // Extract target class number (selected class or user's class)
+    let targetClassNumber;
+    if (/^Form[\s-]+(\d+)$/.test(targetClass)) {
+      targetClassNumber = parseInt(targetClass.match(/^Form[\s-]+(\d+)$/)[1]);
+    } else if (/^\d+$/.test(targetClass)) {
+      targetClassNumber = parseInt(targetClass);
+    }
+
+    // Filter exams by target class (selected or user's class) and level
+    const targetClassExams = exams.filter(exam => {
+      const examLevel = exam.level ? exam.level.toLowerCase() : '';
+      const examClass = String(exam.class).trim();
+
+      if (examLevel !== userLevel) return false;
+
+      let examClassNumber;
+      if (/^Form[\s-]+(\d+)$/.test(examClass)) {
+        examClassNumber = parseInt(examClass.match(/^Form[\s-]+(\d+)$/)[1]);
+      } else if (/^\d+$/.test(examClass)) {
+        examClassNumber = parseInt(examClass);
+      }
+
+      return targetClassNumber === examClassNumber;
+    });
+
+    // Count categories - use the same field as orange tags on quiz cards
+    const categoryCount = {};
+    targetClassExams.forEach(exam => {
+      // Get the category that appears in orange tags: quiz.category || 'General'
+      const category = exam.category || 'General';
+
+      // Skip only if it's exactly 'General' (the fallback)
+      if (category === 'General') {
+        return;
+      }
+
+      // Normalize the category name for primary level
+      const normalizedCategory = normalizeSubjectName(category, userLevel);
+      categoryCount[normalizedCategory] = (categoryCount[normalizedCategory] || 0) + 1;
+    });
+
+    // Sort by count and get top 7
+    let sortedCategories = Object.entries(categoryCount)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 7)
+      .map(([category, count]) => ({ category, count }));
+
+    // If no categories found for user's class, get categories from user's level
+    if (sortedCategories.length === 0 && userLevel) {
+      console.log('🔄 No categories for user class, getting from user level');
+      const levelExams = exams.filter(exam => {
+        const examLevel = exam.level ? exam.level.toLowerCase() : '';
+        return examLevel === userLevel;
+      });
+
+      const levelCategoryCount = {};
+      levelExams.forEach(exam => {
+        // Use same logic as orange tags: quiz.category || 'General'
+        const category = exam.category || 'General';
+        if (category === 'General') {
+          return;
+        }
+        // Normalize the category name for primary level
+        const normalizedCategory = normalizeSubjectName(category, userLevel);
+        levelCategoryCount[normalizedCategory] = (levelCategoryCount[normalizedCategory] || 0) + 1;
+      });
+
+      sortedCategories = Object.entries(levelCategoryCount)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 7)
+        .map(([category, count]) => ({ category, count }));
+    }
+
+    console.log('🏷️ Target class exams found:', targetClassExams.length);
+    console.log('🏷️ Target class:', targetClass, '(selected:', selectedClass, ', user:', user?.class, ')');
+    console.log('🏷️ All subjects found in target class exams:', Object.keys(categoryCount));
+    console.log('🏷️ Top categories for target class:', sortedCategories);
+    console.log('🏷️ Will show category tags?', sortedCategories.length > 0);
+
+    // Debug: Show all unique categories in database for this level
+    if (userLevel === 'primary') {
+      const allPrimaryCategories = [...new Set(exams
+        .filter(exam => exam.level?.toLowerCase() === 'primary')
+        .map(exam => exam.category)
+        .filter(Boolean)
+      )];
+      console.log('🔍 All primary level categories in database:', allPrimaryCategories);
+    }
+
+    return sortedCategories;
+  }, [exams, selectedClass, user?.class, user?.level]);
 
   const handleQuizStart = (quiz) => {
     if (!quiz || !quiz._id) {
@@ -363,23 +790,6 @@ const Quiz = () => {
     });
   };
 
-
-
-  const handleQuizView = (quiz) => {
-    if (!quiz || !quiz._id) {
-      message.error('Invalid quiz selected. Please try again.');
-      return;
-    }
-    // Check if user has attempted this quiz
-    const userResult = userResults[quiz._id];
-    if (!userResult) {
-      message.info('You need to attempt this quiz first to view results.');
-      return;
-    }
-    startTransition(() => {
-      navigate(`/quiz/${quiz._id}/result`);
-    });
-  };
 
 
 
@@ -465,6 +875,64 @@ const Quiz = () => {
               )}
             </div>
 
+            {/* Top Quiz Categories - Responsive Design for All Devices */}
+            {topCategories.length > 0 && (
+              <div className="mb-6">
+                {/* Responsive Header */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex items-center gap-2">
+                    <TbStar className="h-5 w-5 text-blue-600" />
+                    <h3 className="text-lg font-semibold text-gray-800">Popular Categories</h3>
+                  </div>
+                  <div className="h-px bg-gray-200 flex-1"></div>
+                  <span className="text-sm text-gray-500 font-medium">
+                    {selectedClass
+                      ? (user?.level === 'primary' ? `Class ${selectedClass}` : `Form ${selectedClass}`)
+                      : (user?.level === 'primary' ? `Class ${user.class}` : `Form ${user.class}`)
+                    }
+                  </span>
+                </div>
+
+                {/* Responsive Category Tags - Horizontal with Wrapping */}
+                <div className="category-tags-container">
+                  {topCategories.map(({ category, count }) => (
+                    <button
+                      key={category}
+                      onClick={() => handleSubjectChange(category)}
+                      className={`mobile-category-button flex items-center gap-1 md:gap-2 px-2 py-1.5 md:px-4 md:py-2.5 rounded-lg md:rounded-xl font-medium transition-all duration-200 whitespace-nowrap ${
+                        selectedSubject === category
+                          ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25 md:transform md:scale-105'
+                          : 'bg-white text-gray-700 border border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 shadow-sm hover:shadow-md'
+                      }`}
+                    >
+                      <TbBook className={`h-3 w-3 md:h-4 md:w-4 ${
+                        selectedSubject === category ? 'text-white' : 'text-blue-600'
+                      }`} />
+                      <span className="text-xs md:text-sm category-button-text">{category}</span>
+                      <span className={`category-count px-1.5 py-0.5 md:px-2 md:py-1 rounded-full text-xs font-bold ${
+                        selectedSubject === category
+                          ? 'bg-white/20 text-white'
+                          : 'bg-orange-100 text-orange-700'
+                      }`}>
+                        {count}
+                      </span>
+                    </button>
+                  ))}
+
+                  {/* Clear Filter Button */}
+                  {selectedSubject && selectedSubject !== 'all' && (
+                    <button
+                      onClick={() => handleSubjectChange('all')}
+                      className="mobile-category-button flex items-center gap-1 md:gap-2 px-2 py-1.5 md:px-4 md:py-2.5 rounded-lg md:rounded-xl font-medium bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600 border border-gray-200 hover:border-red-200 transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap"
+                    >
+                      <TbX className="h-3 w-3 md:h-4 md:w-4" />
+                      <span className="text-xs md:text-sm">Clear</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Search, Filter, and Refresh Controls */}
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <div className="flex-1 relative">
@@ -489,27 +957,29 @@ const Quiz = () => {
                     onChange={(e) => handleClassChange(e.target.value)}
                     className="block w-full pl-9 pr-8 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none text-sm"
                   >
-                    <option value="">All Classes</option>
+                    <option value="">
+                      {user?.class
+                        ? `My Class (${
+                            user.level === 'primary'
+                              ? `Class ${user.class}`
+                              : `Form ${user.class.toString().replace(/^Form[\s-]+/, '')}`
+                          })`
+                        : 'All Classes'
+                      }
+                    </option>
                     {availableClasses.map((className) => (
                       <option key={className} value={className}>
-                        {user?.level === 'primary' ? `Class ${className}` : className}
+                        {user?.level === 'primary'
+                          ? `Class ${className}`
+                          : `Form ${className}`
+                        }
                       </option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              {/* Clear Filters Button */}
-              {(searchTerm || selectedClass) && (
-                <button
-                  onClick={clearSearchAndFilters}
-                  className="flex items-center justify-center px-3 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg hover:from-gray-600 hover:to-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all shadow-md"
-                  title="Clear all search and filters"
-                >
-                  <TbX className="h-4 w-4" />
-                  <span className="ml-1.5 hidden sm:inline text-sm">Clear</span>
-                </button>
-              )}
+
 
 
             </div>
@@ -543,7 +1013,6 @@ const Quiz = () => {
                     userResult={userResults[quiz._id]}
                     showResults={true}
                     onStart={handleQuizStart}
-                    onView={() => handleQuizView(quiz)}
                     onPreload={preloadQuizData}
                     index={index}
                   />
@@ -559,9 +1028,16 @@ const Quiz = () => {
   );
 };
 
-// Optimized QuizCard component with React.memo
-const QuizCard = React.memo(({ quiz, userResult, onStart, onView, onPreload, index }) => {
+// Optimized QuizCard component with React.memo and hover preloading
+const QuizCard = React.memo(({ quiz, userResult, onStart, onPreload, index }) => {
   const { isKiswahili, getClassName } = useLanguage();
+
+  // Preload on hover for instant access
+  const handleMouseEnter = () => {
+    if (onPreload && quiz._id) {
+      onPreload(quiz._id);
+    }
+  };
 
   const formatTime = (seconds) => {
     if (!seconds) return 'N/A';
@@ -617,12 +1093,7 @@ const QuizCard = React.memo(({ quiz, userResult, onStart, onView, onPreload, ind
         minHeight: window.innerWidth <= 768 ? '240px' : '320px',
         height: 'auto'
       }}
-      onMouseEnter={() => {
-        // Preload quiz data on hover for instant loading
-        if (onPreload && quiz._id) {
-          onPreload(quiz._id);
-        }
-      }}
+      onMouseEnter={handleMouseEnter}
     >
       {/* Quiz Title - At Top */}
       <div className="mb-2 text-center">
@@ -903,21 +1374,7 @@ const QuizCard = React.memo(({ quiz, userResult, onStart, onView, onPreload, ind
           {userResult ? (isKiswahili ? '🔄 Rudia Mtihani' : '🔄 Retake Quiz') : (isKiswahili ? '🚀 Anza Mtihani' : '🚀 Start Quiz')}
         </button>
 
-        {/* Small Trophy Button - Only show when there are results */}
-        {userResult && (
-          <button
-            onClick={() => onView(quiz)}
-            className="px-3 py-2 rounded-lg transition-all duration-200 font-bold transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg text-white"
-            style={{
-              background: 'linear-gradient(to right, #fbbf24, #f97316)',
-              fontSize: '13px',
-              minHeight: '36px'
-            }}
-            title="View Results"
-          >
-            <TbTrophy className="w-3 h-3" />
-          </button>
-        )}
+
       </div>
     </div>
   );

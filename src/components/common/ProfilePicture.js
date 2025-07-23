@@ -171,9 +171,9 @@ const ProfilePicture = ({
             alt={user.name || 'User'}
             className="object-cover rounded-full w-full h-full"
             style={{ objectFit: 'cover' }}
-            onError={() => {
+            onError={(e) => {
               // Fallback to initials if image fails to load
-              console.warn('Profile image failed to load, falling back to initials');
+              console.warn('Profile image failed to load:', e.target.src);
               setImageError(true);
             }}
           />

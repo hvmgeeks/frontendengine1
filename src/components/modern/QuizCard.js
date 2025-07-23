@@ -24,7 +24,6 @@ import { getExamStats } from '../../apicalls/exams';
 const QuizCard = ({
   quiz,
   onStart,
-  onView,
   showResults = false,
   userResult = null,
   className = '',
@@ -373,10 +372,10 @@ const QuizCard = ({
             )}
 
             <div className="flex gap-2">
-              {/* Main Action Button - Bigger for retake */}
+              {/* Single Action Button - Full width */}
               <button
                 onClick={() => onStart && quiz?._id && onStart(quiz)}
-                className={`flex-1 px-4 py-3 rounded-lg font-bold transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                className={`w-full px-4 py-3 rounded-lg font-bold transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 ${
                   showResults && userResult
                     ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white'
                     : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white'
@@ -385,17 +384,6 @@ const QuizCard = ({
                 <TbPlayerPlay className="w-5 h-5" />
                 {showResults && userResult ? '🔄 Retake Quiz' : '🚀 Start Quiz'}
               </button>
-
-              {/* Small Trophy Button - Only show when there are results */}
-              {showResults && userResult && onView && (
-                <button
-                  onClick={() => onView(quiz, userResult)}
-                  className="px-3 py-3 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white rounded-lg font-bold transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105"
-                  title="View Results"
-                >
-                  <TbAward className="w-5 h-5" />
-                </button>
-              )}
             </div>
           </div>
         </div>

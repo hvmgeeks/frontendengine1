@@ -13,7 +13,7 @@ import { useDispatch } from "react-redux";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
 import { Tabs } from "antd";
 import AddEditQuestion from "./AddEditQuestion";
-import { primarySubjects, secondarySubjects, advanceSubjects } from "../../../data/Subjects";
+import { primarySubjects, primaryKiswahiliSubjects, secondarySubjects, advanceSubjects } from "../../../data/Subjects";
 const { TabPane } = Tabs;
 
 function AddEditExam() {
@@ -317,6 +317,7 @@ function AddEditExam() {
                         Select Level
                       </option>
                       <option value="Primary">Primary</option>
+                      <option value="Primary_Kiswahili">Primary Kiswahili</option>
                       <option value="Secondary">Secondary</option>
                       <option value="Advance">Advance</option>
                     </select>
@@ -330,6 +331,15 @@ function AddEditExam() {
                       {level.toLowerCase() === "primary" && (
                         <>
                           {primarySubjects.map((subject, index) => (
+                            <option key={index} value={subject}>
+                              {subject}
+                            </option>
+                          ))}
+                        </>
+                      )}
+                      {level.toLowerCase() === "primary_kiswahili" && (
+                        <>
+                          {primaryKiswahiliSubjects.map((subject, index) => (
                             <option key={index} value={subject}>
                               {subject}
                             </option>
@@ -374,6 +384,17 @@ function AddEditExam() {
                           <option value="5">5</option>
                           <option value="6">6</option>
                           <option value="7">7</option>
+                        </>
+                      )}
+                      {level.toLowerCase() === "primary_kiswahili" && (
+                        <>
+                          <option value="1">Darasa la 1</option>
+                          <option value="2">Darasa la 2</option>
+                          <option value="3">Darasa la 3</option>
+                          <option value="4">Darasa la 4</option>
+                          <option value="5">Darasa la 5</option>
+                          <option value="6">Darasa la 6</option>
+                          <option value="7">Darasa la 7</option>
                         </>
                       )}
                       {level.toLowerCase() === "secondary" && (

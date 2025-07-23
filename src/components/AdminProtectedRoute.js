@@ -12,6 +12,16 @@ const AdminProtectedRoute = ({ children }) => {
       user: user ? { name: user.name, isAdmin: user.isAdmin } : null
     });
 
+    // Debug localStorage contents
+    const token = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+    console.log("AdminProtectedRoute: localStorage debug", {
+      hasToken: !!token,
+      tokenLength: token?.length,
+      hasStoredUser: !!storedUser,
+      reduxUser: user ? { name: user.name, isAdmin: user.isAdmin } : null
+    });
+
     // Check if user is loaded and is not an admin
     if (user && !user.isAdmin) {
       console.log("AdminProtectedRoute: Non-admin user detected, redirecting to user hub");
