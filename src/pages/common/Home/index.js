@@ -1197,7 +1197,7 @@ const Home = () => {
               Get in Touch
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-              Have questions? We'd love to hear from you. Send us a message through the form below or contact us directly via WhatsApp at <strong>+255 655 285 549</strong>.
+              Have questions? We'd love to hear from you. Send us a message through the form below or contact us directly via WhatsApp at <strong>+255 765 528 549</strong>.
             </p>
           </motion.div>
 
