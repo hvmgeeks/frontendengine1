@@ -1264,7 +1264,7 @@ const Home = () => {
 
                 {/* Call Now Button */}
                 <motion.a
-                  href="tel:+255655285549"
+                  href="tel:+255765528549"
                   className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -1277,7 +1277,7 @@ const Home = () => {
 
                 {/* WhatsApp Text Button */}
                 <motion.a
-                  href="https://wa.me/255655285549?text=Hello%20BrainWave%20Team!%20I%20need%20help%20with%20the%20educational%20platform.%20Can%20you%20assist%20me?"
+                  href="https://wa.me/255765528549?text=Hello%20BrainWave%20Team!%20I%20need%20help%20with%20the%20educational%20platform.%20Can%20you%20assist%20me?"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
