@@ -520,8 +520,12 @@ const Profile = () => {
                     <p className="text-lg font-bold text-gray-900 truncate max-w-[150px]">{userDetails?.username || 'username'}</p>
                   </div>
                   <div className="bg-purple-50 rounded-lg px-4 py-3 border border-purple-200 min-w-[120px]">
-                    <p className="text-sm text-purple-600 font-medium">{isKiswahili ? 'Darasa' : 'Class'}</p>
-                    <p className="text-lg font-bold" style={{color: '#111827'}}>{formatClassName(userDetails?.class, userDetails?.level)}</p>
+                    <p className="text-sm text-purple-600 font-medium">
+                      {userDetails?.isAdmin ? 'Role' : (isKiswahili ? 'Darasa' : 'Class')}
+                    </p>
+                    <p className="text-lg font-bold" style={{color: '#111827'}}>
+                      {userDetails?.isAdmin ? 'Administrator' : formatClassName(userDetails?.class, userDetails?.level)}
+                    </p>
                   </div>
 
                   {/* Subscription Status */}

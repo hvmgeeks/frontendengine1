@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   TbBell,
   TbBellRinging,
@@ -16,6 +17,7 @@ import {
 } from '../../apicalls/notifications';
 
 const NotificationBell = ({ className = '' }) => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -325,7 +327,8 @@ const NotificationBell = ({ className = '' }) => {
                           handleMarkAsRead(notification._id);
                         }
                         if (notification.actionUrl) {
-                          window.location.href = notification.actionUrl;
+                          setIsOpen(false); // Close notification panel
+                          navigate(notification.actionUrl);
                         }
                       }}
                     >

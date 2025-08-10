@@ -140,15 +140,15 @@ function ProtectedRoute({ children }) {
       }
     }
 
-    // Redirect users with paymentRequired or no subscription to subscription page
+    // Redirect users without valid subscription to subscription page
     // BUT skip redirect if they have recent payment success
-    if (isPaymentPending && !isAllowedRoute && !hasRecentPayment &&
-        (user?.paymentRequired || user?.subscriptionStatus === 'free' || !user?.subscriptionStatus) &&
-        !user?.isAdmin) {
-      console.log("Redirecting user to subscription page - paymentRequired:", user?.paymentRequired, "subscriptionStatus:", user?.subscriptionStatus);
+    if (isPaymentPending && !isAllowedRoute && !hasRecentPayment && !user?.isAdmin) {
+      console.log("Redirecting user to subscription page - no valid subscription found");
 
-      // Show different messages for expired vs free users
-      if (user?.subscriptionStatus === 'free' && user?.subscriptionEndDate) {
+      // Check if user had a subscription that expired
+      const hadSubscription = user?.subscriptionEndDate || subscriptionData?.endDate;
+
+      if (hadSubscription) {
         // User had a subscription that expired
         message.warning({
           content: '⏰ Your subscription has expired! Please renew to continue accessing premium features.',
@@ -159,6 +159,13 @@ function ProtectedRoute({ children }) {
         // User needs to complete payment
         message.info({
           content: '💳 Please complete your subscription to access premium features.',
+          duration: 4,
+          style: { marginTop: '20vh' }
+        });
+      } else {
+        // User needs to subscribe
+        message.info({
+          content: '🚀 Subscribe now to access all premium features and content!',
           duration: 4,
           style: { marginTop: '20vh' }
         });
@@ -202,22 +209,52 @@ function ProtectedRoute({ children }) {
     }
   }, [isPaymentPending, activeRoute, navigate, user]);
 
+  // Helper function to check if subscription is expired
+  const isSubscriptionExpired = (subscriptionData) => {
+    if (!subscriptionData) return true;
+
+    // If no subscription data, consider expired
+    if (!subscriptionData.endDate) return true;
+
+    // If payment status is not paid, consider expired
+    if (subscriptionData.paymentStatus !== 'paid') return true;
+
+    // If status is not active, consider expired
+    if (subscriptionData.status !== 'active') return true;
+
+    // Check if end date has passed
+    const endDate = new Date(subscriptionData.endDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of day
+    endDate.setHours(0, 0, 0, 0); // Reset time to start of day
+
+    return endDate < today;
+  };
+
   const verifyPaymentStatus = async () => {
     try {
       const data = await checkPaymentStatus();
       console.log("Payment Status:", data);
-      if (data?.error || data?.paymentStatus !== 'paid') {
+
+      // Check if subscription is valid and not expired
+      const hasValidSubscription = data && !data.error &&
+                                  data.paymentStatus === 'paid' &&
+                                  data.status === 'active' &&
+                                  !isSubscriptionExpired(data);
+
+      if (!hasValidSubscription) {
+        console.log("No valid subscription found or subscription expired");
         if (subscriptionData !== null) {
           dispatch(SetSubscription(null));
         }
-        // Set payment pending if user has paymentRequired or no subscription
-        if ((user?.paymentRequired || user?.subscriptionStatus === 'free' || !user?.subscriptionStatus) && !user?.isAdmin) {
+        // Block access for non-admin users without valid subscription
+        if (!user?.isAdmin) {
           setIsPaymentPending(true);
         } else {
-          setIsPaymentPending(false); // User has active subscription, allow access
+          setIsPaymentPending(false); // Admins always have access
         }
-      }
-      else {
+      } else {
+        console.log("Valid subscription found, allowing access");
         setIsPaymentPending(false);
         dispatch(SetSubscription(data));
         if (intervalRef.current) {
@@ -227,41 +264,41 @@ function ProtectedRoute({ children }) {
     } catch (error) {
       console.log("Error checking payment status:", error);
       dispatch(SetSubscription(null));
-      // Set payment pending if user has paymentRequired or no subscription
-      if ((user?.paymentRequired || user?.subscriptionStatus === 'free' || !user?.subscriptionStatus) && !user?.isAdmin) {
+      // Block access for non-admin users when there's an error
+      if (!user?.isAdmin) {
         setIsPaymentPending(true);
       } else {
-        setIsPaymentPending(false); // User has active subscription, allow access
+        setIsPaymentPending(false); // Admins always have access
       }
     }
   };
 
   useEffect(() => {
-    // Verify payment for users with paymentRequired or no subscription
-    if (user && !user?.isAdmin && (user?.paymentRequired || user?.subscriptionStatus === 'free' || !user?.subscriptionStatus)) {
-      console.log("Effect Running - checking payment for user with paymentRequired:", user?.paymentRequired);
+    // Always verify payment status for non-admin users
+    if (user && !user?.isAdmin) {
+      console.log("Effect Running - checking payment status for user:", user.name);
 
       if (paymentVerificationNeeded) {
-        console.log('Inside timer in effect 2....');
+        console.log('Starting payment verification timer...');
         intervalRef.current = setInterval(() => {
-          console.log('Timer in action...');
+          console.log('Timer checking payment status...');
           verifyPaymentStatus();
         }, 15000);
         dispatch(setPaymentVerificationNeeded(false));
       }
-    } else {
-      // For users with active subscription, ensure they have access
+    } else if (user?.isAdmin) {
+      // Admins always have access
       setIsPaymentPending(false);
     }
   }, [paymentVerificationNeeded, user]);
 
   useEffect(() => {
-    // Verify payment for users with paymentRequired or no subscription
-    if (user && !user?.isAdmin && (user?.paymentRequired || user?.subscriptionStatus === 'free' || !user?.subscriptionStatus)) {
-      console.log("Effect Running - verifying payment status for user with paymentRequired:", user?.paymentRequired);
+    // Always verify payment status for non-admin users on route change
+    if (user && !user?.isAdmin) {
+      console.log("Effect Running - verifying payment status on route change");
       verifyPaymentStatus();
-    } else {
-      // For users with active subscription, ensure they have access
+    } else if (user?.isAdmin) {
+      // Admins always have access
       setIsPaymentPending(false);
     }
   }, [user, activeRoute]);

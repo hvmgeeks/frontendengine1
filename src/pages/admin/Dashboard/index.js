@@ -136,6 +136,13 @@ const AdminDashboard = () => {
       icon: TbMessageCircle,
       path: '/admin/forum',
       color: 'bg-purple-500'
+    },
+    {
+      title: 'Join Forum Discussion',
+      description: 'Participate in community discussions',
+      icon: TbMessageCircle,
+      path: '/forum',
+      color: 'bg-blue-500'
     }
   ];
 

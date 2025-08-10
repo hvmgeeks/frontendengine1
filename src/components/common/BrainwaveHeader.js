@@ -337,6 +337,9 @@ const BrainwaveHeader = ({ title = "Brainwave" }) => {
                     </div>
                     <div className="text-xs text-gray-500 group-hover:text-blue-500 transition-colors duration-300">
                       {(() => {
+                        // Show "Administrator" for admin users
+                        if (user?.isAdmin) return 'Administrator';
+
                         if (!user?.class) return 'N/A';
                         switch (user?.level) {
                           case 'primary':

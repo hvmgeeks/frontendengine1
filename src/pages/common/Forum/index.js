@@ -7,6 +7,7 @@ import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
 import { addQuestion, addReply, getAllQuestions } from "../../../apicalls/forum";
 import image from '../../../assets/person.png';
 import { PlusOutlined, MessageOutlined, UserOutlined } from '@ant-design/icons';
+import { MdVerified } from 'react-icons/md';
 
 const Forum = () => {
     const [isAdmin, setIsAdmin] = useState(false);
@@ -51,10 +52,10 @@ const Forum = () => {
             if (response.success) {
                 if (response.data.isAdmin) {
                     setIsAdmin(true);
+                    setUserData(response.data); // Set userData for admins too
                 } else {
                     setIsAdmin(false);
                     setUserData(response.data);
-                    // fetchQuestions will be called by useEffect when userData changes
                 }
             } else {
                 message.error(response.message);
@@ -74,7 +75,7 @@ const Forum = () => {
 
     // Fetch questions when component mounts or page changes
     useEffect(() => {
-        if (!isAdmin && userData) {
+        if (userData || isAdmin) {
             fetchQuestions(currentPage);
         }
     }, [currentPage, isAdmin, userData]);
@@ -234,8 +235,7 @@ const Forum = () => {
 
     return (
         <div>
-            {!isAdmin && (
-                <div className="modern-forum">
+            <div className="modern-forum">
                     {/* Header Section */}
                     <div className="forum-header">
                         <div className="forum-header-content">
@@ -338,13 +338,25 @@ const Forum = () => {
                                             )}
                                         </div>
                                         <div className="user-details">
-                                            <span className="username">{question.user?.name || 'Anonymous'}</span>
+                                            <span className="username">
+                                                {question.user?.name || 'Anonymous'}
+                                                {question.user?.isAdmin && (
+                                                    <MdVerified
+                                                        style={{
+                                                            marginLeft: '6px',
+                                                            color: '#1DA1F2',
+                                                            fontSize: '16px'
+                                                        }}
+                                                        title="Verified Admin"
+                                                    />
+                                                )}
+                                            </span>
                                             <div className="question-meta">
                                                 <span className="question-datetime">
                                                     {formatDateTime(question.createdAt)}
                                                 </span>
-                                                <Tag color="blue" className="subject-tag">
-                                                    {formatUserClass(question.user?.class, question.user?.level)}
+                                                <Tag color={question.user?.isAdmin ? "purple" : "blue"} className="subject-tag">
+                                                    {question.user?.isAdmin ? "Administrator" : formatUserClass(question.user?.class, question.user?.level)}
                                                 </Tag>
                                             </div>
                                         </div>
@@ -412,9 +424,21 @@ const Forum = () => {
                                                         </div>
                                                         <div className="reply-user-info">
                                                             <div className="reply-user-details">
-                                                                <span className="reply-username">{reply.user?.name || 'Anonymous'}</span>
-                                                                <Tag color="green" className="reply-class-tag" size="small">
-                                                                    {formatUserClass(reply.user?.class, reply.user?.level)}
+                                                                <span className="reply-username">
+                                                                    {reply.user?.name || 'Anonymous'}
+                                                                    {reply.user?.isAdmin && (
+                                                                        <MdVerified
+                                                                            style={{
+                                                                                marginLeft: '4px',
+                                                                                color: '#1DA1F2',
+                                                                                fontSize: '14px'
+                                                                            }}
+                                                                            title="Verified Admin"
+                                                                        />
+                                                                    )}
+                                                                </span>
+                                                                <Tag color={reply.user?.isAdmin ? "purple" : "green"} className="reply-class-tag" size="small">
+                                                                    {reply.user?.isAdmin ? "Administrator" : formatUserClass(reply.user?.class, reply.user?.level)}
                                                                 </Tag>
                                                             </div>
                                                             <span className="reply-datetime">
@@ -543,7 +567,6 @@ const Forum = () => {
                         </div>
                     )}
                 </div>
-            )}
         </div>
     );
 }

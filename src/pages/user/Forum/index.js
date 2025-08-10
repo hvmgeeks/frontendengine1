@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
 import { addQuestion, addReply, getAllQuestions } from "../../../apicalls/forum";
 import image from '../../../assets/person.png';
+import { MdVerified } from 'react-icons/md';
 
 const Forum = () => {
     const [isAdmin, setIsAdmin] = useState(false);
@@ -123,8 +124,7 @@ const Forum = () => {
 
     return (
         <div>
-            {!isAdmin && (
-                <div className="Forum">
+            <div className="Forum">
                     <PageTitle title="Forum" />
                     <div className="divider"></div>
 
@@ -159,7 +159,19 @@ const Forum = () => {
                             <div className="question">
                                 <div className="profile-row">
                                     <Avatar src={question.user.profileImage ? question.user.profileImage : image} alt="profile" size={50} />
-                                    <p>{question.user.name}</p>
+                                    <p>
+                                        {question.user.name}
+                                        {question.user?.isAdmin && (
+                                            <MdVerified
+                                                style={{
+                                                    marginLeft: '6px',
+                                                    color: '#1DA1F2',
+                                                    fontSize: '16px'
+                                                }}
+                                                title="Verified Admin"
+                                            />
+                                        )}
+                                    </p>
                                 </div>
                                 <div className="title">{question.title}</div>
                                 <div className="body">{question.body}</div>
@@ -174,7 +186,19 @@ const Forum = () => {
                                         <div key={reply._id} className="reply">
                                             <div className="profile-row">
                                                 <Avatar src={reply.user.profileImage ? reply.user.profileImage : image} alt="profile" size={50} />
-                                                <p>{reply.user.name}</p>
+                                                <p>
+                                                    {reply.user.name}
+                                                    {reply.user?.isAdmin && (
+                                                        <MdVerified
+                                                            style={{
+                                                                marginLeft: '4px',
+                                                                color: '#1DA1F2',
+                                                                fontSize: '14px'
+                                                            }}
+                                                            title="Verified Admin"
+                                                        />
+                                                    )}
+                                                </p>
                                             </div>
                                             <div className="text">{reply.text}</div>
                                         </div>
@@ -201,7 +225,6 @@ const Forum = () => {
                         </div>
                     ))}
                 </div>
-            )}
         </div>
     );
 }

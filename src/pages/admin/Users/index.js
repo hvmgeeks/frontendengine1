@@ -254,7 +254,9 @@ function Users() {
                   </div>
                   <div className="flex items-center space-x-2">
                     <TbUsers className="w-4 h-4" />
-                    <span>Class: {user.class || 'Not assigned'}</span>
+                    <span>
+                      {user.isAdmin ? 'Role: Administrator' : `Class: ${user.class || 'Not assigned'}`}
+                    </span>
                   </div>
 
                   {/* Subscription Details */}

@@ -17,7 +17,8 @@ import {
   TbLogout,
   TbHome,
   TbUser,
-  TbStar
+  TbStar,
+  TbMessageCircle
 } from 'react-icons/tb';
 
 const AdminTopNavigation = () => {
@@ -55,6 +56,12 @@ const AdminTopNavigation = () => {
       icon: TbStar,
       path: '/admin/skills',
       color: 'text-yellow-500'
+    },
+    {
+      title: 'Forum',
+      icon: TbMessageCircle,
+      path: '/admin/forum',
+      color: 'text-pink-500'
     },
     {
       title: 'Reports',
