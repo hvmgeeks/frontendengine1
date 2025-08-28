@@ -48,11 +48,10 @@ function Login() {
       console.log('Login response:', response);
 
       if (response.success) {
-        message.success(response.message);
-
         console.log('🔐 Login successful, storing token and user data');
         console.log('Token to store:', response.data);
         console.log('User to store:', response.response);
+        console.log('Payment status:', response.paymentStatus);
 
         localStorage.setItem("token", response.data);
         console.log('✅ Token stored in localStorage');
@@ -71,14 +70,74 @@ function Login() {
         console.log('🔍 Verification - Token in localStorage:', localStorage.getItem('token'));
         console.log('🔍 Verification - User in localStorage:', localStorage.getItem('user'));
 
-        // Check admin status from response.response (user object)
-        if (response.response?.isAdmin) {
-          console.log("Admin user detected, redirecting to admin dashboard");
-          navigate("/admin/dashboard");
+        // Handle different payment statuses
+        if (response.paymentStatus === "PENDING") {
+          message.warning({
+            content: (
+              <div>
+                <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>
+                  Welcome! Payment Pending
+                </div>
+                <div style={{ marginBottom: '4px' }}>
+                  {response.message}
+                </div>
+                {response.pendingSubscription && (
+                  <div style={{ fontSize: '12px', color: '#666' }}>
+                    Plan: {response.pendingSubscription.plan} |
+                    Amount: {response.pendingSubscription.amount?.toLocaleString()} TZS
+                  </div>
+                )}
+                <div style={{ fontSize: '12px', color: '#1890ff', marginTop: '4px' }}>
+                  Redirecting to subscription page...
+                </div>
+              </div>
+            ),
+            duration: 5,
+            style: { marginTop: '20px' }
+          });
+
+          // Redirect to subscription page
+          setTimeout(() => {
+            navigate("/user/subscription");
+          }, 2000);
+
+        } else if (response.paymentStatus === "REQUIRED") {
+          message.info({
+            content: (
+              <div>
+                <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>
+                  Welcome! Subscription Required
+                </div>
+                <div style={{ marginBottom: '4px' }}>
+                  {response.message}
+                </div>
+                <div style={{ fontSize: '12px', color: '#1890ff', marginTop: '4px' }}>
+                  Redirecting to subscription page...
+                </div>
+              </div>
+            ),
+            duration: 5,
+            style: { marginTop: '20px' }
+          });
+
+          // Redirect to subscription page
+          setTimeout(() => {
+            navigate("/user/subscription");
+          }, 2000);
+
         } else {
-          // Always redirect regular users to hub first
-          console.log("Regular user detected, redirecting to user hub");
-          navigate("/user/hub");
+          // Normal login flow for users with active subscriptions
+          message.success(response.message);
+
+          // Check admin status from response.response (user object)
+          if (response.response?.isAdmin) {
+            console.log("Admin user detected, redirecting to admin dashboard");
+            navigate("/admin/dashboard");
+          } else {
+            // Always redirect regular users to hub first
+            console.log("Regular user detected, redirecting to user hub");
+            navigate("/user/hub");
+          }
         }
       } else {
         message.error(response.message);

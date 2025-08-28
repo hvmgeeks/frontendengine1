@@ -90,6 +90,72 @@ axiosInstance.interceptors.response.use(
             return Promise.reject(error);
         }
 
+        // Handle 403 Payment Required errors
+        if (error.response && error.response.status === 403) {
+            const errorData = error.response.data;
+
+            if (errorData.errorType === "PAYMENT_PENDING") {
+                console.log('💳 Payment pending error detected');
+
+                message.error({
+                    content: (
+                        <div>
+                            <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>
+                                Account Not Activated
+                            </div>
+                            <div style={{ marginBottom: '4px' }}>
+                                {errorData.message}
+                            </div>
+                            {errorData.pendingSubscription && (
+                                <div style={{ fontSize: '12px', color: '#666' }}>
+                                    Plan: {errorData.pendingSubscription.plan} |
+                                    Amount: {errorData.pendingSubscription.amount?.toLocaleString()} TZS
+                                </div>
+                            )}
+                            <div style={{ fontSize: '12px', color: '#1890ff', marginTop: '4px' }}>
+                                Complete your payment to access this feature.
+                            </div>
+                        </div>
+                    ),
+                    duration: 8,
+                    style: { marginTop: '20px' }
+                });
+
+                // Redirect to subscription page after a delay
+                setTimeout(() => {
+                    window.location.href = '/user/subscription';
+                }, 3000);
+
+            } else if (errorData.errorType === "SUBSCRIPTION_REQUIRED") {
+                console.log('📋 Subscription required error detected');
+
+                message.error({
+                    content: (
+                        <div>
+                            <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>
+                                Subscription Required
+                            </div>
+                            <div style={{ marginBottom: '4px' }}>
+                                {errorData.message}
+                            </div>
+                            <div style={{ fontSize: '12px', color: '#1890ff', marginTop: '4px' }}>
+                                Choose a subscription plan to get started.
+                            </div>
+                        </div>
+                    ),
+                    duration: 8,
+                    style: { marginTop: '20px' }
+                });
+
+                // Redirect to subscription page after a delay
+                setTimeout(() => {
+                    window.location.href = '/user/subscription';
+                }, 3000);
+            }
+
+            return Promise.reject(error);
+        }
+
         return Promise.reject(error);
     }
 );

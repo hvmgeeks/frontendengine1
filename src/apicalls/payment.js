@@ -5,7 +5,27 @@ export const addPayment = async (payload) => {
     const response = await axiosInstance.post("/api/payment/create-invoice", payload);
     return response.data;
   } catch (error) {
-    return error.response.data;
+    console.error('❌ Payment error:', error);
+
+    // Handle different types of errors
+    if (error.response?.data) {
+      // Server responded with an error status
+      return error.response.data;
+    } else if (error.request) {
+      // Request was made but no response received (network error, timeout, etc.)
+      return {
+        success: false,
+        message: "Network error: Unable to connect to payment service. Please check your internet connection and try again.",
+        errorType: "NETWORK_ERROR"
+      };
+    } else {
+      // Something else happened
+      return {
+        success: false,
+        message: error.message || "Payment failed. Please try again.",
+        errorType: "UNKNOWN_ERROR"
+      };
+    }
   }
 };
 
