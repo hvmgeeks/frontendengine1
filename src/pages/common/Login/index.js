@@ -1,5 +1,5 @@
-import { Form, message, Input } from "antd";
-import React, { useEffect } from "react";
+import { Form, message, Input, Checkbox } from "antd";
+import React, { useEffect, useState } from "react";
 import './index.css';
 import Logo from '../../../assets/logo.png';
 import { useDispatch } from "react-redux";
@@ -13,6 +13,23 @@ function Login() {
   const dispatch = useDispatch();
   const location = useLocation();
   const [form] = Form.useForm();
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // Check for saved credentials on component mount
+  useEffect(() => {
+    const savedCredentials = localStorage.getItem('rememberedUser');
+    if (savedCredentials) {
+      try {
+        const { email, rememberMe: wasRemembered } = JSON.parse(savedCredentials);
+        if (wasRemembered) {
+          form.setFieldsValue({ email });
+          setRememberMe(true);
+        }
+      } catch (error) {
+        console.error('Error loading saved credentials:', error);
+      }
+    }
+  }, [form]);
 
   // Handle pre-filled data from registration
   useEffect(() => {
@@ -64,6 +81,20 @@ function Login() {
           // IMPORTANT: Set user data in Redux immediately to prevent redirect issues
           dispatch(SetUser(response.response));
           console.log('✅ User data set in Redux');
+        }
+
+        // Handle "Remember Me" functionality
+        if (rememberMe) {
+          const credentialsToSave = {
+            email: values.email,
+            rememberMe: true,
+            timestamp: Date.now()
+          };
+          localStorage.setItem('rememberedUser', JSON.stringify(credentialsToSave));
+          console.log('✅ User credentials saved for auto-login');
+        } else {
+          // Remove saved credentials if "Remember Me" is unchecked
+          localStorage.removeItem('rememberedUser');
         }
 
         // Verify storage immediately
@@ -183,6 +214,20 @@ function Login() {
               placeholder="Enter your password"
               autoComplete="current-password"
             />
+          </Form.Item>
+
+          <Form.Item>
+            <div className="remember-me-container" style={{ marginBottom: '1rem' }}>
+              <Checkbox
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                style={{ color: '#64748b' }}
+              >
+                <span style={{ color: '#64748b', fontSize: '0.875rem' }}>
+                  Remember me on this device
+                </span>
+              </Checkbox>
+            </div>
           </Form.Item>
 
           <Form.Item>

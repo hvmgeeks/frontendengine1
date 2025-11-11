@@ -80,6 +80,7 @@ export const cleanupInvalidSession = () => {
   console.log('🧹 Cleaning up invalid session data');
   localStorage.removeItem('token');
   localStorage.removeItem('user');
+  // Note: We keep 'rememberedUser' for auto-login on next visit
 };
 
 /**
@@ -89,8 +90,9 @@ export const cleanupInvalidSession = () => {
 export const clearSessionAndRedirect = (errorMessage = 'Your session has expired. Please login again.') => {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
+  // Note: We keep 'rememberedUser' for auto-login on next visit
   message.error(errorMessage);
-  
+
   setTimeout(() => {
     window.location.href = '/login';
   }, 1000);

@@ -45,77 +45,81 @@ const VideoGrid = ({
           {paginatedVideos.map((video, index) => (
             <React.Fragment key={index}>
               <div className="video-item">
-                <div className="video-card" onClick={() => handleShowVideo(index)}>
-                  <div className="video-card-thumbnail">
-                    <img
-                      src={getThumbnailUrl(video)}
-                      alt={video.title}
-                      className="thumbnail-image"
-                      loading="lazy"
-                      onError={(e) => {
-                        // Fallback logic for failed thumbnails
-                        if (video.videoID && !video.videoID.includes('amazonaws.com')) {
-                          // For YouTube videos, try different quality thumbnails
-                          let videoId = video.videoID;
-                          if (videoId.includes('youtube.com') || videoId.includes('youtu.be')) {
-                            const match = videoId.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
-                            videoId = match ? match[1] : videoId;
-                          }
+                <div className="video-card">
+                  {/* Show thumbnail only if this video is NOT currently playing */}
+                  {currentVideoIndex !== index ? (
+                    <div onClick={() => handleShowVideo(index)}>
+                      <div className="video-card-thumbnail">
+                        <img
+                          src={getThumbnailUrl(video)}
+                          alt={video.title}
+                          className="thumbnail-image"
+                          loading="lazy"
+                          onError={(e) => {
+                            // Fallback logic for failed thumbnails
+                            if (video.videoID && !video.videoID.includes('amazonaws.com')) {
+                              // For YouTube videos, try different quality thumbnails
+                              let videoId = video.videoID;
+                              if (videoId.includes('youtube.com') || videoId.includes('youtu.be')) {
+                                const match = videoId.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
+                                videoId = match ? match[1] : videoId;
+                              }
 
-                          const fallbacks = [
-                            `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
-                            `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
-                            `https://img.youtube.com/vi/${videoId}/default.jpg`,
-                            'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjNEE5MEUyIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkJyYWlud2F2ZSBWaWRlbzwvdGV4dD48L3N2Zz4='
-                          ];
+                              const fallbacks = [
+                                `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+                                `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
+                                `https://img.youtube.com/vi/${videoId}/default.jpg`,
+                                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjNEE5MEUyIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkJyYWlud2F2ZSBWaWRlbzwvdGV4dD48L3N2Zz4='
+                              ];
 
-                          const currentSrc = e.target.src;
-                          const currentIndex = fallbacks.findIndex(url => currentSrc.includes(url.split('/').pop()));
+                              const currentSrc = e.target.src;
+                              const currentIndex = fallbacks.findIndex(url => currentSrc.includes(url.split('/').pop()));
 
-                          if (currentIndex < fallbacks.length - 1) {
-                            e.target.src = fallbacks[currentIndex + 1];
-                          }
-                        } else {
-                          e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjNEE5MEUyIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkJyYWlud2F2ZSBWaWRlbzwvdGV4dD48L3N2Zz4=';
-                        }
-                      }}
-                    />
-                    <div className="play-overlay">
-                      <FaPlayCircle className="play-icon" />
-                    </div>
-                    <div className="video-duration">
-                      {video.duration || "Video"}
-                    </div>
-                    {video.subtitles && video.subtitles.length > 0 && (
-                      <div className="subtitle-badge">
-                        <TbInfoCircle />
-                        CC
+                              if (currentIndex < fallbacks.length - 1) {
+                                e.target.src = fallbacks[currentIndex + 1];
+                              }
+                            } else {
+                              e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjNEE5MEUyIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkJyYWlud2F2ZSBWaWRlbzwvdGV4dD48L3N2Zz4=';
+                            }
+                          }}
+                        />
+                        <div className="play-overlay">
+                          <FaPlayCircle className="play-icon" />
+                        </div>
+                        <div className="video-duration">
+                          {video.duration || "Video"}
+                        </div>
+                        {video.subtitles && video.subtitles.length > 0 && (
+                          <div className="subtitle-badge">
+                            <TbInfoCircle />
+                            CC
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <div className="video-card-content">
-                    <h3 className="video-title">{video.title}</h3>
-                    <div className="video-meta">
-                      <span className="video-subject">{getSubjectName(video.subject)}</span>
-                      <span className="video-class">
-                        {selectedLevel === 'primary' || selectedLevel === 'primary_kiswahili' ?
-                          (isKiswahili ? `Darasa la ${video.className || video.class}` : `Class ${video.className || video.class}`) :
-                          `Form ${video.className || video.class}`}
-                      </span>
+                      <div className="video-card-content">
+                        <h3 className="video-title">{video.title}</h3>
+                        <div className="video-meta">
+                          <span className="video-subject">{getSubjectName(video.subject)}</span>
+                          <span className="video-class">
+                            {selectedLevel === 'primary' || selectedLevel === 'primary_kiswahili' ?
+                              (isKiswahili ? `Darasa la ${video.className || video.class}` : `Class ${video.className || video.class}`) :
+                              `Form ${video.className || video.class}`}
+                          </span>
+                        </div>
+                        <div className="video-tags">
+                          {video.topic && <span className="topic-tag">{video.topic}</span>}
+                          {video.sharedFromClass && video.sharedFromClass !== (video.className || video.class) && (
+                            <span className="shared-tag">
+                              {isKiswahili ? 'Kushirikiwa kutoka ' : 'Shared from '}{selectedLevel === 'primary' || selectedLevel === 'primary_kiswahili' ?
+                                (isKiswahili ? `Darasa la ${video.sharedFromClass}` : `Class ${video.sharedFromClass}`) :
+                                `Form ${video.sharedFromClass}`}
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div className="video-tags">
-                      {video.topic && <span className="topic-tag">{video.topic}</span>}
-                      {video.sharedFromClass && video.sharedFromClass !== (video.className || video.class) && (
-                        <span className="shared-tag">
-                          {isKiswahili ? 'Kushirikiwa kutoka ' : 'Shared from '}{selectedLevel === 'primary' || selectedLevel === 'primary_kiswahili' ?
-                            (isKiswahili ? `Darasa la ${video.sharedFromClass}` : `Class ${video.sharedFromClass}`) :
-                            `Form ${video.sharedFromClass}`}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                {currentVideoIndex === index && (
+                  ) : (
+                    /* Show video player in place of thumbnail when this video is playing */
                   <div className="inline-video-player">
                     {video.videoUrl ? (
                       <video
@@ -300,7 +304,8 @@ const VideoGrid = ({
                       </div>
                     )}
                   </div>
-                )}
+                  )}
+                </div>
               </div>
             </React.Fragment>
           ))}

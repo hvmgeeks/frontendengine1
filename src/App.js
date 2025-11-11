@@ -35,7 +35,6 @@ const UserReports = lazy(() => import("./pages/user/UserReports"));
 const AdminReports = lazy(() => import("./pages/admin/AdminReports"));
 const StudyMaterial = lazy(() => import("./pages/user/StudyMaterial"));
 const VideoLessons = lazy(() => import("./pages/user/VideoLessons"));
-const Skills = lazy(() => import("./pages/user/Skills"));
 const Ranking = lazy(() => import("./pages/user/Ranking"));
 const RankingErrorBoundary = lazy(() => import("./components/RankingErrorBoundary"));
 const Profile = lazy(() => import("./pages/common/Profile"));
@@ -46,7 +45,6 @@ const Subscription = lazy(() => import("./pages/user/Subscription"));
 
 const Hub = lazy(() => import("./pages/user/Hub"));
 const AdminStudyMaterials = lazy(() => import("./pages/admin/StudyMaterials"));
-const AdminSkills = lazy(() => import("./pages/admin/Skills"));
 const AdminVideos = lazy(() => import("./pages/admin/Videos"));
 const AdminVideoLessons = lazy(() => import("./pages/admin/VideoLessons"));
 const AdminProfile = lazy(() => import("./pages/admin/Profile"));
@@ -254,17 +252,6 @@ function App() {
           />
 
           <Route
-            path="/user/skills"
-            element={
-              <ProtectedRoute>
-                <Suspense fallback={<FastLoader />}>
-                  <Skills />
-                </Suspense>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
             path="/user/ranking"
             element={
               <ProtectedRoute>
@@ -361,17 +348,6 @@ function App() {
               <AdminProtectedRoute>
                 <Suspense fallback={<FastLoader />}>
                   <AdminStudyMaterials />
-                </Suspense>
-              </AdminProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/admin/skills"
-            element={
-              <AdminProtectedRoute>
-                <Suspense fallback={<FastLoader />}>
-                  <AdminSkills />
                 </Suspense>
               </AdminProtectedRoute>
             }

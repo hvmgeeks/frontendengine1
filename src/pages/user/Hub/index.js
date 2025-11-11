@@ -2,31 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
-import { message } from 'antd';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import './Hub.css';
 import {
-  FaHome,
   FaQuestionCircle,
   FaBook,
   FaChartLine,
-  FaUser,
   FaComments,
-  FaCreditCard,
-  FaInfoCircle,
-  FaGraduationCap,
   FaTrophy,
   FaStar,
-  FaRocket,
-  FaRobot,
-  FaSignOutAlt,
-  FaVideo
+  FaVideo,
+  FaGraduationCap,
+  FaRocket
 } from 'react-icons/fa';
 
 const Hub = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.user);
-  const { t, isKiswahili } = useLanguage();
+  const { isKiswahili } = useLanguage();
   const [currentQuote, setCurrentQuote] = useState(0);
   const [currentWelcome, setCurrentWelcome] = useState(0);
 
@@ -37,8 +30,7 @@ const Hub = () => {
     videoLessons: 3, // 3 new video lessons
     reports: 0, // No notifications for reports
     forum: 5, // 5 new forum posts
-    ranking: 0, // No notifications for ranking
-    skills: 1 // 1 new skill video
+    ranking: 0 // No notifications for ranking
   };
 
 
@@ -110,21 +102,6 @@ const Hub = () => {
     return () => clearInterval(welcomeInterval);
   }, [welcomeMessages.length]);
 
-  // Logout function
-  const handleLogout = () => {
-    // Clear authentication data
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-
-    // Show success message
-    message.success('Logged out successfully!');
-
-    // Navigate to home page
-    navigate('/');
-  };
-
-
-
   const navigationItems = [
     {
       title: isKiswahili ? 'Fanya Mtihani' : 'Take Quiz',
@@ -170,15 +147,6 @@ const Hub = () => {
       color: 'from-yellow-500 to-yellow-600',
       hoverColor: 'from-yellow-600 to-yellow-700',
       notificationCount: hubNotificationCounts.ranking
-    },
-    {
-      title: isKiswahili ? 'Ujuzi' : 'Skills',
-      description: isKiswahili ? 'Ongeza ujuzi wako' : 'Enhance your skills',
-      icon: FaStar,
-      path: '/user/skills',
-      color: 'from-yellow-500 to-yellow-600',
-      hoverColor: 'from-yellow-600 to-yellow-700',
-      notificationCount: hubNotificationCounts.skills
     },
     {
       title: 'Forum',

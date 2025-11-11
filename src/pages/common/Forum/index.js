@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import './index.css';
 import { getUserInfo } from "../../../apicalls/users";
 import { message, Button, Input, Form, Avatar, Badge, Tag } from "antd";
 import { useDispatch } from "react-redux";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
-import { addQuestion, addReply, getAllQuestions } from "../../../apicalls/forum";
+import { addQuestion, addReply, getAllQuestions, deleteQuestion, deleteReply } from "../../../apicalls/forum";
 import image from '../../../assets/person.png';
-import { PlusOutlined, MessageOutlined, UserOutlined } from '@ant-design/icons';
-import { MdVerified } from 'react-icons/md';
+import { PlusOutlined, MessageOutlined, UserOutlined, DeleteOutlined } from '@ant-design/icons';
+import { MdVerified, MdCheckCircle } from 'react-icons/md';
 
 const Forum = () => {
     const [isAdmin, setIsAdmin] = useState(false);
@@ -16,6 +16,15 @@ const Forum = () => {
     const [askQuestionVisible, setAskQuestionVisible] = useState(false);
     const [replyQuestionId, setReplyQuestionId] = useState(null);
     const [form] = Form.useForm();
+
+    // Delete confirmation modal states
+    const [deleteModal, setDeleteModal] = useState({
+        visible: false,
+        type: null, // 'question' or 'reply'
+        questionId: null,
+        replyId: null,
+        position: { top: 0, left: 0 } // Store button position
+    });
     const dispatch = useDispatch();
 
 
@@ -145,7 +154,83 @@ const Forum = () => {
         }
     };
 
+    // Show delete confirmation modal
+    const showDeleteModal = (type, questionId, replyId = null, event) => {
+        // Get the button's position
+        const buttonRect = event.currentTarget.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
 
+        setDeleteModal({
+            visible: true,
+            type,
+            questionId,
+            replyId,
+            position: {
+                top: buttonRect.top + scrollTop,
+                left: buttonRect.left + scrollLeft,
+                buttonWidth: buttonRect.width,
+                buttonHeight: buttonRect.height
+            }
+        });
+    };
+
+    // Hide delete confirmation modal
+    const hideDeleteModal = () => {
+        setDeleteModal({
+            visible: false,
+            type: null,
+            questionId: null,
+            replyId: null,
+            position: { top: 0, left: 0 }
+        });
+    };
+
+    // Confirm delete action
+    const confirmDelete = async () => {
+        if (deleteModal.type === 'question') {
+            await handleDeleteQuestion(deleteModal.questionId);
+        } else if (deleteModal.type === 'reply') {
+            await handleDeleteReply(deleteModal.questionId, deleteModal.replyId);
+        }
+        hideDeleteModal();
+    };
+
+    const handleDeleteQuestion = async (questionId) => {
+        try {
+            dispatch(ShowLoading());
+            const response = await deleteQuestion(questionId);
+            if (response.success) {
+                message.success(response.message);
+                // Refresh current page
+                await fetchQuestions(currentPage);
+            } else {
+                message.error(response.message);
+            }
+        } catch (error) {
+            message.error(error.message);
+        } finally {
+            dispatch(HideLoading());
+        }
+    };
+
+    const handleDeleteReply = async (questionId, replyId) => {
+        try {
+            dispatch(ShowLoading());
+            const response = await deleteReply(questionId, replyId);
+            if (response.success) {
+                message.success(response.message);
+                // Refresh current page
+                await fetchQuestions(currentPage);
+            } else {
+                message.error(response.message);
+            }
+        } catch (error) {
+            message.error(error.message);
+        } finally {
+            dispatch(HideLoading());
+        }
+    };
 
     // Pagination calculations - use all questions since we're fetching by page
     const totalPages = Math.ceil(totalQuestions / questionsPerPage);
@@ -392,7 +477,7 @@ const Forum = () => {
                                                 </span>
                                             </div>
                                             {question.replies.map((reply) => (
-                                                <div key={reply._id} className="modern-reply">
+                                                <div key={reply._id} className={`modern-reply ${reply.isVerified ? 'verified-reply' : ''}`}>
                                                     <div className="reply-header">
                                                         <div className="reply-avatar-container">
                                                             <Avatar
@@ -436,15 +521,37 @@ const Forum = () => {
                                                                             title="Verified Admin"
                                                                         />
                                                                     )}
+                                                                    {reply.isVerified && (
+                                                                        <MdCheckCircle
+                                                                            style={{
+                                                                                marginLeft: '4px',
+                                                                                color: '#10b981',
+                                                                                fontSize: '14px'
+                                                                            }}
+                                                                            title="Verified Answer"
+                                                                        />
+                                                                    )}
                                                                 </span>
-                                                                <Tag color={reply.user?.isAdmin ? "purple" : "green"} className="reply-class-tag" size="small">
-                                                                    {reply.user?.isAdmin ? "Administrator" : formatUserClass(reply.user?.class, reply.user?.level)}
+                                                                <Tag color={reply.user?.isAdmin ? "purple" : reply.isVerified ? "success" : "green"} className="reply-class-tag" size="small">
+                                                                    {reply.user?.isAdmin ? "Administrator" : reply.isVerified ? "Verified Answer" : formatUserClass(reply.user?.class, reply.user?.level)}
                                                                 </Tag>
                                                             </div>
                                                             <span className="reply-datetime">
                                                                 {formatDateTime(reply.createdAt || reply.timestamp || extractDateFromObjectId(reply._id))}
                                                             </span>
                                                         </div>
+                                                        {/* Delete button for reply - only show if user is reply author or admin */}
+                                                        {(userData._id === reply.user?._id || isAdmin) && (
+                                                            <Button
+                                                                icon={<DeleteOutlined />}
+                                                                size="small"
+                                                                danger
+                                                                type="text"
+                                                                className="reply-delete-btn"
+                                                                title="Delete reply"
+                                                                onClick={(e) => showDeleteModal('reply', question._id, reply._id, e)}
+                                                            />
+                                                        )}
                                                     </div>
                                                     <div className="reply-content">{reply.text}</div>
                                                 </div>
@@ -502,6 +609,17 @@ const Forum = () => {
                                     >
                                         {question.replies?.length || 0} Replies
                                     </Button>
+                                    {/* Delete button - only show if user is question author or admin */}
+                                    {(userData._id === question.user?._id || isAdmin) && (
+                                        <Button
+                                            icon={<DeleteOutlined />}
+                                            className="action-btn delete-btn"
+                                            danger
+                                            onClick={(e) => showDeleteModal('question', question._id, null, e)}
+                                        >
+                                            Delete
+                                        </Button>
+                                    )}
                                 </div>
 
 
@@ -567,6 +685,42 @@ const Forum = () => {
                         </div>
                     )}
                 </div>
+
+                {/* Custom Delete Confirmation Modal */}
+                {deleteModal.visible && (
+                    <div className="delete-modal-overlay" onClick={hideDeleteModal}>
+                        <div
+                            className="delete-modal-content"
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                                position: 'absolute',
+                                top: `${deleteModal.position.top - 10}px`,
+                                left: `${deleteModal.position.left}px`,
+                                transform: 'translateY(-100%)'
+                            }}
+                        >
+                            <div className="delete-modal-header">
+                                <DeleteOutlined className="delete-modal-icon" />
+                                <h3 className="delete-modal-title">
+                                    {deleteModal.type === 'question' ? 'Delete Question' : 'Delete Reply'}
+                                </h3>
+                            </div>
+                            <p className="delete-modal-description">
+                                {deleteModal.type === 'question'
+                                    ? 'Are you sure you want to delete this question? This action cannot be undone.'
+                                    : 'Are you sure you want to delete this reply?'}
+                            </p>
+                            <div className="delete-modal-actions">
+                                <button className="delete-modal-btn cancel-btn" onClick={hideDeleteModal}>
+                                    Cancel
+                                </button>
+                                <button className="delete-modal-btn delete-btn" onClick={confirmDelete}>
+                                    Yes, Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
         </div>
     );
 }

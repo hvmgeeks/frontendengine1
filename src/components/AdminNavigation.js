@@ -78,13 +78,6 @@ const AdminNavigation = () => {
       color: 'text-orange-400'
     },
     {
-      title: 'Skills',
-      icon: TbStar,
-      path: '/admin/skills',
-      description: 'Manage skill videos',
-      color: 'text-yellow-400'
-    },
-    {
       title: 'Videos',
       icon: TbVideo,
       path: '/admin/videos',
@@ -137,6 +130,8 @@ const AdminNavigation = () => {
     try {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      // Clear remembered credentials on explicit logout
+      localStorage.removeItem('rememberedUser');
       message.success('Logged out successfully');
       navigate('/login');
     } catch (error) {

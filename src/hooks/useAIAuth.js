@@ -92,6 +92,8 @@ export const useAIAuth = () => {
   const logout = useCallback(() => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    // Clear remembered credentials on explicit logout
+    localStorage.removeItem('rememberedUser');
     setIsAuthenticated(false);
     setHasAIAccess(false);
     setUser(null);

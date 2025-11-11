@@ -16,6 +16,17 @@
   <title>
     BRAINWAVE
   </title>
+  <script>
+    // Suppress ResizeObserver loop errors (benign warnings)
+    window.addEventListener('error', function(e) {
+      if (e.message === 'ResizeObserver loop completed with undelivered notifications.' ||
+          e.message === 'ResizeObserver loop limit exceeded') {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        return false;
+      }
+    });
+  </script>
 </head>
 
 <body>

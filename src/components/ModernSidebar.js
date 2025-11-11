@@ -139,6 +139,8 @@ const ModernSidebar = ({ isOpen = false, setIsOpen = () => {} }) => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    // Clear remembered credentials on explicit logout
+    localStorage.removeItem('rememberedUser');
     // Force page reload to clear all state
     window.location.href = "/";
   };
@@ -199,7 +201,10 @@ const ModernSidebar = ({ isOpen = false, setIsOpen = () => {} }) => {
                 className="text-center"
                 style={{
                   paddingRight: window.innerWidth <= 768 ? '32px' : '48px',
-                  marginTop: window.innerWidth <= 768 ? '20px' : '24px'
+                  marginTop: window.innerWidth <= 320 ? '50px' :
+                            window.innerWidth <= 375 ? '55px' :
+                            window.innerWidth <= 425 ? '60px' :
+                            window.innerWidth <= 768 ? '65px' : '24px'
                 }}
               >
                 <h1

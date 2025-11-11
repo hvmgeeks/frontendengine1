@@ -52,12 +52,6 @@ const AdminTopNavigation = () => {
       color: 'text-orange-500'
     },
     {
-      title: 'Skills',
-      icon: TbStar,
-      path: '/admin/skills',
-      color: 'text-yellow-500'
-    },
-    {
       title: 'Forum',
       icon: TbMessageCircle,
       path: '/admin/forum',
@@ -91,6 +85,8 @@ const AdminTopNavigation = () => {
     try {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      // Clear remembered credentials on explicit logout
+      localStorage.removeItem('rememberedUser');
       navigate('/login');
     } catch (error) {
       console.error('Error logging out:', error);
