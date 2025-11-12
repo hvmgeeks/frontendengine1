@@ -49,6 +49,18 @@ const QuizResult = () => {
   const [loadingExplanations, setLoadingExplanations] = useState({});
   const [isFlashing, setIsFlashing] = useState(false);
 
+  // Clear quiz results cache when result page loads to force refresh on quiz list
+  useEffect(() => {
+    // Clear the user results cache so quiz list will fetch fresh data
+    const userId = user?._id;
+    if (userId) {
+      const resultsCacheKey = `user_results_${userId}`;
+      localStorage.removeItem(resultsCacheKey);
+      localStorage.removeItem(`${resultsCacheKey}_time`);
+      console.log('🔄 Cleared quiz results cache to force refresh on quiz list');
+    }
+  }, [user]);
+
   // Play sound and trigger animations when component loads
   useEffect(() => {
 
@@ -360,6 +372,19 @@ const QuizResult = () => {
 
   const handleBackToQuizzes = () => {
     console.log('🏠 Navigating to quiz listing...');
+
+    // Clear cache to force immediate refresh of quiz cards
+    const userId = user?._id;
+    if (userId) {
+      const resultsCacheKey = `user_results_${userId}`;
+      localStorage.removeItem(resultsCacheKey);
+      localStorage.removeItem(`${resultsCacheKey}_time`);
+
+      // Set a flag to indicate fresh data is needed
+      sessionStorage.setItem('quiz_results_refresh_needed', 'true');
+      console.log('🔄 Cache cleared - quiz list will show updated status immediately');
+    }
+
     startTransition(() => {
       navigate('/user/quiz');
     });
@@ -861,7 +886,7 @@ const QuizResult = () => {
                 : 'animate-premium-pulse animate-red-glow'
             }`}
             style={{
-              fontSize: window.innerWidth <= 768 ? '24px' : window.innerWidth <= 1024 ? '36px' : '48px'
+              fontSize: window.innerWidth <= 320 ? '48px' : window.innerWidth <= 375 ? '52px' : window.innerWidth <= 425 ? '56px' : window.innerWidth <= 768 ? '60px' : window.innerWidth <= 1024 ? '64px' : '72px'
             }}
           >
             {isPassed ? (
@@ -871,12 +896,12 @@ const QuizResult = () => {
               >
                 <span
                   className="animate-celebration"
-                  style={{ fontSize: window.innerWidth <= 768 ? '32px' : '56px' }}
+                  style={{ fontSize: window.innerWidth <= 320 ? '52px' : window.innerWidth <= 375 ? '56px' : window.innerWidth <= 425 ? '60px' : window.innerWidth <= 768 ? '64px' : '72px' }}
                 >🎉</span>
                 <span className="animate-rainbow-glow animate-elegant">Congratulations!</span>
                 <span
                   className="animate-celebration"
-                  style={{ fontSize: window.innerWidth <= 768 ? '32px' : '56px' }}
+                  style={{ fontSize: window.innerWidth <= 320 ? '52px' : window.innerWidth <= 375 ? '56px' : window.innerWidth <= 425 ? '60px' : window.innerWidth <= 768 ? '64px' : '72px' }}
                 >🎉</span>
               </span>
             ) : (
@@ -886,22 +911,27 @@ const QuizResult = () => {
               >
                 <span
                   className="animate-premium-pulse"
-                  style={{ fontSize: window.innerWidth <= 768 ? '32px' : '56px' }}
+                  style={{ fontSize: window.innerWidth <= 320 ? '52px' : window.innerWidth <= 375 ? '56px' : window.innerWidth <= 425 ? '60px' : window.innerWidth <= 768 ? '64px' : '72px' }}
                 >💪</span>
                 <span className="animate-red-glow animate-elegant">Keep Going!</span>
                 <span
                   className="animate-premium-pulse"
-                  style={{ fontSize: window.innerWidth <= 768 ? '32px' : '56px' }}
+                  style={{ fontSize: window.innerWidth <= 320 ? '52px' : window.innerWidth <= 375 ? '56px' : window.innerWidth <= 425 ? '60px' : window.innerWidth <= 768 ? '64px' : '72px' }}
                 >💪</span>
               </span>
             )}
           </h1>
 
-          <div className={`text-3xl font-bold mb-4 ${
-            isPassed
-              ? 'animate-celebration animate-rainbow-glow'
-              : 'animate-premium-pulse animate-red-glow'
-          }`}>
+          <div
+            className={`font-bold mb-4 ${
+              isPassed
+                ? 'animate-celebration animate-rainbow-glow'
+                : 'animate-premium-pulse animate-red-glow'
+            }`}
+            style={{
+              fontSize: window.innerWidth <= 320 ? '36px' : window.innerWidth <= 375 ? '40px' : window.innerWidth <= 425 ? '44px' : window.innerWidth <= 768 ? '48px' : window.innerWidth <= 1024 ? '52px' : '56px'
+            }}
+          >
             {isPassed ? (
               <span className="animate-elegant animate-rainbow-glow">✨ You Passed! ✨</span>
             ) : (

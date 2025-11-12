@@ -230,13 +230,15 @@ body {
 
 /* Force quiz styling */
 .quiz-option {
-  padding: 0.75rem !important;
+  padding: 1.25rem !important;
   border: 2px solid var(--gray-200) !important;
   border-radius: 0.5rem !important;
   background: var(--white) !important;
   margin-bottom: 0.5rem !important;
   cursor: pointer !important;
   transition: all 0.2s ease !important;
+  font-size: 1.25rem !important;
+  line-height: 1.6 !important;
 }
 
 .quiz-option:hover {

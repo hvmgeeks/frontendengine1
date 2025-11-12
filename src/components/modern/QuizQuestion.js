@@ -183,7 +183,14 @@ const QuizQuestion = ({
                 </div>
               </div>
             )}
-            <div className="text-lg font-medium text-gray-900 dark:text-white">
+            <div
+              className="text-lg font-medium text-gray-900 dark:text-white"
+              style={{
+                fontSize: window.innerWidth <= 480 ? '1.25rem' : window.innerWidth <= 768 ? '1.375rem' : '1.5rem',
+                lineHeight: '1.8',
+                fontWeight: '600'
+              }}
+            >
               {String(question.name || '')}
             </div>
             <div className="space-y-3">
@@ -221,13 +228,33 @@ const QuizQuestion = ({
                           whileTap={!showResult ? { scale: 0.98 } : {}}
                           className={getOptionClassName(index)}
                           onClick={() => handleOptionSelect(index)}
+                          style={{
+                            fontSize: window.innerWidth <= 480 ? '1.125rem' : window.innerWidth <= 768 ? '1.25rem' : '1.25rem',
+                            padding: window.innerWidth <= 480 ? '1rem' : window.innerWidth <= 768 ? '1.125rem' : '1.25rem',
+                            lineHeight: '1.6',
+                            minHeight: window.innerWidth <= 480 ? '56px' : window.innerWidth <= 768 ? '60px' : '64px'
+                          }}
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-3">
-                              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium text-gray-600">
+                              <div
+                                className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium text-gray-600"
+                                style={{
+                                  fontSize: window.innerWidth <= 480 ? '1rem' : '1.125rem',
+                                  fontWeight: '600'
+                                }}
+                              >
                                 {String.fromCharCode(65 + index)}
                               </div>
-                              <span className="text-gray-900 dark:text-white">{String(option)}</span>
+                              <span
+                                className="text-gray-900 dark:text-white"
+                                style={{
+                                  fontSize: window.innerWidth <= 480 ? '1.125rem' : window.innerWidth <= 768 ? '1.25rem' : '1.25rem',
+                                  lineHeight: '1.6'
+                                }}
+                              >
+                                {String(option)}
+                              </span>
                             </div>
                             {getOptionIcon(index)}
                           </div>

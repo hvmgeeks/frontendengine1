@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import "./index.css";
 import { motion, AnimatePresence } from "framer-motion";
-import { getStudyMaterial } from "../../../apicalls/study";
+import { getStudyMaterial, likeVideo } from "../../../apicalls/study";
 import { getVideoComments, addVideoComment, addCommentReply, likeComment, deleteVideoComment } from "../../../apicalls/videoComments";
 import { useDispatch, useSelector } from "react-redux";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
@@ -434,7 +434,8 @@ function VideoLessons() {
     // For AWS S3 URLs, get signed URL from backend
     if (videoUrl.includes('amazonaws.com') || videoUrl.includes('s3.')) {
       try {
-        const response = await fetch(`http://localhost:5000/api/study/video-signed-url?videoUrl=${encodeURIComponent(videoUrl)}`, {
+        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+        const response = await fetch(`${apiUrl}/api/study/video-signed-url?videoUrl=${encodeURIComponent(videoUrl)}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -699,6 +700,29 @@ function VideoLessons() {
     }
   };
 
+  const handleLikeVideo = async (videoId) => {
+    try {
+      const response = await likeVideo(videoId);
+
+      if (response.success) {
+        // Update the video in the local state
+        setVideos(prevVideos =>
+          prevVideos.map(video =>
+            (video._id === videoId || video.id === videoId)
+              ? { ...video, likes: response.data.likes, likedBy: response.data.likedBy }
+              : video
+          )
+        );
+        message.success(response.message || "Video liked successfully!");
+      } else {
+        message.error(response.message || "Failed to like video");
+      }
+    } catch (error) {
+      console.error("Error liking video:", error);
+      message.error("Failed to like video");
+    }
+  };
+
   const handleEditComment = (comment) => {
     setEditingComment(comment._id || comment.id);
     setEditCommentText(comment.text);
@@ -883,62 +907,77 @@ function VideoLessons() {
             {/* Top Pagination Controls */}
             {totalVideos > 0 && (
               <div className="pagination-container pagination-top">
-                <div className="pagination-info">
-                  Showing {startItem}-{endItem} of {totalVideos} videos
-                </div>
-
-                <div className="pagination-controls">
+                <div className="pagination-controls" style={{ gap: 0, flexWrap: 'nowrap' }}>
                   <button
                     className="pagination-btn"
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
+                    style={{
+                      minWidth: window.innerWidth <= 320 ? '28px' : window.innerWidth <= 375 ? '30px' : window.innerWidth <= 425 ? '32px' : '40px',
+                      padding: window.innerWidth <= 320 ? '0.3rem 0.4rem' : window.innerWidth <= 375 ? '0.35rem 0.45rem' : window.innerWidth <= 425 ? '0.4rem 0.5rem' : '0.5rem 0.75rem',
+                      fontSize: window.innerWidth <= 320 ? '0.7rem' : window.innerWidth <= 375 ? '0.72rem' : window.innerWidth <= 425 ? '0.75rem' : '0.8rem',
+                      margin: 0
+                    }}
                   >
                     Previous
                   </button>
 
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
+                  {(() => {
+                    // Show only 3 page numbers on small screens, 5 on larger screens
+                    const maxButtons = window.innerWidth <= 425 ? 3 : 5;
+                    let startPage, endPage;
+
+                    if (totalPages <= maxButtons) {
+                      startPage = 1;
+                      endPage = totalPages;
                     } else {
-                      pageNum = currentPage - 2 + i;
+                      const halfButtons = Math.floor(maxButtons / 2);
+
+                      if (currentPage <= halfButtons + 1) {
+                        startPage = 1;
+                        endPage = maxButtons;
+                      } else if (currentPage >= totalPages - halfButtons) {
+                        startPage = totalPages - maxButtons + 1;
+                        endPage = totalPages;
+                      } else {
+                        startPage = currentPage - halfButtons;
+                        endPage = currentPage + halfButtons;
+                      }
                     }
 
-                    return (
-                      <button
-                        key={pageNum}
-                        className={`pagination-btn ${currentPage === pageNum ? 'active' : ''}`}
-                        onClick={() => handlePageChange(pageNum)}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
+                    return Array.from({ length: endPage - startPage + 1 }, (_, i) => {
+                      const pageNum = startPage + i;
+                      return (
+                        <button
+                          key={pageNum}
+                          className={`pagination-btn ${currentPage === pageNum ? 'active' : ''}`}
+                          onClick={() => handlePageChange(pageNum)}
+                          style={{
+                            minWidth: window.innerWidth <= 320 ? '28px' : window.innerWidth <= 375 ? '30px' : window.innerWidth <= 425 ? '32px' : '40px',
+                            padding: window.innerWidth <= 320 ? '0.3rem 0.4rem' : window.innerWidth <= 375 ? '0.35rem 0.45rem' : window.innerWidth <= 425 ? '0.4rem 0.5rem' : '0.5rem 0.75rem',
+                            fontSize: window.innerWidth <= 320 ? '0.7rem' : window.innerWidth <= 375 ? '0.72rem' : window.innerWidth <= 425 ? '0.75rem' : '0.8rem',
+                            margin: 0
+                          }}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    });
+                  })()}
 
                   <button
                     className="pagination-btn"
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
+                    style={{
+                      minWidth: window.innerWidth <= 320 ? '28px' : window.innerWidth <= 375 ? '30px' : window.innerWidth <= 425 ? '32px' : '40px',
+                      padding: window.innerWidth <= 320 ? '0.3rem 0.4rem' : window.innerWidth <= 375 ? '0.35rem 0.45rem' : window.innerWidth <= 425 ? '0.4rem 0.5rem' : '0.5rem 0.75rem',
+                      fontSize: window.innerWidth <= 320 ? '0.7rem' : window.innerWidth <= 375 ? '0.72rem' : window.innerWidth <= 425 ? '0.75rem' : '0.8rem',
+                      margin: 0
+                    }}
                   >
                     Next
                   </button>
-                </div>
-
-                <div className="page-size-selector">
-                  <span>Videos per page:</span>
-                  <select
-                    value={videosPerPage}
-                    onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-                  >
-                    <option value={6}>6</option>
-                    <option value={12}>12</option>
-                    <option value={24}>24</option>
-                    <option value={48}>48</option>
-                  </select>
                 </div>
               </div>
             )}
@@ -965,6 +1004,7 @@ function VideoLessons() {
               handleDeleteComment={handleDeleteComment}
               formatTimeAgo={formatTimeAgo}
               user={user}
+              handleLikeVideo={handleLikeVideo}
             />
 
 
@@ -972,62 +1012,77 @@ function VideoLessons() {
     {/* Pagination Controls */}
     {totalVideos > 0 && (
       <div className="pagination-container">
-        <div className="pagination-info">
-          Showing {startItem}-{endItem} of {totalVideos} videos
-        </div>
-
-        <div className="pagination-controls">
+        <div className="pagination-controls" style={{ gap: 0, flexWrap: 'nowrap' }}>
           <button
             className="pagination-btn"
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
+            style={{
+              minWidth: window.innerWidth <= 320 ? '28px' : window.innerWidth <= 375 ? '30px' : window.innerWidth <= 425 ? '32px' : '40px',
+              padding: window.innerWidth <= 320 ? '0.3rem 0.4rem' : window.innerWidth <= 375 ? '0.35rem 0.45rem' : window.innerWidth <= 425 ? '0.4rem 0.5rem' : '0.5rem 0.75rem',
+              fontSize: window.innerWidth <= 320 ? '0.7rem' : window.innerWidth <= 375 ? '0.72rem' : window.innerWidth <= 425 ? '0.75rem' : '0.8rem',
+              margin: 0
+            }}
           >
             Previous
           </button>
 
-          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-            let pageNum;
-            if (totalPages <= 5) {
-              pageNum = i + 1;
-            } else if (currentPage <= 3) {
-              pageNum = i + 1;
-            } else if (currentPage >= totalPages - 2) {
-              pageNum = totalPages - 4 + i;
+          {(() => {
+            // Show only 3 page numbers on small screens, 5 on larger screens
+            const maxButtons = window.innerWidth <= 425 ? 3 : 5;
+            let startPage, endPage;
+
+            if (totalPages <= maxButtons) {
+              startPage = 1;
+              endPage = totalPages;
             } else {
-              pageNum = currentPage - 2 + i;
+              const halfButtons = Math.floor(maxButtons / 2);
+
+              if (currentPage <= halfButtons + 1) {
+                startPage = 1;
+                endPage = maxButtons;
+              } else if (currentPage >= totalPages - halfButtons) {
+                startPage = totalPages - maxButtons + 1;
+                endPage = totalPages;
+              } else {
+                startPage = currentPage - halfButtons;
+                endPage = currentPage + halfButtons;
+              }
             }
 
-            return (
-              <button
-                key={pageNum}
-                className={`pagination-btn ${currentPage === pageNum ? 'active' : ''}`}
-                onClick={() => handlePageChange(pageNum)}
-              >
-                {pageNum}
-              </button>
-            );
-          })}
+            return Array.from({ length: endPage - startPage + 1 }, (_, i) => {
+              const pageNum = startPage + i;
+              return (
+                <button
+                  key={pageNum}
+                  className={`pagination-btn ${currentPage === pageNum ? 'active' : ''}`}
+                  onClick={() => handlePageChange(pageNum)}
+                  style={{
+                    minWidth: window.innerWidth <= 320 ? '28px' : window.innerWidth <= 375 ? '30px' : window.innerWidth <= 425 ? '32px' : '40px',
+                    padding: window.innerWidth <= 320 ? '0.3rem 0.4rem' : window.innerWidth <= 375 ? '0.35rem 0.45rem' : window.innerWidth <= 425 ? '0.4rem 0.5rem' : '0.5rem 0.75rem',
+                    fontSize: window.innerWidth <= 320 ? '0.7rem' : window.innerWidth <= 375 ? '0.72rem' : window.innerWidth <= 425 ? '0.75rem' : '0.8rem',
+                    margin: 0
+                  }}
+                >
+                  {pageNum}
+                </button>
+              );
+            });
+          })()}
 
           <button
             className="pagination-btn"
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
+            style={{
+              minWidth: window.innerWidth <= 320 ? '28px' : window.innerWidth <= 375 ? '30px' : window.innerWidth <= 425 ? '32px' : '40px',
+              padding: window.innerWidth <= 320 ? '0.3rem 0.4rem' : window.innerWidth <= 375 ? '0.35rem 0.45rem' : window.innerWidth <= 425 ? '0.4rem 0.5rem' : '0.5rem 0.75rem',
+              fontSize: window.innerWidth <= 320 ? '0.7rem' : window.innerWidth <= 375 ? '0.72rem' : window.innerWidth <= 425 ? '0.75rem' : '0.8rem',
+              margin: 0
+            }}
           >
             Next
           </button>
-        </div>
-
-        <div className="page-size-selector">
-          <span>Videos per page:</span>
-          <select
-            value={videosPerPage}
-            onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-          >
-            <option value={6}>6</option>
-            <option value={12}>12</option>
-            <option value={24}>24</option>
-            <option value={48}>48</option>
-          </select>
         </div>
       </div>
     )}

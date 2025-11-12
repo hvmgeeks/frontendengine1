@@ -254,8 +254,11 @@ const Quiz = () => {
       const cachedResults = localStorage.getItem(resultsCacheKey);
       const cacheTime = localStorage.getItem(`${resultsCacheKey}_time`);
 
-      // Use cache if less than 5 minutes old (results change less frequently)
-      if (cachedResults && cacheTime && (Date.now() - parseInt(cacheTime)) < 300000) {
+      // Check if force refresh is needed
+      const forceRefresh = sessionStorage.getItem('quiz_results_refresh_needed') === 'true';
+
+      // Use cache if less than 5 minutes old (results change less frequently) AND no force refresh
+      if (!forceRefresh && cachedResults && cacheTime && (Date.now() - parseInt(cacheTime)) < 300000) {
         try {
           const parsed = JSON.parse(cachedResults);
           setUserResults(parsed);
@@ -265,6 +268,10 @@ const Quiz = () => {
         } catch (error) {
           console.warn('Failed to parse cached results:', error);
         }
+      }
+
+      if (forceRefresh) {
+        console.log('🔄 Bypassing cache due to force refresh flag');
       }
 
       const response = await getAllReportsByUser({ userId: user._id });
@@ -424,13 +431,49 @@ const Quiz = () => {
   }, [dispatch, user]);
 
   useEffect(() => {
-    // Don't clear caches on mount - let caching work for performance
-    // Only clear caches manually when needed (e.g., user action)
-    console.log('🎯 Quiz component mounted - using cached data if available');
+    // Check if we need to force refresh (coming back from quiz result)
+    const refreshNeeded = sessionStorage.getItem('quiz_results_refresh_needed');
+
+    if (refreshNeeded === 'true') {
+      console.log('🔄 Force refresh detected - clearing cache and fetching fresh data');
+      sessionStorage.removeItem('quiz_results_refresh_needed');
+
+      // Clear cache to force fresh fetch
+      if (user) {
+        const resultsCacheKey = `user_results_${user._id}`;
+        localStorage.removeItem(resultsCacheKey);
+        localStorage.removeItem(`${resultsCacheKey}_time`);
+      }
+    } else {
+      console.log('🎯 Quiz component mounted - using cached data if available');
+    }
 
     getExams(); // Initial load with caching
-    getUserResults();
-  }, [getExams, getUserResults]);
+    getUserResults(); // This will fetch fresh data if cache was cleared
+  }, [getExams, getUserResults, user]);
+
+  // Refresh results when component becomes visible (user navigates back)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && user) {
+        console.log('🔄 Page became visible - checking for fresh quiz results...');
+        // Force refresh by clearing cache
+        const resultsCacheKey = `user_results_${user._id}`;
+        const cacheTime = localStorage.getItem(`${resultsCacheKey}_time`);
+
+        // If cache was recently cleared (within last 2 seconds), fetch fresh data
+        if (!cacheTime || (Date.now() - parseInt(cacheTime)) > 2000) {
+          getUserResults();
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [user, getUserResults]);
 
   // Real-time updates for quiz completion and new exams
   useEffect(() => {

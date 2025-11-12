@@ -565,14 +565,14 @@
 
 /* Comments Section - Below Video Layout */
 .comments-section-below {
-  background: rgba(248, 250, 252, 0.8);
+  background: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(20px);
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
   margin-top: 1rem;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .comments-section-below.normal-comments {
@@ -585,7 +585,7 @@
 .comments-section-below.expanded-comments {
   flex: 1;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(20px);
   max-height: 60vh;
   overflow: hidden;
@@ -595,8 +595,8 @@
 
 /* Legacy comments section for backward compatibility */
 .comments-section {
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
+  background: #000000;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
   padding: 1.5rem;
   transition: all 0.3s ease;
 }
@@ -612,8 +612,8 @@
   right: 0;
   width: 400px;
   max-height: 60vh;
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px 12px 0 0;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
   z-index: 20;
@@ -626,8 +626,8 @@
   align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 0.75rem;
-  border-bottom: 2px solid #e2e8f0;
-  background: white;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  background: #000000;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -640,8 +640,8 @@
 }
 
 .comments-count {
-  font-size: 0.85rem;
-  color: #718096;
+  font-size: 1rem;
+  color: #ffffff;
   font-weight: 500;
 }
 
@@ -649,26 +649,26 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: 700;
-  color: #2d3748;
+  color: #ffffff;
   margin: 0;
 }
 
 .comments-title svg {
   color: #667eea;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
 }
 
 /* Enhanced comments section visibility */
 .comments-section-below.normal-comments {
   border-top: 3px solid #667eea;
-  box-shadow: 0 -2px 10px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 -2px 10px rgba(102, 126, 234, 0.3);
 }
 
 .comments-section-below.expanded-comments {
   border-left: 3px solid #667eea;
-  box-shadow: -2px 0 10px rgba(102, 126, 234, 0.1);
+  box-shadow: -2px 0 10px rgba(102, 126, 234, 0.3);
 }
 
 /* Comments Count Header - Always visible */
@@ -902,27 +902,28 @@
   flex-direction: column;
   align-items: center;
   padding: 2rem;
-  color: #718096;
+  color: #ffffff;
   text-align: center;
 }
 
 .no-comments-icon {
   font-size: 2rem;
   margin-bottom: 0.5rem;
-  opacity: 0.5;
+  opacity: 0.7;
 }
 
 .comment {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   padding: 1rem;
   transition: all 0.2s ease;
 }
 
 .comment:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-color: #cbd5e0;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .comment-main {
@@ -959,20 +960,21 @@
 
 .comment-author {
   font-weight: 600;
-  color: #2d3748;
-  font-size: 0.9rem;
+  color: #ffffff;
+  font-size: 1.05rem;
 }
 
 .comment-time {
-  font-size: 0.75rem;
-  color: #718096;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .comment-text {
-  color: #4a5568;
-  line-height: 1.5;
+  color: #ffffff;
+  line-height: 1.6;
   margin-bottom: 0.75rem;
   word-wrap: break-word;
+  font-size: 1rem;
 }
 
 .comment-actions {
@@ -1496,6 +1498,18 @@
   background: rgba(220, 53, 69, 0.2);
 }
 
+.youtube-action-btn-small.liked {
+  background: rgba(0, 123, 255, 0.2);
+  border-color: rgba(0, 123, 255, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.youtube-action-btn-small.liked:hover {
+  background: rgba(0, 123, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.4);
+}
+
 /* Top Pagination */
 .pagination-top {
   margin: 1rem 0;
@@ -1504,79 +1518,56 @@
   padding: 1rem;
 }
 
-/* Pagination Styles */
+/* Pagination Styles - Simple and Clean */
 .pagination-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1rem;
   margin: 2rem 0;
   padding: 1rem;
   position: relative;
   z-index: 5;
 }
 
-.pagination-info {
-  color: white;
-  font-size: 0.9rem;
-  opacity: 0.8;
-}
-
 .pagination-controls {
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .pagination-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  border: none;
   color: white;
   padding: 0.5rem 1rem;
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  font-size: 1rem;
   font-weight: 500;
+  min-width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .pagination-btn:hover:not(:disabled):not(.active) {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.4);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
 }
 
 .pagination-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.3;
   cursor: not-allowed;
-  background: rgba(255, 255, 255, 0.05);
 }
 
 .pagination-btn.active {
-  background: linear-gradient(135deg, #007BFF 0%, #0056b3 100%) !important;
-  border: 2px solid #0066cc !important;
+  background: #ff0000 !important;
   color: white !important;
   font-weight: 700 !important;
-  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.5), 0 3px 8px rgba(0, 0, 0, 0.3) !important;
-  transform: scale(1.1) !important;
-}
-
-.page-size-selector {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: white;
-  font-size: 0.9rem;
-}
-
-.page-size-selector select {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
 }
 
 /* Enhanced Responsive Design */
@@ -2199,7 +2190,7 @@ video {
 .youtube-comments-section {
   margin-top: 0;
   padding: 1.5rem 1.25rem;
-  background: rgba(255, 255, 255, 0.98);
+  background: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(10px);
   border-radius: 0 0 12px 12px;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
@@ -2307,20 +2298,20 @@ video {
 }
 
 .youtube-comment-author {
-  font-size: 13px;
-  font-weight: 500;
-  color: #0f0f0f;
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
 }
 
 .youtube-comment-time {
-  font-size: 12px;
-  color: #606060;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .youtube-comment-text {
-  font-size: 14px;
-  color: #0f0f0f;
-  line-height: 1.4;
+  font-size: 16px;
+  color: #ffffff;
+  line-height: 1.5;
   margin-bottom: 8px;
 }
 
@@ -3239,6 +3230,17 @@ video {
     font-size: 0.85rem;
     line-height: 1.3;
   }
+
+  .pagination-controls {
+    gap: 0;
+  }
+
+  .pagination-btn {
+    min-width: 28px;
+    padding: 0.3rem 0.4rem;
+    font-size: 0.7rem;
+    border-radius: 3px;
+  }
 }
 
 /* Medium Mobile Screens (375px) */
@@ -3303,6 +3305,17 @@ video {
     font-size: 0.9rem;
     line-height: 1.35;
   }
+
+  .pagination-controls {
+    gap: 0;
+  }
+
+  .pagination-btn {
+    min-width: 30px;
+    padding: 0.35rem 0.45rem;
+    font-size: 0.72rem;
+    border-radius: 3px;
+  }
 }
 
 /* Large Mobile Screens (425px) */
@@ -3366,6 +3379,17 @@ video {
   .video-title {
     font-size: 0.95rem;
     line-height: 1.4;
+  }
+
+  .pagination-controls {
+    gap: 0;
+  }
+
+  .pagination-btn {
+    min-width: 32px;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 4px;
   }
 }
 
@@ -3449,48 +3473,29 @@ video {
     display: none !important;
   }
 
-  .pagination-container.pagination-top {
-    display: none !important;
-  }
-
-  /* Mobile Horizontal Navigation - Show All Buttons */
   .pagination-container {
     display: flex !important;
-    flex-direction: column !important;
+    justify-content: center;
     align-items: center;
-    gap: 0.75rem;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
+    padding: 0.5rem;
     margin: 1rem 0;
-  }
-
-  .pagination-info {
-    text-align: center;
-    font-size: 0.8rem;
-    color: white;
-    opacity: 0.9;
-    margin: 0;
-    width: auto;
+    overflow-x: auto;
   }
 
   .pagination-controls {
     display: flex !important;
-    flex-direction: row !important;
-    gap: 0.5rem;
-    flex-wrap: wrap;
+    gap: 0;
+    flex-wrap: nowrap;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    padding: 0.25rem;
   }
 
   .pagination-btn {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8rem;
-    min-width: 40px;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.75rem;
+    min-width: 32px;
     height: 36px;
-    border-radius: 6px;
+    border-radius: 4px;
     white-space: nowrap;
     flex-shrink: 0;
     display: flex;
@@ -3499,17 +3504,21 @@ video {
     border: 1px solid rgba(255, 255, 255, 0.2);
     background: rgba(255, 255, 255, 0.1);
     color: white;
-    margin: 0.125rem;
+    margin: 0;
   }
 
   .pagination-btn.active {
-    background: #007BFF !important;
+    background: #ff0000 !important;
+    border: 2px solid #ff0000 !important;
     color: white !important;
-    border-color: #007BFF !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+    transform: scale(1.05) !important;
   }
 
-  .pagination-btn:hover {
+  .pagination-btn:hover:not(:disabled):not(.active) {
     background: rgba(255, 255, 255, 0.2) !important;
+    transform: scale(1.02) !important;
   }
 
   .page-size-selector {
@@ -3674,7 +3683,7 @@ video {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
-    background: rgba(255, 255, 255, 0.1) !important;
+    background: rgba(0, 0, 0, 0.95) !important;
     border-radius: 8px !important;
     padding: 1.25rem !important;
     margin-top: 0.5rem !important;
@@ -4306,23 +4315,24 @@ video {
   }
 
   .pagination-container {
-    flex-direction: row;
-    flex-wrap: wrap;
+    display: flex !important;
     justify-content: center;
-    gap: 1rem;
+    align-items: center;
     padding: 1rem;
   }
 
   .pagination-controls {
-    display: flex;
-    flex-direction: row;
+    display: flex !important;
     gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
   .pagination-btn {
     padding: 0.5rem 0.75rem;
-    font-size: 0.85rem;
-    min-width: 40px;
+    font-size: 0.9rem;
+    min-width: 42px;
+    height: 42px;
   }
 
   .inline-video-player video,
@@ -4819,60 +4829,52 @@ video {
   transform: translateY(-1px);
 }
 
-/* Mobile Pagination Force Horizontal - Show All Buttons */
+/* Mobile Pagination - Horizontal Layout - Compact */
 @media (max-width: 767px) {
   .pagination-container {
     display: flex !important;
-    flex-direction: column !important;
-    background: rgba(255, 255, 255, 0.05) !important;
-    border-radius: 8px !important;
-    padding: 1rem !important;
+    justify-content: center !important;
+    padding: 0.5rem !important;
     margin: 1rem 0 !important;
-  }
-
-  .pagination-info {
-    font-size: 0.8rem !important;
-    text-align: center !important;
-    margin-bottom: 0.75rem !important;
-    color: white !important;
-    opacity: 0.9 !important;
+    overflow-x: auto !important;
   }
 
   .pagination-controls {
     display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: wrap !important;
+    gap: 0 !important;
+    flex-wrap: nowrap !important;
     justify-content: center !important;
-    width: 100% !important;
-    gap: 0.5rem !important;
-    padding: 0.25rem !important;
+    align-items: center !important;
   }
 
   .pagination-btn {
     flex-shrink: 0 !important;
-    white-space: nowrap !important;
-    padding: 0.5rem 0.75rem !important;
-    font-size: 0.8rem !important;
-    min-width: 40px !important;
+    padding: 0.4rem 0.5rem !important;
+    font-size: 0.75rem !important;
+    min-width: 32px !important;
     height: 36px !important;
-    border-radius: 6px !important;
+    border-radius: 4px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
     background: rgba(255, 255, 255, 0.1) !important;
     color: white !important;
-    margin: 0.125rem !important;
+    margin: 0 !important;
   }
 
   .pagination-btn.active {
-    background: #007BFF !important;
-    border-color: #007BFF !important;
+    background: #ff0000 !important;
+    border: 2px solid #ff0000 !important;
     color: white !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+    transform: scale(1.05) !important;
   }
 
-  .pagination-btn:hover {
+  .pagination-btn:hover:not(:disabled):not(.active) {
     background: rgba(255, 255, 255, 0.2) !important;
+    transform: scale(1.02) !important;
   }
 
   .page-size-selector {

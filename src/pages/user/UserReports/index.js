@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import './index.css';
 import PageTitle from "../../../components/PageTitle";
-import { message, Card, Progress, Statistic, Select, DatePicker, Button, Empty, Table, Tag, Modal, Descriptions } from "antd";
+import { message, Card, Progress, Statistic, Select, DatePicker, Button, Empty, Table, Tag, Modal } from "antd";
 import { useDispatch } from "react-redux";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
 import { getAllReportsByUser } from "../../../apicalls/reports";
@@ -46,6 +46,25 @@ function UserReports() {
   const [selectedReport, setSelectedReport] = useState(null);
   const dispatch = useDispatch();
 
+  // Helper function to safely get correct answers count
+  // Handles both array format (old) and number format (new)
+  const getCorrectAnswersCount = (result) => {
+    if (!result) return 0;
+    if (Array.isArray(result.correctAnswers)) return result.correctAnswers.length;
+    if (typeof result.correctAnswers === 'number') return result.correctAnswers;
+    return 0;
+  };
+
+  // Helper function to safely get wrong answers count
+  const getWrongAnswersCount = (result) => {
+    if (!result) return 0;
+    if (Array.isArray(result.wrongAnswers)) return result.wrongAnswers.length;
+    if (typeof result.wrongAnswers === 'number') return result.wrongAnswers;
+    return 0;
+  };
+
+
+
   const calculateStats = (data) => {
     if (!data || data.length === 0) {
       setStats({
@@ -61,7 +80,7 @@ function UserReports() {
     const totalExams = data.length;
     const passedExams = data.filter(report => report.result?.verdict === 'Pass').length;
     const scores = data.map(report => {
-      const obtained = report.result?.correctAnswers?.length || 0;
+      const obtained = getCorrectAnswersCount(report.result) || 0;
       const total = report.exam?.totalMarks || 1;
       return (obtained / total) * 100;
     });
@@ -221,32 +240,34 @@ function UserReports() {
         dataIndex: 'score',
         key: 'score',
         render: (text, record) => {
-          const obtained = record.result?.correctAnswers?.length || 0;
+          const obtained = getCorrectAnswersCount(record.result) || 0;
           const total = record.exam?.totalMarks || 1;
           const percentage = Math.round((obtained / total) * 100);
 
           return (
             <div className="text-center">
-              <div className="text-sm sm:text-base font-bold text-gray-900">
+              {/* BIG PERCENTAGE - EASY TO SEE */}
+              <div className={`text-2xl sm:text-3xl font-black mb-1 ${getScoreColor(percentage)}`}>
+                {percentage}%
+              </div>
+              {/* CORRECT/TOTAL - CLEAR */}
+              <div className="text-base sm:text-lg font-bold text-gray-700 mb-2">
                 {obtained}/{total}
               </div>
+              {/* Progress Bar */}
               <Progress
                 percent={percentage}
                 size="small"
                 strokeColor={percentage >= 60 ? '#10b981' : '#ef4444'}
                 showInfo={false}
-                className="mb-1"
               />
-              <div className={`text-xs sm:text-sm font-medium ${getScoreColor(percentage)}`}>
-                {percentage}%
-              </div>
             </div>
           );
         },
-        width: isMobile ? 80 : 120,
+        width: isMobile ? 100 : 140,
         sorter: (a, b) => {
-          const scoreA = Math.round(((a.result?.correctAnswers?.length || 0) / (a.exam?.totalMarks || 1)) * 100);
-          const scoreB = Math.round(((b.result?.correctAnswers?.length || 0) / (b.exam?.totalMarks || 1)) * 100);
+          const scoreA = Math.round(((getCorrectAnswersCount(a.result) || 0) / (a.exam?.totalMarks || 1)) * 100);
+          const scoreB = Math.round(((getCorrectAnswersCount(b.result) || 0) / (b.exam?.totalMarks || 1)) * 100);
           return scoreA - scoreB;
         },
       },
@@ -325,119 +346,77 @@ function UserReports() {
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
 
 
-        {/* Stats Cards */}
+        {/* Stats Cards - PROFESSIONAL DESIGN */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8"
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6"
         >
-          <Card className="text-center hover:shadow-xl hover:scale-105 transition-all duration-300 border-0 bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-blue-600/10"></div>
-            <div className="relative flex flex-col items-center p-3 sm:p-4 lg:p-6">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-3 sm:mb-4 shadow-lg">
-                <TbTarget className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
+          {/* Total Exams */}
+          <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-l-4 border-amber-500 p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Total Exams</p>
+                <p className="text-2xl sm:text-3xl font-bold text-amber-600">{stats.totalExams}</p>
               </div>
-              <Statistic
-                title="Total Exams"
-                value={stats.totalExams}
-                valueStyle={{
-                  color: '#1e40af',
-                  fontWeight: 'bold',
-                  fontSize: window.innerWidth < 640 ? '18px' : window.innerWidth < 1024 ? '20px' : '24px',
-                  textAlign: 'center'
-                }}
-                className="responsive-statistic text-center"
-                style={{ textAlign: 'center' }}
-              />
+              <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                <TbTarget className="w-6 h-6 text-amber-600" />
+              </div>
             </div>
-          </Card>
+          </div>
 
-          <Card className="text-center hover:shadow-xl hover:scale-105 transition-all duration-300 border-0 bg-gradient-to-br from-green-50 via-green-100 to-green-200 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-600/10"></div>
-            <div className="relative flex flex-col items-center p-3 sm:p-4 lg:p-6">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-3 sm:mb-4 shadow-lg">
-                <TbCheck className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
+          {/* Passed */}
+          <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-l-4 border-amber-500 p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Passed</p>
+                <p className="text-2xl sm:text-3xl font-bold text-amber-600">{stats.passedExams}</p>
               </div>
-              <Statistic
-                title="Passed"
-                value={stats.passedExams}
-                valueStyle={{
-                  color: '#059669',
-                  fontWeight: 'bold',
-                  fontSize: window.innerWidth < 640 ? '18px' : window.innerWidth < 1024 ? '20px' : '24px',
-                  textAlign: 'center'
-                }}
-                className="responsive-statistic text-center"
-                style={{ textAlign: 'center' }}
-              />
+              <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                <TbCheck className="w-6 h-6 text-amber-600" />
+              </div>
             </div>
-          </Card>
+          </div>
 
-          <Card className="text-center hover:shadow-xl hover:scale-105 transition-all duration-300 border-0 bg-gradient-to-br from-purple-50 via-purple-100 to-purple-200 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-purple-600/10"></div>
-            <div className="relative flex flex-col items-center p-3 sm:p-4 lg:p-6">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-3 sm:mb-4 shadow-lg">
-                <TbTrendingUp className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
+          {/* Average Score */}
+          <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-l-4 border-amber-500 p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Average Score</p>
+                <p className="text-2xl sm:text-3xl font-bold text-amber-600">{stats.averageScore}%</p>
               </div>
-              <Statistic
-                title="Average Score"
-                value={stats.averageScore}
-                suffix="%"
-                valueStyle={{
-                  color: '#7c3aed',
-                  fontWeight: 'bold',
-                  fontSize: window.innerWidth < 640 ? '18px' : window.innerWidth < 1024 ? '20px' : '24px',
-                  textAlign: 'center'
-                }}
-                className="responsive-statistic text-center"
-                style={{ textAlign: 'center' }}
-              />
+              <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                <TbTrendingUp className="w-6 h-6 text-amber-600" />
+              </div>
             </div>
-          </Card>
+          </div>
 
-          <Card className="text-center hover:shadow-xl hover:scale-105 transition-all duration-300 border-0 bg-gradient-to-br from-orange-50 via-orange-100 to-orange-200 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-orange-600/10"></div>
-            <div className="relative flex flex-col items-center p-3 sm:p-4 lg:p-6">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mb-3 sm:mb-4 shadow-lg">
-                <TbTrophy className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
+          {/* Best Score */}
+          <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-l-4 border-amber-500 p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Best Score</p>
+                <p className="text-2xl sm:text-3xl font-bold text-amber-600">{stats.bestScore}%</p>
               </div>
-              <Statistic
-                title="Best Score"
-                value={stats.bestScore}
-                suffix="%"
-                valueStyle={{
-                  color: '#ea580c',
-                  fontWeight: 'bold',
-                  fontSize: window.innerWidth < 640 ? '18px' : window.innerWidth < 1024 ? '20px' : '24px',
-                  textAlign: 'center'
-                }}
-                className="responsive-statistic text-center"
-                style={{ textAlign: 'center' }}
-              />
+              <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                <TbTrophy className="w-6 h-6 text-amber-600" />
+              </div>
             </div>
-          </Card>
+          </div>
 
-          <Card className="text-center hover:shadow-xl hover:scale-105 transition-all duration-300 border-0 bg-gradient-to-br from-pink-50 via-pink-100 to-pink-200 relative overflow-hidden sm:col-span-3 lg:col-span-1">
-            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-pink-600/10"></div>
-            <div className="relative flex flex-col items-center p-3 sm:p-4 lg:p-6">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl flex items-center justify-center mb-3 sm:mb-4 shadow-lg">
-                <TbFlame className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
+          {/* Best Streak */}
+          <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-l-4 border-amber-500 p-4 sm:col-span-3 lg:col-span-1">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Best Streak</p>
+                <p className="text-2xl sm:text-3xl font-bold text-amber-600">{stats.streak}</p>
               </div>
-              <Statistic
-                title="Best Streak"
-                value={stats.streak}
-                valueStyle={{
-                  color: '#db2777',
-                  fontWeight: 'bold',
-                  fontSize: window.innerWidth < 640 ? '18px' : window.innerWidth < 1024 ? '20px' : '24px',
-                  textAlign: 'center'
-                }}
-                className="responsive-statistic text-center"
-                style={{ textAlign: 'center' }}
-              />
+              <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                <TbFlame className="w-6 h-6 text-amber-600" />
+              </div>
             </div>
-          </Card>
+          </div>
 
 
         </motion.div>
@@ -624,50 +603,72 @@ function UserReports() {
               {/* Exam Information */}
               <div className="bg-gray-50 rounded-lg p-4">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Exam Information</h3>
-                <Descriptions column={isMobile ? 1 : 2} size="small">
-                  <Descriptions.Item label="Exam Name" span={isMobile ? 1 : 2}>
-                    <span className="font-medium">{selectedReport.exam?.name || 'N/A'}</span>
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Subject">
-                    {selectedReport.exam?.subject || 'General'}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Date Taken">
-                    {moment(selectedReport.createdAt).format("MMMM DD, YYYY [at] HH:mm")}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Total Questions">
-                    {selectedReport.exam?.totalMarks || 0}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Passing Marks">
-                    {selectedReport.exam?.passingMarks || 0}
-                  </Descriptions.Item>
-                </Descriptions>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="col-span-1 sm:col-span-2">
+                    <div className="text-sm text-gray-600">Exam Name</div>
+                    <div className="font-medium text-gray-900">{selectedReport.exam?.name || 'N/A'}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-600">Subject</div>
+                    <div className="font-medium text-gray-900">{selectedReport.exam?.subject || 'General'}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-600">Date Taken</div>
+                    <div className="font-medium text-gray-900">{moment(selectedReport.createdAt).format("MMMM DD, YYYY [at] HH:mm")}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-600">Total Questions</div>
+                    <div className="font-medium text-gray-900">{selectedReport.exam?.totalMarks || 0}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-600">Passing Marks</div>
+                    <div className="font-medium text-gray-900">{selectedReport.exam?.passingMarks || 0}</div>
+                  </div>
+                </div>
               </div>
 
-              {/* Performance Summary */}
-              <div className="bg-blue-50 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Summary</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="text-center p-3 bg-white rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">
-                      {selectedReport.result?.correctAnswers?.length || 0}
-                    </div>
-                    <div className="text-sm text-gray-600">Correct Answers</div>
+              {/* Performance Summary - SIMPLE AND CLEAR */}
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200">
+                <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <TbChartBar className="w-6 h-6 text-blue-600" />
+                  Your Performance
+                </h3>
+
+                {/* Score - BIG AND CLEAR */}
+                <div className="mb-6 text-center p-6 bg-white rounded-xl shadow-lg">
+                  <div className="text-sm text-gray-600 mb-2">FINAL SCORE</div>
+                  <div className={`text-6xl font-black mb-2 ${
+                    Math.round(((getCorrectAnswersCount(selectedReport.result) || 0) / (selectedReport.exam?.totalMarks || 1)) * 100) >= 60
+                      ? 'text-green-600'
+                      : 'text-red-600'
+                  }`}>
+                    {Math.round(((getCorrectAnswersCount(selectedReport.result) || 0) / (selectedReport.exam?.totalMarks || 1)) * 100)}%
                   </div>
-                  <div className="text-center p-3 bg-white rounded-lg">
-                    <div className="text-2xl font-bold text-gray-600">
-                      {(selectedReport.exam?.totalMarks || 0) - (selectedReport.result?.correctAnswers?.length || 0)}
-                    </div>
-                    <div className="text-sm text-gray-600">Wrong Answers</div>
+                  <div className="text-2xl font-bold text-gray-700">
+                    {getCorrectAnswersCount(selectedReport.result) || 0} / {selectedReport.exam?.totalMarks || 0}
                   </div>
-                  <div className="text-center p-3 bg-white rounded-lg">
-                    <div className={`text-2xl font-bold ${
-                      Math.round(((selectedReport.result?.correctAnswers?.length || 0) / (selectedReport.exam?.totalMarks || 1)) * 100) >= 60
-                        ? 'text-green-600'
-                        : 'text-red-600'
-                    }`}>
-                      {Math.round(((selectedReport.result?.correctAnswers?.length || 0) / (selectedReport.exam?.totalMarks || 1)) * 100)}%
+                  <div className="text-sm text-gray-500 mt-1">Correct Answers</div>
+                </div>
+
+                {/* Breakdown - SIMPLE */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-4 bg-green-50 rounded-lg border-2 border-green-200">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <TbCheck className="w-6 h-6 text-green-600" />
+                      <span className="text-sm font-medium text-green-700">CORRECT</span>
                     </div>
-                    <div className="text-sm text-gray-600">Score</div>
+                    <div className="text-4xl font-black text-green-600">
+                      {getCorrectAnswersCount(selectedReport.result) || 0}
+                    </div>
+                  </div>
+                  <div className="text-center p-4 bg-red-50 rounded-lg border-2 border-red-200">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <TbX className="w-6 h-6 text-red-600" />
+                      <span className="text-sm font-medium text-red-700">WRONG</span>
+                    </div>
+                    <div className="text-4xl font-black text-red-600">
+                      {(selectedReport.exam?.totalMarks || 0) - (getCorrectAnswersCount(selectedReport.result) || 0)}
+                    </div>
                   </div>
                 </div>
               </div>

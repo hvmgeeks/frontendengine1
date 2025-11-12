@@ -141,6 +141,7 @@ const ModernSidebar = ({ isOpen = false, setIsOpen = () => {} }) => {
     localStorage.removeItem("user");
     // Clear remembered credentials on explicit logout
     localStorage.removeItem('rememberedUser');
+    localStorage.removeItem('brainwave_remember_me');
     // Force page reload to clear all state
     window.location.href = "/";
   };

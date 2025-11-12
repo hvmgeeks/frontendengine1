@@ -628,60 +628,80 @@ const Forum = () => {
                     </div>
 
                     {/* Pagination */}
-                    {totalQuestions > 0 && (
+                    {totalQuestions > 0 && totalPages > 1 && (
                         <div className="forum-pagination">
-                            <div className="pagination-info">
-                                <span className="pagination-text">
-                                    Showing {startItem}-{endItem} of {totalQuestions} questions
-                                </span>
-                                {totalPages > 1 && (
-                                    <span className="pagination-pages">
-                                        Page {currentPage} of {totalPages}
-                                    </span>
-                                )}
-                            </div>
-                            {totalPages > 1 && (
-                                <div className="pagination-controls">
-                                    <Button
-                                        onClick={() => handlePageChange(currentPage - 1)}
-                                        disabled={currentPage === 1}
-                                        className="pagination-btn"
-                                    >
-                                        Previous
-                                    </Button>
+                            <div className="pagination-controls" style={{ gap: 0, flexWrap: 'nowrap' }}>
+                                <Button
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className="pagination-btn"
+                                    style={{
+                                        minWidth: window.innerWidth <= 320 ? '28px' : window.innerWidth <= 375 ? '30px' : window.innerWidth <= 425 ? '32px' : '40px',
+                                        padding: window.innerWidth <= 320 ? '0.3rem 0.4rem' : window.innerWidth <= 375 ? '0.35rem 0.45rem' : window.innerWidth <= 425 ? '0.4rem 0.5rem' : '0.5rem 0.75rem',
+                                        fontSize: window.innerWidth <= 320 ? '0.7rem' : window.innerWidth <= 375 ? '0.72rem' : window.innerWidth <= 425 ? '0.75rem' : '0.8rem',
+                                        margin: 0
+                                    }}
+                                >
+                                    Previous
+                                </Button>
 
-                                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                                        let pageNum;
-                                        if (totalPages <= 5) {
-                                            pageNum = i + 1;
-                                        } else if (currentPage <= 3) {
-                                            pageNum = i + 1;
-                                        } else if (currentPage >= totalPages - 2) {
-                                            pageNum = totalPages - 4 + i;
+                                {(() => {
+                                    // Show only 3 page numbers on small screens, 5 on larger screens
+                                    const maxButtons = window.innerWidth <= 425 ? 3 : 5;
+                                    let startPage, endPage;
+
+                                    if (totalPages <= maxButtons) {
+                                        startPage = 1;
+                                        endPage = totalPages;
+                                    } else {
+                                        const halfButtons = Math.floor(maxButtons / 2);
+
+                                        if (currentPage <= halfButtons + 1) {
+                                            startPage = 1;
+                                            endPage = maxButtons;
+                                        } else if (currentPage >= totalPages - halfButtons) {
+                                            startPage = totalPages - maxButtons + 1;
+                                            endPage = totalPages;
                                         } else {
-                                            pageNum = currentPage - 2 + i;
+                                            startPage = currentPage - halfButtons;
+                                            endPage = currentPage + halfButtons;
                                         }
+                                    }
 
+                                    return Array.from({ length: endPage - startPage + 1 }, (_, i) => {
+                                        const pageNum = startPage + i;
                                         return (
                                             <Button
                                                 key={pageNum}
                                                 onClick={() => handlePageChange(pageNum)}
                                                 className={`pagination-btn ${currentPage === pageNum ? 'active' : ''}`}
+                                                style={{
+                                                    minWidth: window.innerWidth <= 320 ? '28px' : window.innerWidth <= 375 ? '30px' : window.innerWidth <= 425 ? '32px' : '40px',
+                                                    padding: window.innerWidth <= 320 ? '0.3rem 0.4rem' : window.innerWidth <= 375 ? '0.35rem 0.45rem' : window.innerWidth <= 425 ? '0.4rem 0.5rem' : '0.5rem 0.75rem',
+                                                    fontSize: window.innerWidth <= 320 ? '0.7rem' : window.innerWidth <= 375 ? '0.72rem' : window.innerWidth <= 425 ? '0.75rem' : '0.8rem',
+                                                    margin: 0
+                                                }}
                                             >
                                                 {pageNum}
                                             </Button>
                                         );
-                                    })}
+                                    });
+                                })()}
 
-                                    <Button
-                                        onClick={() => handlePageChange(currentPage + 1)}
-                                        disabled={currentPage === totalPages}
-                                        className="pagination-btn"
-                                    >
-                                        Next
-                                    </Button>
-                                </div>
-                            )}
+                                <Button
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    className="pagination-btn"
+                                    style={{
+                                        minWidth: window.innerWidth <= 320 ? '28px' : window.innerWidth <= 375 ? '30px' : window.innerWidth <= 425 ? '32px' : '40px',
+                                        padding: window.innerWidth <= 320 ? '0.3rem 0.4rem' : window.innerWidth <= 375 ? '0.35rem 0.45rem' : window.innerWidth <= 425 ? '0.4rem 0.5rem' : '0.5rem 0.75rem',
+                                        fontSize: window.innerWidth <= 320 ? '0.7rem' : window.innerWidth <= 375 ? '0.72rem' : window.innerWidth <= 425 ? '0.75rem' : '0.8rem',
+                                        margin: 0
+                                    }}
+                                >
+                                    Next
+                                </Button>
+                            </div>
                         </div>
                     )}
                 </div>

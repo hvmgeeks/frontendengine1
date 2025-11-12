@@ -132,6 +132,7 @@ const AdminNavigation = () => {
       localStorage.removeItem('user');
       // Clear remembered credentials on explicit logout
       localStorage.removeItem('rememberedUser');
+      localStorage.removeItem('brainwave_remember_me');
       message.success('Logged out successfully');
       navigate('/login');
     } catch (error) {

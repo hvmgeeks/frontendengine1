@@ -70,37 +70,55 @@
 /* Responsive text sizing */
 @media (max-width: 480px) {
   .quiz-question-text {
-    font-size: 1rem;
-    line-height: 1.5;
+    font-size: 1.25rem !important;
+    line-height: 1.6 !important;
+    font-weight: 600 !important;
   }
-  
+
   .quiz-option-text {
-    font-size: 0.875rem;
-    line-height: 1.4;
+    font-size: 1.125rem !important;
+    line-height: 1.5 !important;
+  }
+
+  .quiz-option {
+    font-size: 1.125rem !important;
+    padding: 1rem !important;
   }
 }
 
 @media (min-width: 481px) and (max-width: 768px) {
   .quiz-question-text {
-    font-size: 1.125rem;
-    line-height: 1.6;
+    font-size: 1.375rem !important;
+    line-height: 1.7 !important;
+    font-weight: 600 !important;
   }
-  
+
   .quiz-option-text {
-    font-size: 1rem;
-    line-height: 1.5;
+    font-size: 1.25rem !important;
+    line-height: 1.6 !important;
+  }
+
+  .quiz-option {
+    font-size: 1.25rem !important;
+    padding: 1.125rem !important;
   }
 }
 
 @media (min-width: 769px) {
   .quiz-question-text {
-    font-size: 1.25rem;
-    line-height: 1.7;
+    font-size: 1.5rem !important;
+    line-height: 1.8 !important;
+    font-weight: 600 !important;
   }
-  
+
   .quiz-option-text {
-    font-size: 1rem;
-    line-height: 1.6;
+    font-size: 1.25rem !important;
+    line-height: 1.6 !important;
+  }
+
+  .quiz-option {
+    font-size: 1.25rem !important;
+    padding: 1.25rem !important;
   }
 }
 

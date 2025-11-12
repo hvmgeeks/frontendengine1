@@ -1,5 +1,5 @@
 import { Form, message, Input, Checkbox } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import './index.css';
 import Logo from '../../../assets/logo.png';
 import { useDispatch } from "react-redux";
@@ -7,6 +7,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { loginUser } from "../../../apicalls/users";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
 import { SetUser } from "../../../redux/usersSlice";
+import { saveCredentials, getCredentials, clearCredentials, hasStoredCredentials } from "../../../utils/secureStorage";
 
 function Login() {
   const navigate = useNavigate();
@@ -14,22 +15,97 @@ function Login() {
   const location = useLocation();
   const [form] = Form.useForm();
   const [rememberMe, setRememberMe] = useState(false);
+  const [autoLoginAttempted, setAutoLoginAttempted] = useState(false);
+  const autoLoginInProgress = useRef(false);
 
-  // Check for saved credentials on component mount
+  // Auto-login with saved credentials on component mount
   useEffect(() => {
-    const savedCredentials = localStorage.getItem('rememberedUser');
-    if (savedCredentials) {
-      try {
-        const { email, rememberMe: wasRemembered } = JSON.parse(savedCredentials);
-        if (wasRemembered) {
-          form.setFieldsValue({ email });
-          setRememberMe(true);
-        }
-      } catch (error) {
-        console.error('Error loading saved credentials:', error);
+    const attemptAutoLogin = async () => {
+      // Prevent multiple auto-login attempts
+      if (autoLoginInProgress.current || autoLoginAttempted) {
+        return;
       }
-    }
-  }, [form]);
+
+      // Don't auto-login if coming from registration with pre-filled data
+      if (location.state?.autoFill) {
+        setAutoLoginAttempted(true);
+        return;
+      }
+
+      // Check if user is already logged in
+      const existingToken = localStorage.getItem('token');
+      const existingUser = localStorage.getItem('user');
+      if (existingToken && existingUser) {
+        console.log('✅ User already logged in, redirecting...');
+        try {
+          const user = JSON.parse(existingUser);
+          dispatch(SetUser(user));
+          if (user.isAdmin) {
+            navigate("/admin/dashboard");
+          } else {
+            navigate("/user/hub");
+          }
+        } catch (error) {
+          console.error('Error parsing existing user:', error);
+        }
+        setAutoLoginAttempted(true);
+        return;
+      }
+
+      // Try auto-login with saved credentials
+      if (hasStoredCredentials()) {
+        autoLoginInProgress.current = true;
+        console.log('🔐 Found saved credentials, attempting auto-login...');
+
+        const credentials = getCredentials();
+        if (credentials && credentials.email && credentials.password) {
+          try {
+            dispatch(ShowLoading());
+            const response = await loginUser({
+              email: credentials.email,
+              password: credentials.password
+            });
+            dispatch(HideLoading());
+
+            if (response.success) {
+              console.log('✅ Auto-login successful!');
+
+              // Store authentication data
+              localStorage.setItem("token", response.data);
+              if (response.response) {
+                localStorage.setItem("user", JSON.stringify(response.response));
+                dispatch(SetUser(response.response));
+              }
+
+              message.success('Welcome back! Auto-login successful.', 2);
+
+              // Navigate based on user role
+              if (response.response?.isAdmin) {
+                navigate("/admin/dashboard");
+              } else {
+                navigate("/user/hub");
+              }
+            } else {
+              console.log('⚠️ Auto-login failed:', response.message);
+              // Clear invalid credentials
+              clearCredentials();
+              // Pre-fill email for manual login
+              form.setFieldsValue({ email: credentials.email });
+            }
+          } catch (error) {
+            console.error('❌ Auto-login error:', error);
+            dispatch(HideLoading());
+            clearCredentials();
+          }
+        }
+        autoLoginInProgress.current = false;
+      }
+
+      setAutoLoginAttempted(true);
+    };
+
+    attemptAutoLogin();
+  }, [form, dispatch, navigate, location.state, autoLoginAttempted]);
 
   // Handle pre-filled data from registration
   useEffect(() => {
@@ -83,18 +159,18 @@ function Login() {
           console.log('✅ User data set in Redux');
         }
 
-        // Handle "Remember Me" functionality
+        // Handle "Remember Me" functionality with secure storage
         if (rememberMe) {
-          const credentialsToSave = {
-            email: values.email,
-            rememberMe: true,
-            timestamp: Date.now()
-          };
-          localStorage.setItem('rememberedUser', JSON.stringify(credentialsToSave));
-          console.log('✅ User credentials saved for auto-login');
+          const saved = saveCredentials(values.email, values.password);
+          if (saved) {
+            console.log('✅ User credentials saved securely for auto-login');
+          } else {
+            console.error('❌ Failed to save credentials');
+          }
         } else {
           // Remove saved credentials if "Remember Me" is unchecked
-          localStorage.removeItem('rememberedUser');
+          clearCredentials();
+          console.log('🗑️ Credentials cleared (Remember Me unchecked)');
         }
 
         // Verify storage immediately

@@ -267,3 +267,13 @@ export const getAllStudyMaterials = async (filters = {}) => {
         return error.response;
     }
 }
+
+// Like/unlike a video
+export const likeVideo = async (videoId) => {
+    try {
+        const response = await axiosInstance.post(`/api/study/like-video/${videoId}`);
+        return response.data;
+    } catch (error) {
+        return error.response?.data || { success: false, message: "Failed to like video" };
+    }
+}

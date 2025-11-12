@@ -94,6 +94,7 @@ export const useAIAuth = () => {
     localStorage.removeItem('user');
     // Clear remembered credentials on explicit logout
     localStorage.removeItem('rememberedUser');
+    localStorage.removeItem('brainwave_remember_me');
     setIsAuthenticated(false);
     setHasAIAccess(false);
     setUser(null);

@@ -275,7 +275,8 @@ function VideoLessons() {
     // For AWS S3 URLs, get signed URL from backend
     if (videoUrl.includes('amazonaws.com') || videoUrl.includes('s3.')) {
       try {
-        const response = await fetch(`http://localhost:5000/api/study/video-signed-url?videoUrl=${encodeURIComponent(videoUrl)}`, {
+        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+        const response = await fetch(`${apiUrl}/api/study/video-signed-url?videoUrl=${encodeURIComponent(videoUrl)}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

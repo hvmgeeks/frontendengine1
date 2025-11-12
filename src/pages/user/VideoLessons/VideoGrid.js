@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { FaPlayCircle, FaGraduationCap } from 'react-icons/fa';
 import { TbInfoCircle } from 'react-icons/tb';
 import { MdVerified } from 'react-icons/md';
+import { Avatar } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
 
 const VideoGrid = ({
   paginatedVideos,
@@ -24,7 +26,8 @@ const VideoGrid = ({
   handleLikeComment,
   handleDeleteComment,
   formatTimeAgo,
-  user
+  user,
+  handleLikeVideo
 }) => {
   // Mobile detection state
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
@@ -186,8 +189,28 @@ const VideoGrid = ({
                       >
                         💬 Comments ({getCurrentVideoComments().length})
                       </button>
-                      <button className="youtube-action-btn-small">
-                        👍 Like
+                      <button
+                        className={`youtube-action-btn-small ${video.likedBy?.includes(user?._id) ? 'liked' : ''}`}
+                        onClick={() => handleLikeVideo(video._id || video.id)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
+                      >
+                        <span style={{ fontSize: '16px' }}>{video.likedBy?.includes(user?._id) ? '👍' : '👍'}</span>
+                        <span style={{
+                          fontSize: '14px',
+                          fontWeight: '700',
+                          color: '#ffffff',
+                          backgroundColor: '#000000',
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          minWidth: '30px',
+                          textAlign: 'center'
+                        }}>
+                          {video.likes || 0}
+                        </span>
                       </button>
                       <button
                         className="youtube-action-btn-small close-btn"
@@ -256,13 +279,22 @@ const VideoGrid = ({
                           ) : (
                             getCurrentVideoComments().map((comment) => (
                               <div key={comment._id || comment.id} className="youtube-comment">
-                                <div className="youtube-comment-avatar">
-                                  {comment.avatar || comment.author?.charAt(0)?.toUpperCase() || "A"}
-                                </div>
+                                <Avatar
+                                  src={comment.user?.profileImage || comment.avatar}
+                                  alt="profile"
+                                  size={40}
+                                  icon={<UserOutlined />}
+                                  style={{
+                                    flexShrink: 0,
+                                    backgroundColor: !comment.user?.profileImage && !comment.avatar ? '#667eea' : undefined
+                                  }}
+                                >
+                                  {!comment.user?.profileImage && !comment.avatar && (comment.author?.charAt(0)?.toUpperCase() || "A")}
+                                </Avatar>
                                 <div className="youtube-comment-content">
                                   <div className="youtube-comment-header">
                                     <span className="youtube-comment-author">{comment.author}</span>
-                                    {(comment.userRole === 'admin' || comment.isAdmin) && (
+                                    {(comment.user?.isAdmin || comment.userRole === 'admin' || comment.isAdmin) && (
                                       <MdVerified style={{ color: '#1d9bf0', fontSize: '12px', marginLeft: '4px' }} title="Verified Admin" />
                                     )}
                                     <span className="youtube-comment-time">
@@ -276,9 +308,27 @@ const VideoGrid = ({
                                     <button
                                       onClick={() => handleLikeComment(comment._id || comment.id)}
                                       className={`youtube-comment-action ${comment.likedBy?.includes(user?._id) ? 'liked' : ''}`}
+                                      style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px'
+                                      }}
                                     >
-                                      <span>{comment.likedBy?.includes(user?._id) ? '👍' : '👍'}</span>
-                                      {comment.likes > 0 && <span>{comment.likes}</span>}
+                                      <span style={{ fontSize: '16px' }}>{comment.likedBy?.includes(user?._id) ? '👍' : '👍'}</span>
+                                      <span style={{
+                                        marginLeft: '2px',
+                                        fontSize: '15px',
+                                        fontWeight: '700',
+                                        color: '#ffffff',
+                                        backgroundColor: comment.likedBy?.includes(user?._id) ? 'rgba(59, 130, 246, 0.8)' : 'rgba(0, 0, 0, 0.7)',
+                                        padding: '2px 8px',
+                                        borderRadius: '4px',
+                                        minWidth: '30px',
+                                        textAlign: 'center',
+                                        textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)'
+                                      }}>
+                                        {comment.likes || 0}
+                                      </span>
                                     </button>
                                     <button className="youtube-comment-action">
                                       {isKiswahili ? 'Jibu' : 'Reply'}
