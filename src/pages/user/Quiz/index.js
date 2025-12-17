@@ -12,16 +12,19 @@ import {
   TbBrain,
   TbTarget,
   TbCheck,
-
   TbStar,
   TbHome,
   TbBolt,
   TbX,
-  TbBook
+  TbBook,
+  TbDownload,
+  TbCheck as TbCheckCircle
 } from 'react-icons/tb';
 import { getAllExams, getExamById } from '../../../apicalls/exams';
 import { getAllReportsByUser } from '../../../apicalls/reports';
 import { HideLoading, ShowLoading } from '../../../redux/loaderSlice';
+import { downloadQuizForOffline, isQuizDownloaded, getAllOfflineQuizzes } from '../../../utils/offlineQuiz';
+import ModernQuizCard from '../../../components/modern/QuizCard';
 import './animations.css';
 
 // Function to normalize subject names for primary level
@@ -274,6 +277,14 @@ const Quiz = () => {
         console.log('🔄 Bypassing cache due to force refresh flag');
       }
 
+      // Check if offline - skip fetching results from server
+      const isOnline = navigator.onLine;
+      if (!isOnline) {
+        console.log('📡 Offline mode - skipping user results fetch from server');
+        // Keep existing cached results if available
+        return;
+      }
+
       const response = await getAllReportsByUser({ userId: user._id });
 
       if (response.success) {
@@ -335,6 +346,68 @@ const Quiz = () => {
         const cacheTimeKey = `user_exams_cache_time_${userLevel}`;
         const memoryCacheKey = `exams_${userLevel}`;
 
+        // Check if offline FIRST - load from IndexedDB only
+        const isOnline = navigator.onLine;
+        if (!isOnline) {
+          console.log('📡 Offline mode detected - loading downloaded quizzes from IndexedDB...');
+          try {
+            const offlineQuizzes = await getAllOfflineQuizzes();
+            if (offlineQuizzes && offlineQuizzes.length > 0) {
+              console.log(`✅ Loaded ${offlineQuizzes.length} quizzes from offline storage`);
+
+              // Convert offline quiz format to match expected format
+              const formattedQuizzes = offlineQuizzes.map(quiz => ({
+                _id: quiz.id,
+                name: quiz.name,
+                description: quiz.description,
+                duration: quiz.duration,
+                category: quiz.category,
+                subject: quiz.subject,
+                topic: quiz.topic,
+                level: quiz.level,
+                class: quiz.class,
+                totalMarks: quiz.totalMarks,
+                passingMarks: quiz.passingMarks,
+                passingPercentage: quiz.passingPercentage,
+                difficulty: quiz.difficulty,
+                difficultyLevel: quiz.difficultyLevel,
+                questions: quiz.questions,
+                totalQuestions: quiz.totalQuestions,
+                createdBy: quiz.createdBy,
+                createdAt: quiz.createdAt,
+                updatedAt: quiz.updatedAt
+              }));
+
+              // Build userResults map from stored offline quiz results
+              const offlineUserResults = {};
+              offlineQuizzes.forEach(quiz => {
+                if (quiz.userResult) {
+                  offlineUserResults[quiz.id] = quiz.userResult;
+                }
+              });
+
+              setExams(formattedQuizzes);
+              setUserResults(offlineUserResults); // Set user results from offline storage
+              setLastRefresh(new Date());
+              setLoading(false);
+              message.info('📡 Offline mode: Showing downloaded quizzes only');
+              return;
+            } else {
+              message.warning('📡 No quizzes available offline. Please download quizzes when online.');
+              setExams([]);
+              setLoading(false);
+              return;
+            }
+          } catch (error) {
+            console.error('Error loading offline quizzes:', error);
+            message.error('Failed to load offline quizzes');
+            setExams([]);
+            setLoading(false);
+            return;
+          }
+        }
+
+        // Online mode - check cache first, then fetch from API
         // Check memory cache first for instant loading
         const memoryCache = examCache[memoryCacheKey];
         if (memoryCache && (Date.now() - memoryCache.timestamp) < 600000) {
@@ -376,7 +449,7 @@ const Quiz = () => {
           }
         }
 
-        // Fetch from API as last resort
+        // Fetch from API when online
         console.log('🌐 Loading quizzes from API...');
         dispatch(ShowLoading());
         const response = await getAllExams();
@@ -838,7 +911,7 @@ const Quiz = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">{isKiswahili ? 'Inapakia mitihani...' : 'Loading quizzes...'}</p>
@@ -891,13 +964,32 @@ const Quiz = () => {
         }
       `}</style>
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 quiz-container-immediate">
-        <div className="container mx-auto px-3 sm:px-4 lg:px-8 pt-3 pb-3 sm:pb-4 lg:pb-6">
+      <div className="min-h-screen quiz-container-immediate relative overflow-hidden"
+           style={{
+             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+             fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif',
+           }}>
+        {/* Glassmorphism Background Pattern */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl -translate-x-48 -translate-y-48"></div>
+          <div className="absolute top-1/4 right-0 w-96 h-96 bg-purple-300 rounded-full blur-3xl translate-x-48"></div>
+          <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-pink-300 rounded-full blur-3xl translate-y-48"></div>
+          <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-blue-300 rounded-full blur-3xl -translate-x-48 -translate-y-48"></div>
+        </div>
+
+        <div className="container mx-auto px-3 sm:px-4 lg:px-8 pt-3 pb-3 sm:pb-4 lg:pb-6 relative z-10">
 
 
-        {/* Compact Search and Filter with User Level */}
+        {/* Compact Search and Filter with User Level - Glassmorphism */}
         <div className="max-w-4xl mx-auto mb-3 sm:mb-4 opacity-100">
-          <div className="bg-white rounded-xl shadow-md p-3 sm:p-4">
+          <div className="rounded-xl shadow-2xl p-3 sm:p-4"
+               style={{
+                 background: 'rgba(255, 255, 255, 0.25)',
+                 backdropFilter: 'blur(20px) saturate(180%)',
+                 WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                 border: '1px solid rgba(255, 255, 255, 0.3)',
+                 boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+               }}>
             {/* User Level and Quiz Count */}
             <div className="flex flex-col sm:flex-row items-center justify-between mb-3 pb-3 border-b border-gray-100">
               <div className="flex items-center gap-4 text-sm text-gray-600">
@@ -942,21 +1034,39 @@ const Quiz = () => {
                     <button
                       key={category}
                       onClick={() => handleSubjectChange(category)}
-                      className={`mobile-category-button flex items-center gap-1 md:gap-2 px-2 py-1.5 md:px-4 md:py-2.5 rounded-lg md:rounded-xl font-medium transition-all duration-200 whitespace-nowrap ${
-                        selectedSubject === category
-                          ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25 md:transform md:scale-105'
-                          : 'bg-white text-gray-700 border border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 shadow-sm hover:shadow-md'
-                      }`}
+                      className="mobile-category-button flex items-center gap-1 md:gap-2 px-2 py-1.5 md:px-4 md:py-2.5 rounded-lg md:rounded-xl font-medium transition-all duration-200 whitespace-nowrap"
+                      style={selectedSubject === category ? {
+                        background: 'rgba(59, 130, 246, 0.9)',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.3)',
+                        color: 'white',
+                        boxShadow: '0 8px 16px rgba(59, 130, 246, 0.3)',
+                        transform: 'scale(1.05)'
+                      } : {
+                        background: 'rgba(255, 255, 255, 0.4)',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.5)',
+                        color: '#1f2937',
+                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                      }}
                     >
                       <TbBook className={`h-3 w-3 md:h-4 md:w-4 ${
                         selectedSubject === category ? 'text-white' : 'text-blue-600'
                       }`} />
                       <span className="text-xs md:text-sm category-button-text">{category}</span>
-                      <span className={`category-count px-1.5 py-0.5 md:px-2 md:py-1 rounded-full text-xs font-bold ${
-                        selectedSubject === category
-                          ? 'bg-white/20 text-white'
-                          : 'bg-orange-100 text-orange-700'
-                      }`}>
+                      <span
+                        className="category-count px-1.5 py-0.5 md:px-2 md:py-1 rounded-full text-xs font-bold"
+                        style={selectedSubject === category ? {
+                          background: 'rgba(255, 255, 255, 0.25)',
+                          color: 'white'
+                        } : {
+                          background: 'rgba(251, 146, 60, 0.3)',
+                          color: '#ea580c',
+                          fontWeight: '700'
+                        }}
+                      >
                         {count}
                       </span>
                     </button>
@@ -1050,14 +1160,13 @@ const Quiz = () => {
             <>
               <div className="quiz-grid">
                 {filteredExams.map((quiz, index) => (
-                  <QuizCard
+                  <ModernQuizCard
                     key={quiz._id}
                     quiz={quiz}
                     userResult={userResults[quiz._id]}
                     showResults={true}
                     onStart={handleQuizStart}
-                    onPreload={preloadQuizData}
-                    index={index}
+                    className="h-full"
                   />
                 ))}
               </div>
@@ -1070,357 +1179,5 @@ const Quiz = () => {
     </>
   );
 };
-
-// Optimized QuizCard component with React.memo and hover preloading
-const QuizCard = React.memo(({ quiz, userResult, onStart, onPreload, index }) => {
-  const { isKiswahili, getClassName } = useLanguage();
-
-  // Preload on hover for instant access
-  const handleMouseEnter = () => {
-    if (onPreload && quiz._id) {
-      onPreload(quiz._id);
-    }
-  };
-
-  const formatTime = (seconds) => {
-    if (!seconds) return 'N/A';
-    const minutes = Math.round(seconds / 60);
-    return `${minutes} ${isKiswahili ? 'dak' : 'min'}`;
-  };
-
-  const formatCompletionTime = (timeInSeconds) => {
-    // Handle different possible time formats
-    if (!timeInSeconds && timeInSeconds !== 0) return '0s';
-
-    let totalSeconds = timeInSeconds;
-
-    // If it's a string, try to parse it
-    if (typeof timeInSeconds === 'string') {
-      totalSeconds = parseInt(timeInSeconds, 10);
-    }
-
-    // If it's still not a valid number, return 0s
-    if (isNaN(totalSeconds) || totalSeconds < 0) return '0s';
-
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-
-    if (minutes > 0) {
-      return `${minutes}m ${seconds}s`;
-    }
-    return `${timeInSeconds}s`;
-  };
-
-  // Safety checks for quiz object
-  if (!quiz || typeof quiz !== 'object') {
-    return (
-      <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-        <p className="text-gray-500">Invalid quiz data</p>
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className="rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-3 transform hover:scale-105 opacity-100 relative flex flex-col"
-      style={{
-        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%)',
-        border: userResult
-          ? (userResult.verdict === 'Pass' ? '2px solid #10b981' : '2px solid #ef4444')
-          : '2px solid #3b82f6',
-        boxShadow: userResult
-          ? (userResult.verdict === 'Pass'
-              ? '0 8px 20px rgba(16, 185, 129, 0.3)'
-              : '0 8px 20px rgba(239, 68, 68, 0.3)')
-          : '0 8px 20px rgba(59, 130, 246, 0.3)',
-        minHeight: window.innerWidth <= 768 ? '240px' : '320px',
-        height: 'auto'
-      }}
-      onMouseEnter={handleMouseEnter}
-    >
-      {/* Quiz Title - At Top */}
-      <div className="mb-2 text-center">
-        <h3
-          className="font-bold mb-1 line-clamp-2"
-          style={{
-            color: '#1f2937',
-            textShadow: '0 1px 2px rgba(0,0,0,0.1)',
-            lineHeight: '1.1',
-            fontSize: window.innerWidth <= 768 ? '14px' : '16px'
-          }}
-        >
-          {typeof quiz.name === 'string' ? quiz.name : 'Untitled Quiz'}
-        </h3>
-      </div>
-
-      {/* Status Tags - Centered */}
-      <div className="mb-2 text-center">
-        {userResult ? (
-          <div className="flex items-center justify-center gap-1">
-            <div
-              className="px-2 py-1 rounded-full text-xs font-bold text-white shadow-md"
-              style={{
-                backgroundColor: userResult.verdict === 'Pass' ? '#10b981' : '#ef4444',
-                fontSize: window.innerWidth <= 768 ? '9px' : '10px'
-              }}
-            >
-              {userResult.verdict === 'Pass' ? '✅ PASSED' : '❌ FAILED'}
-            </div>
-            <div
-              className="px-2 py-1 rounded-full text-xs font-bold text-center shadow-md"
-              style={{
-                backgroundColor: '#ffffff',
-                color: '#1f2937',
-                fontSize: window.innerWidth <= 768 ? '9px' : '10px'
-              }}
-            >
-              {typeof userResult.percentage === 'number' ? userResult.percentage : 0}%
-            </div>
-          </div>
-        ) : (
-          <div
-            className="px-2 py-1 rounded-full text-xs font-bold text-white shadow-md"
-            style={{
-              backgroundColor: '#3b82f6',
-              fontSize: window.innerWidth <= 768 ? '9px' : '10px'
-            }}
-          >
-            🆕 NOT ATTEMPTED
-          </div>
-        )}
-      </div>
-
-      <div className="text-center mb-6">
-        <div className="flex-1">
-
-          {/* Questions and Duration - Horizontal */}
-          <div className="flex gap-1 mb-2 justify-center">
-            <div
-              className="flex items-center gap-1 rounded-lg py-1 px-2 border shadow-sm"
-              style={{
-                background: 'linear-gradient(to right, #eff6ff, #e0e7ff)',
-                borderColor: '#bfdbfe'
-              }}
-            >
-              <TbQuestionMark className="w-3 h-3" style={{ color: '#2563eb' }} />
-              <span
-                className="font-bold"
-                style={{
-                  color: '#1e40af',
-                  fontSize: window.innerWidth <= 768 ? '11px' : '12px'
-                }}
-              >
-                {Array.isArray(quiz.questions) ? quiz.questions.length : 0}
-              </span>
-            </div>
-            <div
-              className="flex items-center gap-1 rounded-lg py-1 px-2 border shadow-sm"
-              style={{
-                background: 'linear-gradient(to right, #fdf4ff, #fce7f3)',
-                borderColor: '#e9d5ff'
-              }}
-            >
-              <TbClock className="w-3 h-3" style={{ color: '#9333ea' }} />
-              <span
-                className="font-bold"
-                style={{
-                  color: '#7c3aed',
-                  fontSize: window.innerWidth <= 768 ? '11px' : '12px'
-                }}
-              >
-                3m
-              </span>
-            </div>
-          </div>
-
-
-
-          <div className="flex items-center justify-center gap-1 flex-wrap mb-2">
-            {/* Level Tag */}
-            <span
-              className="inline-block px-1 py-1 font-bold rounded-full text-white shadow-sm"
-              style={{
-                background: 'linear-gradient(to right, #8b5cf6, #7c3aed)',
-                fontSize: window.innerWidth <= 768 ? '8px' : '10px'
-              }}
-            >
-              🎯{quiz.level || 'Primary'}
-            </span>
-
-            {/* Class Tag */}
-            <span
-              className="inline-block px-1 py-1 font-bold rounded-full text-white shadow-sm"
-              style={{
-                background: 'linear-gradient(to right, #4ade80, #3b82f6)',
-                fontSize: window.innerWidth <= 768 ? '8px' : '10px'
-              }}
-            >
-              📖{typeof quiz.class === 'string' || typeof quiz.class === 'number' ?
-                (quiz.level === 'primary' || quiz.level === 'primary_kiswahili' ?
-                  (isKiswahili ? `Darasa la ${quiz.class}` : `Class ${quiz.class}`) :
-                  quiz.class) : 'N/A'}
-            </span>
-
-            {/* Category Tag */}
-            <span
-              className="inline-block px-1 py-1 font-bold rounded-full text-white shadow-sm"
-              style={{
-                background: 'linear-gradient(to right, #f97316, #ea580c)',
-                fontSize: window.innerWidth <= 768 ? '8px' : '10px'
-              }}
-            >
-              📂{quiz.category || 'General'}
-            </span>
-
-            {/* Topic Tag - Show actual topic or "General" if not defined */}
-            <span
-              className="inline-block px-1 py-1 font-bold rounded-full text-white shadow-sm"
-              style={{
-                background: quiz.topic && quiz.topic !== 'General' && quiz.topic !== ''
-                  ? 'linear-gradient(to right, #10b981, #059669)'
-                  : 'linear-gradient(to right, #6b7280, #4b5563)',
-                fontSize: window.innerWidth <= 768 ? '8px' : '10px'
-              }}
-            >
-              📚{quiz.topic || (isKiswahili ? 'Jumla' : 'General')}
-            </span>
-          </div>
-        </div>
-      </div>
-
-
-
-      {userResult && typeof userResult === 'object' && (
-        <div
-          className="mb-2 p-2 rounded-lg border shadow-md"
-          style={{
-            background: userResult.verdict === 'Pass'
-              ? 'linear-gradient(to bottom right, #f0fdf4, #ecfdf5)'
-              : 'linear-gradient(to bottom right, #fef2f2, #fdf2f8)',
-            borderColor: userResult.verdict === 'Pass' ? '#86efac' : '#fca5a5'
-          }}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              {userResult.verdict === 'Pass' ? (
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg border-2 animate-pulse"
-                  style={{
-                    background: 'linear-gradient(to right, #10b981, #059669)',
-                    borderColor: '#86efac'
-                  }}
-                >
-                  <TbCheck className="w-6 h-6 font-bold" style={{ color: '#ffffff' }} />
-                </div>
-              ) : (
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg border-2 animate-pulse"
-                  style={{
-                    background: 'linear-gradient(to right, #ef4444, #dc2626)',
-                    borderColor: '#fca5a5'
-                  }}
-                >
-                  <TbX className="w-6 h-6 font-bold" style={{ color: '#ffffff' }} />
-                </div>
-              )}
-              <div>
-                <span className="text-lg font-bold" style={{ color: '#1f2937' }}>🏆 Last Result</span>
-                <div className="text-sm" style={{ color: '#6b7280' }}>
-                  {new Date(userResult.completedAt || userResult.createdAt || Date.now()).toLocaleDateString()}
-                </div>
-              </div>
-            </div>
-            <span
-              className="text-3xl font-bold shadow-lg"
-              style={{
-                color: userResult.verdict === 'Pass' ? '#059669' : '#dc2626'
-              }}
-            >
-              {typeof userResult.percentage === 'number' ? userResult.percentage : 0}%
-            </span>
-          </div>
-
-          {/* Horizontal Layout for Results */}
-          <div className="flex gap-1 justify-center flex-wrap">
-            {/* Correct/Wrong - Horizontal */}
-            <div
-              className="flex items-center gap-1 rounded-lg py-1 px-2 border shadow-md"
-              style={{
-                background: 'linear-gradient(to right, #dcfce7, #fecaca)',
-                borderColor: '#86efac'
-              }}
-            >
-              <div className="flex items-center gap-1">
-                <TbCheck className="w-3 h-3" style={{ color: '#16a34a' }} />
-                <span className="text-sm font-bold" style={{ color: '#15803d' }}>
-                  {typeof userResult.correctAnswers === 'number' ? userResult.correctAnswers : 0}
-                </span>
-              </div>
-              <div className="flex items-center gap-1">
-                <TbX className="w-3 h-3" style={{ color: '#dc2626' }} />
-                <span className="text-sm font-bold" style={{ color: '#b91c1c' }}>
-                  {(quiz.questions?.length || 0) - (typeof userResult.correctAnswers === 'number' ? userResult.correctAnswers : 0)}
-                </span>
-              </div>
-            </div>
-
-            {/* XP */}
-            <div
-              className="flex items-center gap-1 rounded-lg py-1 px-2 border shadow-md"
-              style={{
-                background: 'linear-gradient(to bottom right, #fef3c7, #fed7aa)',
-                borderColor: '#fde047'
-              }}
-            >
-              <span className="text-sm">⭐</span>
-              <span className="text-sm font-bold" style={{ color: '#92400e' }}>
-                {userResult.xpEarned || userResult.points || 0}
-              </span>
-            </div>
-
-            {/* Time - Horizontal if available */}
-            {userResult.timeTaken && userResult.timeTaken > 0 && (
-              <div
-                className="flex items-center gap-1 rounded-lg py-1 px-2 border shadow-md"
-                style={{
-                  background: 'linear-gradient(to bottom right, #e9d5ff, #f3e8ff)',
-                  borderColor: '#c4b5fd'
-                }}
-              >
-                <TbClock className="w-3 h-3" style={{ color: '#9333ea' }} />
-                <span className="text-sm font-bold" style={{ color: '#7c3aed' }}>
-                  {formatCompletionTime(userResult.timeTaken)}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Spacer to push buttons to bottom */}
-      <div className="flex-1"></div>
-
-      <div className="flex gap-2 mt-3">
-        {/* Main Action Button - Bigger for retake */}
-        <button
-          onClick={() => onStart(quiz)}
-          className="flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg font-bold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 text-white"
-          style={{
-            background: userResult
-              ? 'linear-gradient(to right, #f97316, #ef4444)'
-              : 'linear-gradient(to right, #3b82f6, #8b5cf6)',
-            fontSize: '13px',
-            minHeight: '36px'
-          }}
-        >
-          <TbPlayerPlay className="w-3 h-3" />
-          {userResult ? (isKiswahili ? '🔄 Rudia Mtihani' : '🔄 Retake Quiz') : (isKiswahili ? '🚀 Anza Mtihani' : '🚀 Start Quiz')}
-        </button>
-
-
-      </div>
-    </div>
-  );
-});
 
 export default Quiz;

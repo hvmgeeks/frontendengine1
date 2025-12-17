@@ -83,10 +83,63 @@ export const updateUserInfo = async (payload) => {
 
 export const updateUserPhoto = async (payload) => {
     try {
-        const response = await axiosInstance.post('/api/users/update-user-photo', payload);
+        console.log('📸 Uploading profile photo...');
+
+        // Check if token exists
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('❌ No token found - user not authenticated');
+            return {
+                success: false,
+                message: 'User not authenticated. Please login again.'
+            };
+        }
+
+        // Log token info for debugging
+        try {
+            const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+            const currentTime = Date.now() / 1000;
+            console.log('🔑 Token info:', {
+                userId: tokenPayload.userId,
+                expiresAt: new Date(tokenPayload.exp * 1000).toLocaleString(),
+                isExpired: tokenPayload.exp < currentTime
+            });
+
+            if (tokenPayload.exp < currentTime) {
+                console.error('❌ Token is expired');
+                return {
+                    success: false,
+                    message: 'Your session has expired. Please login again.'
+                };
+            }
+        } catch (e) {
+            console.error('❌ Invalid token format:', e);
+        }
+
+        const response = await axiosInstance.post('/api/users/update-user-photo', payload, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        });
+
+        console.log('✅ Profile photo upload response:', response.data);
         return response.data;
     } catch (error) {
-        return error.response.data;
+        console.error('❌ Profile photo upload error:', {
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            message: error.response?.data?.message || error.message,
+            data: error.response?.data
+        });
+
+        if (error.response?.data) {
+            return error.response.data;
+        }
+
+        return {
+            success: false,
+            message: error.message || 'Failed to upload profile photo'
+        };
     }
 }
 

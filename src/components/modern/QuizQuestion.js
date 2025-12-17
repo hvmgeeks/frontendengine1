@@ -95,7 +95,14 @@ const QuizQuestion = ({
                 </div>
               </div>
             )}
-            <div className="text-lg font-medium text-gray-900 dark:text-white">
+            <div
+              className="text-lg font-medium text-gray-900 dark:text-white"
+              style={{
+                fontSize: window.innerWidth <= 480 ? '1.5rem' : window.innerWidth <= 768 ? '1.75rem' : '1.875rem',
+                lineHeight: '1.8',
+                fontWeight: '600'
+              }}
+            >
               {question.name}
             </div>
           </div>
@@ -128,7 +135,14 @@ const QuizQuestion = ({
                 </div>
               </div>
             )}
-            <div className="text-lg font-medium text-gray-900 dark:text-white">
+            <div
+              className="text-lg font-medium text-gray-900 dark:text-white"
+              style={{
+                fontSize: window.innerWidth <= 480 ? '1.5rem' : window.innerWidth <= 768 ? '1.75rem' : '1.875rem',
+                lineHeight: '1.8',
+                fontWeight: '600'
+              }}
+            >
               {String(question.name || '')}
             </div>
             {!showResult ? (
@@ -186,7 +200,7 @@ const QuizQuestion = ({
             <div
               className="text-lg font-medium text-gray-900 dark:text-white"
               style={{
-                fontSize: window.innerWidth <= 480 ? '1.25rem' : window.innerWidth <= 768 ? '1.375rem' : '1.5rem',
+                fontSize: window.innerWidth <= 480 ? '1.5rem' : window.innerWidth <= 768 ? '1.75rem' : '1.875rem',
                 lineHeight: '1.8',
                 fontWeight: '600'
               }}

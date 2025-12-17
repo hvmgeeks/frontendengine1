@@ -23,6 +23,7 @@ function ProtectedRoute({ children }) {
   // Mobile menu state removed since header was removed
   const intervalRef = useRef(null);
   const heartbeatRef = useRef(null);
+  const paymentCheckDone = useRef(false); // Track if payment check has been done
   const { subscriptionData } = useSelector((state) => state.subscription);
   const { paymentVerificationNeeded } = useSelector((state) => state.payment);
   const dispatch = useDispatch();
@@ -60,7 +61,10 @@ function ProtectedRoute({ children }) {
   };
   const activeRoute = location.pathname;
 
-
+  // DISABLED - Reset payment check when route changes
+  // useEffect(() => {
+  //   paymentCheckDone.current = false;
+  // }, [activeRoute]);
 
 
 
@@ -91,6 +95,8 @@ function ProtectedRoute({ children }) {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    console.log("🔍 ProtectedRoute useEffect - Token exists:", !!token, "User exists:", !!user);
+
     if (token) {
       // Check if user data already exists in Redux (from login)
       if (!user) {
@@ -99,115 +105,31 @@ function ProtectedRoute({ children }) {
         if (storedUser) {
           try {
             const userData = JSON.parse(storedUser);
-            console.log("ProtectedRoute: Loading user from localStorage", { name: userData.name, isAdmin: userData.isAdmin });
+            console.log("✅ ProtectedRoute: Loading user from localStorage", { name: userData.name, isAdmin: userData.isAdmin });
             dispatch(SetUser(userData));
           } catch (error) {
-            console.log("ProtectedRoute: Error parsing stored user data, fetching from server");
+            console.log("❌ ProtectedRoute: Error parsing stored user data, fetching from server");
             getUserData();
           }
         } else {
-          console.log("ProtectedRoute: No user in Redux or localStorage, fetching from server");
+          console.log("⚠️ ProtectedRoute: No user in Redux or localStorage, fetching from server");
           getUserData();
         }
       } else {
-        console.log("ProtectedRoute: User already in Redux", { name: user.name, isAdmin: user.isAdmin });
+        console.log("✅ ProtectedRoute: User already in Redux", { name: user.name, isAdmin: user.isAdmin });
       }
     } else {
+      console.log("❌ ProtectedRoute: NO TOKEN FOUND - Redirecting to login");
       navigate("/login");
     }
   }, []);
 
 
 
-  useEffect(() => {
-    // Allow access to profile page, subscription page, and logout for all users
-    const allowedRoutes = ['/user/profile', '/profile', '/subscription', '/user/subscription', '/logout'];
-    const isAllowedRoute = allowedRoutes.some(route => activeRoute.includes(route));
-
-    // Check for recent payment success to avoid redirecting users who just paid
-    const paymentSuccess = localStorage.getItem('paymentSuccess');
-    let hasRecentPayment = false;
-
-    if (paymentSuccess) {
-      try {
-        const successData = JSON.parse(paymentSuccess);
-        const timeDiff = Date.now() - successData.timestamp;
-        // Consider payment recent if within last 5 minutes
-        hasRecentPayment = timeDiff < 300000; // 5 minutes
-      } catch (error) {
-        console.error('Error parsing payment success data:', error);
-        localStorage.removeItem('paymentSuccess');
-      }
-    }
-
-    // Redirect users without valid subscription to subscription page
-    // BUT skip redirect if they have recent payment success
-    if (isPaymentPending && !isAllowedRoute && !hasRecentPayment && !user?.isAdmin) {
-      console.log("Redirecting user to subscription page - no valid subscription found");
-
-      // Check if user had a subscription that expired
-      const hadSubscription = user?.subscriptionEndDate || subscriptionData?.endDate;
-
-      if (hadSubscription) {
-        // User had a subscription that expired
-        message.warning({
-          content: '⏰ Your subscription has expired! Please renew to continue accessing premium features.',
-          duration: 5,
-          style: { marginTop: '20vh' }
-        });
-      } else if (user?.paymentRequired) {
-        // User needs to complete payment
-        message.info({
-          content: '💳 Please complete your subscription to access premium features.',
-          duration: 4,
-          style: { marginTop: '20vh' }
-        });
-      } else {
-        // User needs to subscribe
-        message.info({
-          content: '🚀 Subscribe now to access all premium features and content!',
-          duration: 4,
-          style: { marginTop: '20vh' }
-        });
-      }
-
-      navigate('/subscription'); // Redirect to subscription page to choose plan
-    } else if (hasRecentPayment) {
-      console.log("🎉 Recent payment detected, allowing access to hub");
-
-      // Refresh user data to get updated subscription status
-      const refreshUserData = async () => {
-        try {
-          const token = localStorage.getItem('token');
-          if (token) {
-            const response = await fetch('/api/users/get-user-info', {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
-            });
-
-            if (response.ok) {
-              const userData = await response.json();
-              if (userData.success) {
-                // Update Redux state with fresh user data
-                dispatch(SetUser(userData.data));
-                console.log("✅ User data refreshed after payment");
-              }
-            }
-          }
-        } catch (error) {
-          console.error('Error refreshing user data:', error);
-        }
-      };
-
-      // Only refresh once per payment
-      const refreshKey = `refreshed_${paymentSuccess}`;
-      if (!localStorage.getItem(refreshKey)) {
-        refreshUserData();
-        localStorage.setItem(refreshKey, 'true');
-      }
-    }
-  }, [isPaymentPending, activeRoute, navigate, user]);
+  // DISABLED PAYMENT REDIRECT TO STOP REFRESH LOOP
+  // useEffect(() => {
+  //   // Payment check logic disabled temporarily
+  // }, [isPaymentPending, activeRoute]);
 
   // Helper function to check if subscription is expired
   const isSubscriptionExpired = (subscriptionData) => {
@@ -273,63 +195,20 @@ function ProtectedRoute({ children }) {
     }
   };
 
-  useEffect(() => {
-    // Always verify payment status for non-admin users
-    if (user && !user?.isAdmin) {
-      console.log("Effect Running - checking payment status for user:", user.name);
+  // DISABLED PAYMENT VERIFICATION TO STOP REFRESH LOOP
+  // useEffect(() => {
+  //   // Payment verification disabled temporarily
+  // }, [paymentVerificationNeeded]);
 
-      if (paymentVerificationNeeded) {
-        console.log('Starting payment verification timer...');
-        intervalRef.current = setInterval(() => {
-          console.log('Timer checking payment status...');
-          verifyPaymentStatus();
-        }, 15000);
-        dispatch(setPaymentVerificationNeeded(false));
-      }
-    } else if (user?.isAdmin) {
-      // Admins always have access
-      setIsPaymentPending(false);
-    }
-  }, [paymentVerificationNeeded, user]);
+  // DISABLED ROUTE CHANGE VERIFICATION TO STOP REFRESH LOOP
+  // useEffect(() => {
+  //   // Route change verification disabled temporarily
+  // }, [activeRoute]);
 
-  useEffect(() => {
-    // Always verify payment status for non-admin users on route change
-    if (user && !user?.isAdmin) {
-      console.log("Effect Running - verifying payment status on route change");
-      verifyPaymentStatus();
-    } else if (user?.isAdmin) {
-      // Admins always have access
-      setIsPaymentPending(false);
-    }
-  }, [user, activeRoute]);
-
-  // Online status management
-  useEffect(() => {
-    if (user && !user.isAdmin) {
-      // Set user as online when component mounts
-      setUserOnline().catch(console.error);
-
-      // Send heartbeat every 2 minutes
-      heartbeatRef.current = setInterval(() => {
-        sendHeartbeat().catch(console.error);
-      }, 120000); // 2 minutes
-
-      // Set user as offline when component unmounts or page unloads
-      const handleBeforeUnload = () => {
-        setUserOffline().catch(console.error);
-      };
-
-      window.addEventListener('beforeunload', handleBeforeUnload);
-
-      return () => {
-        if (heartbeatRef.current) {
-          clearInterval(heartbeatRef.current);
-        }
-        window.removeEventListener('beforeunload', handleBeforeUnload);
-        setUserOffline().catch(console.error);
-      };
-    }
-  }, [user]);
+  // DISABLED - Online status management (causing token loss)
+  // useEffect(() => {
+  //   // Online status management disabled
+  // }, []);
 
 
   // getButtonClass function removed since header was removed

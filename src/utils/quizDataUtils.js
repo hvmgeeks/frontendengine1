@@ -64,6 +64,7 @@ export const extractQuizData = (quiz) => {
     totalXP: safeNumber(quiz.xpPoints || quiz.totalXP || quiz.totalMarks, 100),
     subject: safeString(quiz.subject || quiz.category, 'General'),
     class: safeString(quiz.class, 'N/A'),
+    level: safeString(quiz.level, 'primary').toLowerCase(),
     difficulty: safeString(quiz.difficulty || quiz.difficultyLevel, 'medium'),
     category: safeString(quiz.category, 'General'),
     description: safeString(quiz.description, 'Test your knowledge with this quiz'),

@@ -23,7 +23,9 @@ const QuizResult = () => {
     quizName: 'Quiz',
     quizSubject: 'General',
     passingPercentage: 60,
-    verdict: 'Fail'
+    verdict: 'Fail',
+    offlineMode: false,
+    offlineMessage: ''
   };
 
   const {
@@ -36,7 +38,9 @@ const QuizResult = () => {
     quizSubject,
     passingPercentage,
     verdict,
-    resultDetails
+    resultDetails,
+    offlineMode,
+    offlineMessage
   } = resultData;
   const isPassed = verdict === 'Pass' || percentage >= (passingPercentage || 60);
 
@@ -856,6 +860,21 @@ const QuizResult = () => {
         padding: window.innerWidth <= 768 ? '16px' : window.innerWidth <= 1024 ? '24px' : '32px',
         maxWidth: window.innerWidth <= 768 ? '100%' : window.innerWidth <= 1024 ? '90%' : '800px'
       }}>
+        {/* Offline Mode Banner */}
+        {offlineMode && (
+          <div className="mb-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-400 rounded-xl shadow-lg">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">📡</span>
+              <div className="flex-1">
+                <h3 className="font-bold text-yellow-800 text-lg mb-1">Offline Mode</h3>
+                <p className="text-yellow-700 text-sm">
+                  {offlineMessage || 'Quiz marked offline. Results will sync when you reconnect to the internet.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div
           className="text-center"
@@ -898,7 +917,10 @@ const QuizResult = () => {
                   className="animate-celebration"
                   style={{ fontSize: window.innerWidth <= 320 ? '52px' : window.innerWidth <= 375 ? '56px' : window.innerWidth <= 425 ? '60px' : window.innerWidth <= 768 ? '64px' : '72px' }}
                 >🎉</span>
-                <span className="animate-rainbow-glow animate-elegant">Congratulations!</span>
+                <span
+                  className="animate-rainbow-glow animate-elegant"
+                  style={{ fontSize: window.innerWidth <= 320 ? '28px' : window.innerWidth <= 375 ? '32px' : window.innerWidth <= 425 ? '36px' : window.innerWidth <= 768 ? '40px' : '48px', fontWeight: '700' }}
+                >Congratulations!</span>
                 <span
                   className="animate-celebration"
                   style={{ fontSize: window.innerWidth <= 320 ? '52px' : window.innerWidth <= 375 ? '56px' : window.innerWidth <= 425 ? '60px' : window.innerWidth <= 768 ? '64px' : '72px' }}
@@ -913,7 +935,10 @@ const QuizResult = () => {
                   className="animate-premium-pulse"
                   style={{ fontSize: window.innerWidth <= 320 ? '52px' : window.innerWidth <= 375 ? '56px' : window.innerWidth <= 425 ? '60px' : window.innerWidth <= 768 ? '64px' : '72px' }}
                 >💪</span>
-                <span className="animate-red-glow animate-elegant">Keep Going!</span>
+                <span
+                  className="animate-red-glow animate-elegant"
+                  style={{ fontSize: window.innerWidth <= 320 ? '28px' : window.innerWidth <= 375 ? '32px' : window.innerWidth <= 425 ? '36px' : window.innerWidth <= 768 ? '40px' : '48px', fontWeight: '700' }}
+                >Keep Going!</span>
                 <span
                   className="animate-premium-pulse"
                   style={{ fontSize: window.innerWidth <= 320 ? '52px' : window.innerWidth <= 375 ? '56px' : window.innerWidth <= 425 ? '60px' : window.innerWidth <= 768 ? '64px' : '72px' }}
@@ -929,7 +954,7 @@ const QuizResult = () => {
                 : 'animate-premium-pulse animate-red-glow'
             }`}
             style={{
-              fontSize: window.innerWidth <= 320 ? '36px' : window.innerWidth <= 375 ? '40px' : window.innerWidth <= 425 ? '44px' : window.innerWidth <= 768 ? '48px' : window.innerWidth <= 1024 ? '52px' : '56px'
+              fontSize: window.innerWidth <= 320 ? '44px' : window.innerWidth <= 375 ? '48px' : window.innerWidth <= 425 ? '52px' : window.innerWidth <= 768 ? '56px' : window.innerWidth <= 1024 ? '60px' : '64px'
             }}
           >
             {isPassed ? (
@@ -1248,8 +1273,8 @@ const QuizResult = () => {
                         </div>
                       )}
 
-                      {/* Explanation Button for Wrong Answers */}
-                      {!detail.isCorrect && (
+                      {/* Explanation Button for Wrong Answers - Only in Online Mode */}
+                      {!detail.isCorrect && !offlineMode && (
                         <div className="mt-3">
                           <button
                             className={`w-full font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
@@ -1285,6 +1310,18 @@ const QuizResult = () => {
                               </div>
                             </div>
                           )}
+                        </div>
+                      )}
+
+                      {/* Offline Mode Message for Wrong Answers */}
+                      {!detail.isCorrect && offlineMode && (
+                        <div className="mt-3 p-4 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xl">📡</span>
+                            <p className="text-yellow-800 font-medium text-sm">
+                              Explanations are not available in offline mode. Connect to the internet to get AI-powered explanations.
+                            </p>
+                          </div>
                         </div>
                       )}
                     </div>

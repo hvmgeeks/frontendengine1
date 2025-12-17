@@ -1,15 +1,32 @@
 {
-  "short_name": "BRAINWAVE",
-  "name": "BRAINWAVE",
+  "short_name": "Brainwave",
+  "name": "Brainwave - AI Learning Platform",
+  "description": "AI-powered learning platform with offline support for study materials, videos, and chat",
   "icons": [
     {
       "src": "favicon.png",
       "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "type": "image/png"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "orientation": "portrait-primary",
+  "theme_color": "#007BFF",
+  "background_color": "#ffffff",
+  "categories": ["education", "productivity"],
+  "prefer_related_applications": false
 }

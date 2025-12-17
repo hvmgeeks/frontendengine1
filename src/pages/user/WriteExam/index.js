@@ -105,10 +105,10 @@ const MinimalQuizRenderer = ({ question, questionIndex, totalQuestions, selected
           {/* Question Text with Math Support */}
           <div style={{ marginBottom: '32px' }}>
             <div style={{
-              fontSize: '20px',
-              fontWeight: '500',
+              fontSize: window.innerWidth <= 480 ? '24px' : window.innerWidth <= 768 ? '28px' : '30px',
+              fontWeight: '600',
               color: '#111827',
-              lineHeight: '1.6'
+              lineHeight: '1.8'
             }}>
               <ContentRenderer text={questionText} />
             </div>
@@ -1031,12 +1031,22 @@ function WriteExam() {
                       className="w-12 h-12 object-contain"
                     />
                   </div>
-                  <h1 className={`text-4xl font-black mb-4 tracking-tight ${
-                    result.verdict === "Pass" ? "text-emerald-700" : "text-amber-700"
-                  }`}>
+                  <h1
+                    className={`font-black mb-4 tracking-tight ${
+                      result.verdict === "Pass" ? "text-emerald-700" : "text-amber-700"
+                    }`}
+                    style={{
+                      fontSize: window.innerWidth <= 320 ? '32px' : window.innerWidth <= 375 ? '36px' : window.innerWidth <= 425 ? '40px' : window.innerWidth <= 768 ? '44px' : '48px'
+                    }}
+                  >
                     {result.verdict === "Pass" ? "Excellent Work!" : "Keep Pushing!"}
                   </h1>
-                  <p className="text-xl text-slate-600 font-medium max-w-md mx-auto leading-relaxed">
+                  <p
+                    className="text-slate-600 font-medium max-w-md mx-auto leading-relaxed"
+                    style={{
+                      fontSize: window.innerWidth <= 320 ? '18px' : window.innerWidth <= 375 ? '20px' : window.innerWidth <= 768 ? '22px' : '24px'
+                    }}
+                  >
                     {result.verdict === "Pass"
                       ? "You've mastered this exam with flying colors!"
                       : "Every challenge makes you stronger. Try again!"}

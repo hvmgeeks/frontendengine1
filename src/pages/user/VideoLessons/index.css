@@ -1512,51 +1512,44 @@
 
 /* Top Pagination */
 .pagination-top {
-  margin: 1rem 0;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 1rem;
+  margin: 0;
+  background: none;
+  padding: 0;
 }
 
-/* Pagination Styles - Simple and Clean */
+/* Pagination Styles - ULTRA SIMPLE - JUST NUMBERS */
 .pagination-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 2rem 0;
-  padding: 1rem;
-  position: relative;
-  z-index: 5;
+  margin: 1rem 0;
+  padding: 0;
+  background: none;
 }
 
 .pagination-controls {
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
   align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
+  background: none;
 }
 
 .pagination-btn {
-  background: transparent;
-  border: none;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  background: none !important;
+  border: none !important;
+  color: white !important;
+  padding: 0;
+  margin: 0;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease;
   font-size: 1rem;
-  font-weight: 500;
-  min-width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-weight: 400;
+  min-width: auto;
+  height: auto;
 }
 
 .pagination-btn:hover:not(:disabled):not(.active) {
-  background: rgba(255, 255, 255, 0.1);
-  transform: scale(1.05);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .pagination-btn:disabled {
@@ -1565,9 +1558,9 @@
 }
 
 .pagination-btn.active {
-  background: #ff0000 !important;
   color: white !important;
   font-weight: 700 !important;
+  text-decoration: underline;
 }
 
 /* Enhanced Responsive Design */
@@ -2185,6 +2178,36 @@ video {
 .youtube-action-btn.active {
   background: #065fd4;
   color: white;
+}
+
+/* Download button styles */
+.youtube-action-btn-small.download-btn {
+  background: #3b82f6;
+  color: white;
+  font-weight: 600;
+}
+
+.youtube-action-btn-small.download-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.youtube-action-btn-small.downloaded-btn {
+  background: #10b981;
+  color: white;
+  font-weight: 600;
+}
+
+.youtube-action-btn-small.downloaded-btn:hover {
+  background: #059669;
+}
+
+.youtube-action-btn-small.downloading-btn {
+  background: #3b82f6;
+  color: white;
+  font-weight: 600;
+  opacity: 0.8;
 }
 
 .youtube-comments-section {
@@ -3232,14 +3255,17 @@ video {
   }
 
   .pagination-controls {
-    gap: 0;
+    gap: 0.75rem;
+    background: none;
   }
 
   .pagination-btn {
-    min-width: 28px;
-    padding: 0.3rem 0.4rem;
-    font-size: 0.7rem;
-    border-radius: 3px;
+    min-width: auto;
+    padding: 0;
+    font-size: 0.9rem;
+    background: none !important;
+    border: none !important;
+    color: white !important;
   }
 }
 
@@ -3307,14 +3333,17 @@ video {
   }
 
   .pagination-controls {
-    gap: 0;
+    gap: 0.75rem;
+    background: none;
   }
 
   .pagination-btn {
-    min-width: 30px;
-    padding: 0.35rem 0.45rem;
-    font-size: 0.72rem;
-    border-radius: 3px;
+    min-width: auto;
+    padding: 0;
+    font-size: 0.9rem;
+    background: none !important;
+    border: none !important;
+    color: white !important;
   }
 }
 
@@ -3382,14 +3411,17 @@ video {
   }
 
   .pagination-controls {
-    gap: 0;
+    gap: 0.75rem;
+    background: none;
   }
 
   .pagination-btn {
-    min-width: 32px;
-    padding: 0.4rem 0.5rem;
-    font-size: 0.75rem;
-    border-radius: 4px;
+    min-width: auto;
+    padding: 0;
+    font-size: 0.9rem;
+    background: none !important;
+    border: none !important;
+    color: white !important;
   }
 }
 
@@ -3477,48 +3509,36 @@ video {
     display: flex !important;
     justify-content: center;
     align-items: center;
-    padding: 0.5rem;
+    padding: 0;
     margin: 1rem 0;
-    overflow-x: auto;
+    background: none;
   }
 
   .pagination-controls {
     display: flex !important;
-    gap: 0;
-    flex-wrap: nowrap;
-    justify-content: center;
-    align-items: center;
+    gap: 0.75rem;
+    background: none;
   }
 
   .pagination-btn {
-    padding: 0.4rem 0.5rem;
-    font-size: 0.75rem;
-    min-width: 32px;
-    height: 36px;
-    border-radius: 4px;
-    white-space: nowrap;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
+    padding: 0;
+    font-size: 0.9rem;
+    min-width: auto;
+    height: auto;
+    border: none !important;
+    background: none !important;
+    color: white !important;
     margin: 0;
   }
 
   .pagination-btn.active {
-    background: #ff0000 !important;
-    border: 2px solid #ff0000 !important;
     color: white !important;
     font-weight: 700 !important;
-    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3) !important;
-    transform: scale(1.05) !important;
+    text-decoration: underline;
   }
 
   .pagination-btn:hover:not(:disabled):not(.active) {
-    background: rgba(255, 255, 255, 0.2) !important;
-    transform: scale(1.02) !important;
+    color: rgba(255, 255, 255, 0.7) !important;
   }
 
   .page-size-selector {
@@ -4318,21 +4338,24 @@ video {
     display: flex !important;
     justify-content: center;
     align-items: center;
-    padding: 1rem;
+    padding: 0;
+    background: none;
   }
 
   .pagination-controls {
     display: flex !important;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    justify-content: center;
+    gap: 1rem;
+    background: none;
   }
 
   .pagination-btn {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.9rem;
-    min-width: 42px;
-    height: 42px;
+    padding: 0;
+    font-size: 1rem;
+    min-width: auto;
+    height: auto;
+    background: none !important;
+    border: none !important;
+    color: white !important;
   }
 
   .inline-video-player video,
@@ -4658,20 +4681,26 @@ video {
   .pagination-container {
     flex-direction: row;
     justify-content: center;
-    gap: 1rem;
-    padding: 1.5rem;
+    gap: 0;
+    padding: 0;
+    background: none;
   }
 
   .pagination-controls {
     display: flex;
     flex-direction: row;
-    gap: 0.5rem;
+    gap: 1rem;
+    background: none;
   }
 
   .pagination-btn {
-    padding: 0.6rem 0.8rem;
-    font-size: 0.9rem;
-    min-width: 44px;
+    padding: 0;
+    font-size: 1rem;
+    min-width: auto;
+    height: auto;
+    background: none !important;
+    border: none !important;
+    color: white !important;
   }
 
   .inline-video-player video,
@@ -4834,47 +4863,36 @@ video {
   .pagination-container {
     display: flex !important;
     justify-content: center !important;
-    padding: 0.5rem !important;
+    padding: 0 !important;
     margin: 1rem 0 !important;
-    overflow-x: auto !important;
+    background: none !important;
   }
 
   .pagination-controls {
     display: flex !important;
-    gap: 0 !important;
-    flex-wrap: nowrap !important;
-    justify-content: center !important;
-    align-items: center !important;
+    gap: 0.75rem !important;
+    background: none !important;
   }
 
   .pagination-btn {
-    flex-shrink: 0 !important;
-    padding: 0.4rem 0.5rem !important;
-    font-size: 0.75rem !important;
-    min-width: 32px !important;
-    height: 36px !important;
-    border-radius: 4px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    background: rgba(255, 255, 255, 0.1) !important;
+    padding: 0 !important;
+    font-size: 0.9rem !important;
+    min-width: auto !important;
+    height: auto !important;
+    border: none !important;
+    background: none !important;
     color: white !important;
     margin: 0 !important;
   }
 
   .pagination-btn.active {
-    background: #ff0000 !important;
-    border: 2px solid #ff0000 !important;
     color: white !important;
     font-weight: 700 !important;
-    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3) !important;
-    transform: scale(1.05) !important;
+    text-decoration: underline !important;
   }
 
   .pagination-btn:hover:not(:disabled):not(.active) {
-    background: rgba(255, 255, 255, 0.2) !important;
-    transform: scale(1.02) !important;
+    color: rgba(255, 255, 255, 0.7) !important;
   }
 
   .page-size-selector {

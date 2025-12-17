@@ -10,6 +10,7 @@ import { primarySubjects, primaryKiswahiliSubjects, secondarySubjects, advanceSu
 import { useLanguage } from "../../../contexts/LanguageContext";
 import { MdVerified } from 'react-icons/md';
 import VideoGrid from './VideoGrid';
+import { getAllDownloadedVideos } from '../../../utils/offlineVideo';
 
 // Temporary fix: Use simple text/symbols instead of React Icons to avoid chunk loading issues
 const IconComponents = {
@@ -222,7 +223,63 @@ function VideoLessons() {
       const startTime = performance.now();
       console.log('🚀 Starting video fetch...');
 
-      // Check cache first for instant loading
+      // Check if offline - load from IndexedDB
+      const isOnline = navigator.onLine;
+      if (!isOnline) {
+        console.log('📡 Offline mode detected - loading downloaded videos from IndexedDB...');
+        try {
+          const offlineVideos = await getAllDownloadedVideos();
+          console.log('📦 Offline videos from IndexedDB:', offlineVideos);
+
+          if (offlineVideos && offlineVideos.length > 0) {
+            console.log(`✅ Loaded ${offlineVideos.length} videos from offline storage`);
+
+            // Extract video details from offline storage
+            const formattedVideos = offlineVideos.map((item, index) => {
+              // Handle both old format (just blob) and new format (with details)
+              if (item.details) {
+                return {
+                  ...item.details,
+                  _id: item.details._id || item.details.id || `offline_${index}`,
+                  isOffline: true,
+                  offlineUrl: item.url
+                };
+              } else {
+                // Fallback for old format without details
+                return {
+                  _id: `offline_${index}`,
+                  title: item.title || 'Offline Video',
+                  videoUrl: item.url,
+                  isOffline: true,
+                  offlineUrl: item.url
+                };
+              }
+            });
+
+            console.log('📹 Formatted offline videos:', formattedVideos);
+            setVideos(formattedVideos);
+            setLoading(false);
+            dispatch(HideLoading());
+            message.info('📡 Offline mode: Showing downloaded videos only');
+            return;
+          } else {
+            message.warning('📡 No videos available offline. Please download videos when online.');
+            setVideos([]);
+            setLoading(false);
+            dispatch(HideLoading());
+            return;
+          }
+        } catch (error) {
+          console.error('Error loading offline videos:', error);
+          message.error('Failed to load offline videos');
+          setVideos([]);
+          setLoading(false);
+          dispatch(HideLoading());
+          return;
+        }
+      }
+
+      // Check cache first for instant loading (when online)
       const cacheKey = `videos_${selectedLevel}`;
       const cachedData = videoCache[cacheKey];
       const localCachedData = localStorage.getItem(cacheKey);
@@ -255,6 +312,8 @@ function VideoLessons() {
         }
       }
 
+      // Fetch from API when online
+      console.log('🌐 Loading videos from API...');
       const filters = {
         level: selectedLevel,
         className: "all", // Get all classes for the level
@@ -301,7 +360,7 @@ function VideoLessons() {
       setLoading(false);
       dispatch(HideLoading());
     }
-  }, [selectedLevel, dispatch]);
+  }, [selectedLevel, dispatch, videoCache]);
 
   // Filter and sort videos
   const filteredAndSortedVideos = useMemo(() => {

@@ -76,12 +76,52 @@
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
 }
 
+/* Ensure dropdown menus are visible and properly positioned */
+.ant-select-dropdown {
+  z-index: 9999 !important;
+}
+
+.ant-select-item {
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+}
+
+.ant-select-item-option-selected {
+  background-color: #3b82f6 !important;
+  color: white !important;
+  font-weight: 600 !important;
+}
+
+.ant-select-item-option-active {
+  background-color: #dbeafe !important;
+}
+
 /* Text truncation utility */
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Custom Scrollbar for Today's Summary */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #3b82f6, #6366f1);
+  border-radius: 10px;
+  border: 2px solid #f1f5f9;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #2563eb, #4f46e5);
 }
 
 /* Responsive statistic styling */

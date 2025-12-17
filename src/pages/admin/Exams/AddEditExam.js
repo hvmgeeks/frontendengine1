@@ -424,6 +424,17 @@ function AddEditExam() {
                     <input type="number" />
                   </Form.Item>
                 </Col>
+                <Col span={8}>
+                  <Form.Item label="Difficulty Level" name="difficulty">
+                    <select>
+                      <option value="">Select Difficulty</option>
+                      <option value="easy">Easy</option>
+                      <option value="medium">Medium</option>
+                      <option value="hard">Hard</option>
+                      <option value="intense">Intense</option>
+                    </select>
+                  </Form.Item>
+                </Col>
               </Row>
               <div className="flex justify-end gap-2">
                 <button

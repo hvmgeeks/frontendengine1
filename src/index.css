@@ -582,3 +582,15 @@ body {
     min-width: 80px !important;
   }
 }
+
+/* Offline Indicator Animation */
+@keyframes slideInFromTop {
+  from {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

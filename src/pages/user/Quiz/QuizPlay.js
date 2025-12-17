@@ -12,6 +12,7 @@ import { getExamById } from '../../../apicalls/exams';
 import { addReport } from '../../../apicalls/reports';
 import { getUserInfo } from '../../../apicalls/users';
 import { SetUser } from '../../../redux/usersSlice';
+import { markQuizOffline, getOfflineQuiz } from '../../../utils/offlineQuiz';
 
 // Professional Sound System
 const playSound = (type) => {
@@ -147,6 +148,39 @@ const QuizPlay = () => {
             // Clean up corrupted cache
             localStorage.removeItem(cacheKey);
             localStorage.removeItem(`${cacheKey}_time`);
+          }
+        }
+
+        // Check if offline - try to load from IndexedDB
+        const isOnline = navigator.onLine;
+        if (!isOnline) {
+          console.log('📡 Offline mode detected - checking for downloaded quiz...');
+          try {
+            const offlineQuiz = await getOfflineQuiz(id);
+            if (offlineQuiz) {
+              console.log('✅ Loaded quiz from offline storage:', offlineQuiz.name);
+              setQuiz(offlineQuiz);
+              setQuestions(offlineQuiz.questions);
+              setAnswers(new Array(offlineQuiz.questions.length).fill(''));
+              setTimeLeft(offlineQuiz.duration || 180);
+              setStartTime(new Date());
+              setLoading(false);
+              message.success('📡 Quiz loaded from offline storage');
+              return;
+            } else {
+              message.error('This quiz is not available offline. Please download it first.');
+              startTransition(() => {
+                navigate('/quiz');
+              });
+              return;
+            }
+          } catch (error) {
+            console.error('Error loading offline quiz:', error);
+            message.error('Failed to load offline quiz. Please check your connection.');
+            startTransition(() => {
+              navigate('/quiz');
+            });
+            return;
           }
         }
 
@@ -359,6 +393,52 @@ const QuizPlay = () => {
       };
 
       try {
+        // Check if online or offline
+        const isOnline = navigator.onLine;
+
+        if (!isOnline) {
+          // OFFLINE MODE: Mark quiz offline
+          console.log('📡 Offline mode detected - marking quiz offline');
+          message.info('📡 Offline mode: Quiz marked locally. Results will sync when online.');
+
+          const offlineResult = await markQuizOffline(
+            id,
+            questions,
+            answers,
+            currentUser._id,
+            startTime
+          );
+
+          console.log('✅ Quiz marked offline successfully');
+
+          // Navigate to results with offline data
+          const navigationState = {
+            percentage: offlineResult.percentage,
+            correctAnswers: offlineResult.correctAnswers,
+            totalQuestions: questions.length,
+            timeTaken: offlineResult.timeTaken,
+            resultDetails: offlineResult.resultDetails,
+            xpData: null, // No XP in offline mode
+            quizName: (quiz && quiz.name) || 'Quiz',
+            quizSubject: (quiz && (quiz.subject || quiz.category)) || 'General',
+            passingPercentage: passingPercentage,
+            verdict: offlineResult.verdict,
+            offlineMode: true, // Flag to indicate offline marking
+            offlineMessage: 'Quiz marked offline. Explanations not available. Results will sync when online.'
+          };
+
+          setNavigatingToResults(true);
+          await new Promise(resolve => setTimeout(resolve, 1000));
+
+          navigate(`/quiz/${id}/result`, {
+            state: navigationState,
+            replace: true
+          });
+
+          return;
+        }
+
+        // ONLINE MODE: Submit to server
         console.log('📤 Submitting quiz report:', reportData);
         const response = await addReport(reportData);
         console.log('📥 Server response:', response);
@@ -919,6 +999,18 @@ const QuizPlay = () => {
     );
   }
 
+  // Handle back button with confirmation
+  const handleBackClick = () => {
+    const confirmLeave = window.confirm(
+      'Are you sure you want to leave this quiz? Your progress will be lost.'
+    );
+    if (confirmLeave) {
+      startTransition(() => {
+        navigate('/quiz');
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 relative p-2 sm:p-4 lg:p-6">
       {/* Header removed - using ProtectedRoute header only */}
@@ -926,10 +1018,19 @@ const QuizPlay = () => {
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
           {/* Quiz Content Layout */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
-            {/* Quiz Title */}
-            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 text-center sm:text-left truncate">
-              {quiz.name}
-            </h1>
+            {/* Back Button and Quiz Title */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
+                onClick={handleBackClick}
+                className="flex-shrink-0 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 group"
+                title="Back to quiz list"
+              >
+                <TbArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600 group-hover:text-gray-900" />
+              </button>
+              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 truncate">
+                {quiz.name}
+              </h1>
+            </div>
 
             {/* Timer - Responsive */}
             <div className="flex justify-center">
@@ -1009,7 +1110,7 @@ const QuizPlay = () => {
         <div className="bg-white rounded-lg sm:rounded-2xl shadow-lg sm:shadow-xl border border-gray-200 transition-all duration-300 p-4 sm:p-6 lg:p-8">
           {/* Responsive Question */}
           <div className="mb-6 sm:mb-8">
-            <h2 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 text-center mb-4 sm:mb-6 leading-tight">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-4xl font-bold text-gray-900 text-center mb-4 sm:mb-6 leading-tight">
               {typeof currentQ.name === 'string' ? currentQ.name : 'Question'}
             </h2>
 

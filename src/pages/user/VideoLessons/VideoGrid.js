@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { FaPlayCircle, FaGraduationCap } from 'react-icons/fa';
+import { FaPlayCircle, FaGraduationCap, FaDownload, FaCheckCircle, FaTrash } from 'react-icons/fa';
 import { TbInfoCircle } from 'react-icons/tb';
 import { MdVerified } from 'react-icons/md';
-import { Avatar } from 'antd';
+import { Avatar, message } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
+import {
+  downloadVideoForOffline,
+  isVideoDownloaded,
+  deleteOfflineVideo,
+  getOfflineVideo
+} from '../../../utils/offlineVideo';
 
 const VideoGrid = ({
   paginatedVideos,
@@ -32,6 +38,12 @@ const VideoGrid = ({
   // Mobile detection state
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
 
+  // Download states
+  const [downloadedVideos, setDownloadedVideos] = useState({});
+  const [downloadProgress, setDownloadProgress] = useState({});
+  const [downloading, setDownloading] = useState({});
+  const [offlineVideoUrls, setOfflineVideoUrls] = useState({}); // Store offline blob URLs
+
   // Update mobile state on window resize
   useEffect(() => {
     const handleResize = () => {
@@ -41,6 +53,98 @@ const VideoGrid = ({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Check which videos are downloaded and load offline URLs
+  useEffect(() => {
+    const checkDownloadedVideos = async () => {
+      const downloaded = {};
+      const offlineUrls = {};
+
+      for (const video of paginatedVideos) {
+        if (video.videoUrl) {
+          const isDownloaded = await isVideoDownloaded(video.videoUrl);
+          downloaded[video.videoUrl] = isDownloaded;
+
+          // If downloaded, get the offline blob URL
+          if (isDownloaded) {
+            try {
+              const offlineUrl = await getOfflineVideo(video.videoUrl);
+              if (offlineUrl) {
+                offlineUrls[video.videoUrl] = offlineUrl;
+                console.log('✅ Loaded offline video:', video.title);
+              }
+            } catch (error) {
+              console.error('Failed to load offline video:', error);
+            }
+          }
+        }
+      }
+
+      setDownloadedVideos(downloaded);
+      setOfflineVideoUrls(offlineUrls);
+    };
+
+    checkDownloadedVideos();
+  }, [paginatedVideos]);
+
+  // Handle video download
+  const handleDownloadVideo = async (video) => {
+    if (!video.videoUrl) {
+      message.error('Video URL not available');
+      return;
+    }
+
+    // Check if already downloaded
+    if (downloadedVideos[video.videoUrl]) {
+      message.info('Video already downloaded for offline viewing');
+      return;
+    }
+
+    setDownloading(prev => ({ ...prev, [video.videoUrl]: true }));
+    setDownloadProgress(prev => ({ ...prev, [video.videoUrl]: 0 }));
+
+    try {
+      await downloadVideoForOffline(
+        video.videoUrl,
+        video.title,
+        (progress) => {
+          setDownloadProgress(prev => ({ ...prev, [video.videoUrl]: progress }));
+        },
+        () => {
+          message.success(`${video.title} downloaded for offline viewing!`);
+          setDownloadedVideos(prev => ({ ...prev, [video.videoUrl]: true }));
+          setDownloading(prev => ({ ...prev, [video.videoUrl]: false }));
+          setDownloadProgress(prev => ({ ...prev, [video.videoUrl]: 0 }));
+
+          // Reload offline blob URL
+          getOfflineVideo(video.videoUrl).then(offlineUrl => {
+            if (offlineUrl) {
+              setOfflineVideoUrls(prev => ({ ...prev, [video.videoUrl]: offlineUrl }));
+            }
+          });
+        },
+        (error) => {
+          message.error(`Download failed: ${error}`);
+          setDownloading(prev => ({ ...prev, [video.videoUrl]: false }));
+          setDownloadProgress(prev => ({ ...prev, [video.videoUrl]: 0 }));
+        },
+        video // Pass complete video details for offline storage
+      );
+    } catch (error) {
+      console.error('Download error:', error);
+    }
+  };
+
+  // Handle delete offline video
+  const handleDeleteOfflineVideo = async (video) => {
+    try {
+      await deleteOfflineVideo(video.videoUrl);
+      setDownloadedVideos(prev => ({ ...prev, [video.videoUrl]: false }));
+      message.success('Offline video deleted');
+    } catch (error) {
+      message.error('Failed to delete offline video');
+    }
+  };
   return (
     <div className="videos-grid">
       {paginatedVideos.length > 0 ? (
@@ -148,7 +252,11 @@ const VideoGrid = ({
                         }}
                         crossOrigin="anonymous"
                       >
-                        <source src={video.signedVideoUrl || video.videoUrl} type="video/mp4" />
+                        {/* Use offline video URL if available, otherwise use signed/original URL */}
+                        <source
+                          src={offlineVideoUrls[video.videoUrl] || video.signedVideoUrl || video.videoUrl}
+                          type="video/mp4"
+                        />
                         {video.subtitles && video.subtitles.length > 0 && video.subtitles.map((subtitle, subIndex) => (
                           <track
                             key={`${subtitle.language}-${subIndex}`}
@@ -212,6 +320,58 @@ const VideoGrid = ({
                           {video.likes || 0}
                         </span>
                       </button>
+
+                      {/* Download Button for Offline Viewing */}
+                      {video.videoUrl && !video.videoUrl.includes('youtube.com') && !video.videoUrl.includes('youtu.be') && (
+                        <>
+                          {downloadedVideos[video.videoUrl] ? (
+                            <button
+                              className="youtube-action-btn-small downloaded-btn"
+                              onClick={() => handleDeleteOfflineVideo(video)}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                backgroundColor: '#10b981',
+                                color: 'white'
+                              }}
+                            >
+                              <FaCheckCircle style={{ fontSize: '14px' }} />
+                              <span>Downloaded</span>
+                              <FaTrash style={{ fontSize: '12px', marginLeft: '4px', opacity: 0.7 }} />
+                            </button>
+                          ) : downloading[video.videoUrl] ? (
+                            <button
+                              className="youtube-action-btn-small downloading-btn"
+                              disabled
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                backgroundColor: '#3b82f6',
+                                color: 'white',
+                                cursor: 'not-allowed'
+                              }}
+                            >
+                              <span>📥 {downloadProgress[video.videoUrl] || 0}%</span>
+                            </button>
+                          ) : (
+                            <button
+                              className="youtube-action-btn-small download-btn"
+                              onClick={() => handleDownloadVideo(video)}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px'
+                              }}
+                            >
+                              <FaDownload style={{ fontSize: '14px' }} />
+                              <span>Download</span>
+                            </button>
+                          )}
+                        </>
+                      )}
+
                       <button
                         className="youtube-action-btn-small close-btn"
                         onClick={() => setCurrentVideoIndex(null)}

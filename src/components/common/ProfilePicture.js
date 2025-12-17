@@ -25,6 +25,11 @@ const ProfilePicture = ({
     }
   }, [user, showOnlineStatus]);
 
+  // Reset image error when user or profile image changes
+  useEffect(() => {
+    setImageError(false);
+  }, [user?.profileImage, user?.profilePicture]);
+
   const getSizeConfig = () => {
     switch (size) {
       case 'xs':
@@ -171,9 +176,16 @@ const ProfilePicture = ({
             alt={user.name || 'User'}
             className="object-cover rounded-full w-full h-full"
             style={{ objectFit: 'cover' }}
+            crossOrigin="anonymous"
+            onLoad={() => {
+              console.log('✅ Profile image loaded successfully:', user.profileImage || user.profilePicture);
+            }}
             onError={(e) => {
               // Fallback to initials if image fails to load
-              console.warn('Profile image failed to load:', e.target.src);
+              console.warn('⚠️ Profile image failed to load (this is normal if running locally with production images):', {
+                src: e.target.src,
+                user: user?.name
+              });
               setImageError(true);
             }}
           />

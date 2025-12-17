@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useEffect } from "react";
 import "./stylesheets/theme.css";
 import "./stylesheets/alignments.css";
 import "./stylesheets/textelements.css";
@@ -14,7 +14,11 @@ import { useSelector } from "react-redux";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { ErrorBoundary } from "./components/modern";
+import { preCacheEssentialAssets, cacheSoundFiles } from "./utils/autoCacheAssets";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
+import OfflineIndicator from "./components/OfflineIndicator";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import CacheClearButton from "./components/CacheClearButton";
 
 // Immediate load components (critical for initial render)
 import Login from "./pages/common/Login";
@@ -94,6 +98,28 @@ const FastLoader = () => (
 
 function App() {
   const { loading } = useSelector((state) => state.loader);
+  const { user } = useSelector((state) => state.user);
+
+  // Auto-cache essential assets on app load
+  useEffect(() => {
+    // Automatically accept cookies to avoid long loading times
+    try {
+      localStorage.setItem('cookies-accepted', 'true');
+      localStorage.setItem('cookie-consent', 'accepted');
+      console.log('✅ Cookies automatically accepted');
+    } catch (err) {
+      console.warn('⚠️ Failed to set cookie consent:', err);
+    }
+
+    // Cache sounds and essential assets immediately
+    preCacheEssentialAssets().catch(err => {
+      console.warn('⚠️ Failed to pre-cache essential assets:', err);
+    });
+
+    cacheSoundFiles().catch(err => {
+      console.warn('⚠️ Failed to cache sound files:', err);
+    });
+  }, []);
 
   // All mobile header styles removed - using new design in ProtectedRoute
 
@@ -102,6 +128,9 @@ function App() {
       <ThemeProvider>
         <LanguageProvider>
           {loading && <Loader />}
+          <OfflineIndicator />
+          <PWAInstallPrompt />
+          <CacheClearButton />
         <BrowserRouter>
         <Routes>
           {/* Common Routes */}

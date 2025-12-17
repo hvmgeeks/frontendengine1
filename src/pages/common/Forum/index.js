@@ -599,15 +599,7 @@ const Forum = () => {
                                         className="action-btn reply-btn"
                                         type={replyQuestionId === question._id ? "default" : "primary"}
                                     >
-                                        {replyQuestionId === question._id ? "Cancel Reply" : "Reply"}
-                                    </Button>
-                                    <Button
-                                        icon={<MessageOutlined />}
-                                        className="action-btn view-btn"
-                                        disabled
-                                        style={{ opacity: 0.7 }}
-                                    >
-                                        {question.replies?.length || 0} Replies
+                                        {replyQuestionId === question._id ? "Cancel Reply" : `Reply (${question.replies?.length || 0})`}
                                     </Button>
                                     {/* Delete button - only show if user is question author or admin */}
                                     {(userData._id === question.user?._id || isAdmin) && (

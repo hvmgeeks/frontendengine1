@@ -15,18 +15,29 @@ axiosInstance.interceptors.request.use(
             try {
                 const payload = JSON.parse(atob(token.split('.')[1]));
                 const currentTime = Date.now() / 1000;
+                const timeUntilExpiry = payload.exp - currentTime;
+
+                console.log('🔍 Token check:', {
+                    expiresAt: new Date(payload.exp * 1000).toLocaleString(),
+                    timeUntilExpiry: `${Math.floor(timeUntilExpiry / 3600)}h ${Math.floor((timeUntilExpiry % 3600) / 60)}m`,
+                    isExpired: payload.exp < currentTime
+                });
 
                 if (payload.exp && payload.exp < currentTime) {
-                    console.log('🔒 Token expired, clearing storage');
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('user');
-                    window.location.href = '/login';
-                    return Promise.reject(new Error('Token expired'));
+                    console.error('🔒🔒🔒 TOKEN EXPIRED - NOT REDIRECTING FOR DEBUG 🔒🔒🔒');
+                    console.error('Token expired at:', new Date(payload.exp * 1000).toLocaleString());
+                    console.error('Current time:', new Date(currentTime * 1000).toLocaleString());
+                    // DISABLED AUTO-REDIRECT FOR DEBUGGING
+                    // localStorage.removeItem('token');
+                    // localStorage.removeItem('user');
+                    // window.location.href = '/login';
+                    // return Promise.reject(new Error('Token expired'));
                 }
             } catch (e) {
-                console.log('⚠️ Invalid token format, clearing storage');
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
+                console.error('⚠️⚠️⚠️ INVALID TOKEN FORMAT - NOT CLEARING FOR DEBUG ⚠️⚠️⚠️', e);
+                // DISABLED AUTO-CLEAR FOR DEBUGGING
+                // localStorage.removeItem('token');
+                // localStorage.removeItem('user');
             }
 
             config.headers.Authorization = `Bearer ${token}`;
@@ -74,17 +85,15 @@ axiosInstance.interceptors.response.use(
                                    errorMessage.includes('not authenticated');
 
             if (isRealAuthError) {
-                // Clear the token
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-
-                // Show error message
-                message.error('Your session has expired. Please login again.');
-
-                // Redirect to login page only for non-AI requests
-                setTimeout(() => {
-                    window.location.href = '/login';
-                }, 1000);
+                console.error('🚨🚨🚨 AUTH ERROR DETECTED - NOT REDIRECTING FOR DEBUG 🚨🚨🚨');
+                console.error('Error message:', errorMessage);
+                // DISABLED AUTO-REDIRECT FOR DEBUGGING
+                // localStorage.removeItem('token');
+                // localStorage.removeItem('user');
+                // message.error('Your session has expired. Please login again.');
+                // setTimeout(() => {
+                //     window.location.href = '/login';
+                // }, 1000);
             }
 
             return Promise.reject(error);

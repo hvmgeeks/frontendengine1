@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import './index.css';
 import PageTitle from "../../../components/PageTitle";
-import { message, Card, Progress, Statistic, Select, DatePicker, Button, Empty, Table, Tag, Modal } from "antd";
+import { message, Card, Progress, Statistic, Select, Button, Empty, Table, Tag, Modal } from "antd";
 import { useDispatch } from "react-redux";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
 import { getAllReportsByUser } from "../../../apicalls/reports";
@@ -24,14 +24,20 @@ import {
 import moment from "moment";
 
 const { Option } = Select;
-const { RangePicker } = DatePicker;
+
+// Month names for display
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
 
 function UserReports() {
   const [reportsData, setReportsData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-  const [filterSubject, setFilterSubject] = useState('all');
   const [filterVerdict, setFilterVerdict] = useState('all');
-  const [dateRange, setDateRange] = useState(null);
+  const [filterMonth, setFilterMonth] = useState(null); // Month filter (1-12)
+  const [filterDay, setFilterDay] = useState(null); // Day filter (1-31)
+  const [filterYear, setFilterYear] = useState(new Date().getFullYear()); // Current year by default
   const [viewMode, setViewMode] = useState('cards'); // 'cards' or 'table'
   const [stats, setStats] = useState({
     totalExams: 0,
@@ -39,6 +45,13 @@ function UserReports() {
     averageScore: 0,
     streak: 0,
     bestScore: 0
+  });
+  const [todayStats, setTodayStats] = useState({
+    totalToday: 0,
+    passedToday: 0,
+    failedToday: 0,
+    averageToday: 0,
+    todayReports: []
   });
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isTablet, setIsTablet] = useState(window.innerWidth >= 768 && window.innerWidth < 1024);
@@ -109,6 +122,44 @@ function UserReports() {
     });
   };
 
+  const calculateTodayStats = (data) => {
+    const today = moment().startOf('day');
+    const todayReports = data.filter(report => {
+      const reportDate = moment(report.createdAt).startOf('day');
+      return reportDate.isSame(today);
+    });
+
+    if (todayReports.length === 0) {
+      setTodayStats({
+        totalToday: 0,
+        passedToday: 0,
+        failedToday: 0,
+        averageToday: 0,
+        todayReports: []
+      });
+      return;
+    }
+
+    const passedToday = todayReports.filter(report => report.result?.verdict === 'Pass').length;
+    const failedToday = todayReports.filter(report => report.result?.verdict === 'Fail').length;
+
+    const todayScores = todayReports.map(report => {
+      const obtained = getCorrectAnswersCount(report.result) || 0;
+      const total = report.exam?.totalMarks || 1;
+      return (obtained / total) * 100;
+    });
+
+    const averageToday = todayScores.reduce((sum, score) => sum + score, 0) / todayReports.length;
+
+    setTodayStats({
+      totalToday: todayReports.length,
+      passedToday,
+      failedToday,
+      averageToday: Math.round(averageToday),
+      todayReports
+    });
+  };
+
   const getData = async () => {
     try {
       dispatch(ShowLoading());
@@ -117,6 +168,7 @@ function UserReports() {
         setReportsData(response.data);
         setFilteredData(response.data);
         calculateStats(response.data);
+        calculateTodayStats(response.data);
       } else {
         message.error(response.message);
       }
@@ -130,23 +182,42 @@ function UserReports() {
   const applyFilters = () => {
     let filtered = [...reportsData];
 
-    if (filterSubject !== 'all') {
-      filtered = filtered.filter(report =>
-        report.exam?.subject?.toLowerCase().includes(filterSubject.toLowerCase())
-      );
-    }
+    console.log('🔍 Applying filters:', {
+      totalReports: reportsData.length,
+      filterVerdict,
+      filterMonth,
+      filterDay,
+      filterYear
+    });
 
     if (filterVerdict !== 'all') {
       filtered = filtered.filter(report => report.result?.verdict === filterVerdict);
+      console.log(`✅ After verdict filter: ${filtered.length} reports`);
     }
 
-    if (dateRange && dateRange.length === 2) {
+    // Filter by month and day (year defaults to current year)
+    if (filterMonth !== null || filterDay !== null) {
       filtered = filtered.filter(report => {
         const reportDate = moment(report.createdAt);
-        return reportDate.isBetween(dateRange[0], dateRange[1], 'day', '[]');
+        const reportYear = reportDate.year();
+        const reportMonth = reportDate.month() + 1; // moment months are 0-indexed
+        const reportDay = reportDate.date();
+
+        // Only filter by year if month or day is selected
+        if (reportYear !== filterYear) return false;
+
+        // Filter by month if selected
+        if (filterMonth !== null && reportMonth !== filterMonth) return false;
+
+        // Filter by day if selected
+        if (filterDay !== null && reportDay !== filterDay) return false;
+
+        return true;
       });
+      console.log(`📅 After date filter (Month: ${filterMonth}, Day: ${filterDay}, Year: ${filterYear}): ${filtered.length} reports`);
     }
 
+    console.log(`✨ Final filtered results: ${filtered.length} reports`);
     setFilteredData(filtered);
     calculateStats(filtered);
   };
@@ -157,7 +228,7 @@ function UserReports() {
 
   useEffect(() => {
     applyFilters();
-  }, [filterSubject, filterVerdict, dateRange, reportsData]);
+  }, [filterVerdict, filterMonth, filterDay, filterYear, reportsData]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -182,10 +253,7 @@ function UserReports() {
       <TbX className="w-5 h-5 text-red-600" />;
   };
 
-  const getUniqueSubjects = () => {
-    const subjects = reportsData.map(report => report.exam?.subject).filter(Boolean);
-    return [...new Set(subjects)];
-  };
+
 
   const handleViewDetails = (record) => {
     setSelectedReport(record);
@@ -421,6 +489,163 @@ function UserReports() {
 
         </motion.div>
 
+        {/* Today's Summary Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="mb-6 sm:mb-8"
+        >
+          {todayStats.totalToday > 0 ? (
+            <div className="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 rounded-xl sm:rounded-2xl shadow-2xl p-6 sm:p-8 border-2 border-blue-400">{/* Removed decorative circles */}
+
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-purple-400 bg-white rounded-xl p-4 shadow-lg">
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg">
+                  <TbCalendar className="w-7 h-7 text-white drop-shadow-lg" />
+                </div>
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-black text-gray-900">
+                    Today's Summary
+                  </h2>
+                  <p className="text-gray-800 text-sm font-bold">{moment().format('dddd, MMMM Do YYYY')}</p>
+                </div>
+                <div className="ml-auto">
+                  <div className="bg-gradient-to-r from-orange-500 to-red-500 px-4 py-2 rounded-full font-black text-base shadow-lg border-2 border-orange-600">
+                    <span className="text-white drop-shadow-lg">🔥 {todayStats.totalToday} Quiz{todayStats.totalToday > 1 ? 'zes' : ''}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+                {/* Total Quizzes Today */}
+                <div className="bg-white rounded-xl p-4 border-2 border-blue-400 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                      <TbChartBar className="w-6 h-6 text-white drop-shadow-lg" />
+                    </div>
+                  </div>
+                  <p className="text-blue-800 text-xs sm:text-sm font-bold mb-1">Quizzes Taken</p>
+                  <p className="text-3xl sm:text-4xl font-black text-blue-900">{todayStats.totalToday}</p>
+                </div>
+
+                {/* Passed Today */}
+                <div className="bg-white rounded-xl p-4 border-2 border-green-400 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center shadow-md">
+                      <TbCheck className="w-6 h-6 text-white drop-shadow-lg" />
+                    </div>
+                  </div>
+                  <p className="text-green-800 text-xs sm:text-sm font-bold mb-1">Passed</p>
+                  <p className="text-3xl sm:text-4xl font-black text-green-900">{todayStats.passedToday}</p>
+                </div>
+
+                {/* Failed Today */}
+                <div className="bg-white rounded-xl p-4 border-2 border-red-400 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center shadow-md">
+                      <TbX className="w-6 h-6 text-white drop-shadow-lg" />
+                    </div>
+                  </div>
+                  <p className="text-red-800 text-xs sm:text-sm font-bold mb-1">Failed</p>
+                  <p className="text-3xl sm:text-4xl font-black text-red-900">{todayStats.failedToday}</p>
+                </div>
+
+                {/* Average Score Today */}
+                <div className="bg-white rounded-xl p-4 border-2 border-amber-400 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-10 h-10 bg-amber-600 rounded-lg flex items-center justify-center shadow-md">
+                      <TbTrendingUp className="w-6 h-6 text-white drop-shadow-lg" />
+                    </div>
+                  </div>
+                  <p className="text-amber-800 text-xs sm:text-sm font-bold mb-1">Avg Score</p>
+                  <p className="text-3xl sm:text-4xl font-black text-amber-900">{todayStats.averageToday}%</p>
+                </div>
+              </div>
+
+              {/* Today's Reports List */}
+              <div className="bg-white rounded-xl p-5 border-2 border-purple-300 shadow-lg">
+                <h3 className="text-gray-900 font-black text-lg mb-4 flex items-center gap-2">
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow-md">
+                    <TbChartBar className="w-6 h-6 text-white" />
+                  </div>
+                  Today's Quizzes
+                </h3>
+                <div className="space-y-3 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+                  {todayStats.todayReports.map((report, index) => {
+                    const score = ((getCorrectAnswersCount(report.result) / report.exam?.totalMarks) * 100).toFixed(0);
+                    const isPassed = report.result?.verdict === 'Pass';
+                    return (
+                      <div key={index} className={`bg-white rounded-lg p-4 border-2 ${isPassed ? 'border-green-400 hover:border-green-500' : 'border-red-400 hover:border-red-500'} shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-between`}>
+                        <div className="flex-1">
+                          <p className="text-gray-900 font-black text-sm sm:text-base">{report.exam?.name || 'Quiz'}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <TbClock className="w-4 h-4 text-gray-700" />
+                            <p className="text-gray-700 text-xs font-semibold">{moment(report.createdAt).format('h:mm A')}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className={`px-3 py-1 rounded-lg ${isPassed ? 'bg-green-200' : 'bg-red-200'}`}>
+                            <span className={`${isPassed ? 'text-green-900' : 'text-red-900'} font-black text-lg`}>{score}%</span>
+                          </div>
+                          <Tag className={`${isPassed ? 'bg-green-600 border-green-700 text-white' : 'bg-red-600 border-red-700 text-white'} font-bold text-xs px-3 py-1`}>
+                            {isPassed ? '✓ PASS' : '✗ FAIL'}
+                          </Tag>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Motivational Message */}
+              <div className="mt-6">
+                {todayStats.passedToday === todayStats.totalToday ? (
+                  <div className="bg-gradient-to-r from-yellow-300 via-amber-300 to-orange-300 rounded-xl p-5 shadow-xl border-2 border-yellow-500">
+                    <p className="text-gray-900 text-center font-black text-lg flex items-center justify-center gap-3">
+                      <TbTrophy className="w-8 h-8 text-yellow-900" />
+                      <span>Perfect day! You passed all quizzes! 🎉</span>
+                      <TbTrophy className="w-8 h-8 text-yellow-900" />
+                    </p>
+                  </div>
+                ) : todayStats.passedToday > todayStats.failedToday ? (
+                  <div className="bg-gradient-to-r from-green-300 to-emerald-300 rounded-xl p-5 shadow-xl border-2 border-green-500">
+                    <p className="text-gray-900 text-center font-black text-lg flex items-center justify-center gap-3">
+                      <TbAward className="w-8 h-8 text-green-900" />
+                      <span>Great job! Keep up the good work! 💪</span>
+                    </p>
+                  </div>
+                ) : (
+                  <div className="bg-gradient-to-r from-blue-300 to-indigo-300 rounded-xl p-5 shadow-xl border-2 border-blue-500">
+                    <p className="text-gray-900 text-center font-black text-lg flex items-center justify-center gap-3">
+                      <TbTarget className="w-8 h-8 text-blue-900" />
+                      <span>Keep practicing! You're improving! 📚</span>
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="bg-gradient-to-br from-gray-100 via-blue-50 to-purple-50 rounded-xl sm:rounded-2xl shadow-xl p-8 sm:p-12 border-2 border-gray-400">
+              {/* Removed decorative circles */}
+
+              <div className="text-center">
+                <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
+                  <TbCalendar className="w-12 h-12 text-white" />
+                </div>
+                <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-3">No Quizzes Today</h2>
+                <p className="text-gray-800 text-lg mb-2 font-bold">You haven't taken any quizzes yet today.</p>
+                <p className="text-gray-700 text-base font-semibold">Start a quiz to see your daily progress!</p>
+                <div className="mt-6">
+                  <div className="inline-block bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-full font-black shadow-xl text-lg">
+                    🚀 Ready to start?
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </motion.div>
+
         {/* Filters Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -436,23 +661,6 @@ function UserReports() {
 
             {/* Filter Controls */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Subject Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Subject</label>
-                <Select
-                  placeholder="All Subjects"
-                  value={filterSubject}
-                  onChange={setFilterSubject}
-                  className="w-full"
-                  size="large"
-                >
-                  <Option value="all">All Subjects</Option>
-                  {getUniqueSubjects().map(subject => (
-                    <Option key={subject} value={subject}>{subject}</Option>
-                  ))}
-                </Select>
-              </div>
-
               {/* Result Filter */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">Result</label>
@@ -462,6 +670,8 @@ function UserReports() {
                   onChange={setFilterVerdict}
                   className="w-full"
                   size="large"
+                  getPopupContainer={(trigger) => trigger.parentNode}
+                  dropdownStyle={{ zIndex: 9999 }}
                 >
                   <Option value="all">All Results</Option>
                   <Option value="Pass">Passed</Option>
@@ -469,18 +679,60 @@ function UserReports() {
                 </Select>
               </div>
 
-              {/* Date Range Filter */}
-              <div className="space-y-2 sm:col-span-2 lg:col-span-1">
-                <label className="text-sm font-medium text-gray-700">Date Range</label>
-                <RangePicker
-                  value={dateRange}
-                  onChange={setDateRange}
+              {/* Year Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Year</label>
+                <Select
+                  placeholder="Select Year"
+                  value={filterYear}
+                  onChange={setFilterYear}
                   className="w-full"
                   size="large"
-                  placeholder={['From', 'To']}
-                  format="DD/MM/YYYY"
+                  getPopupContainer={(trigger) => trigger.parentNode}
+                  dropdownStyle={{ zIndex: 9999 }}
+                >
+                  {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                    <Option key={year} value={year}>{year}</Option>
+                  ))}
+                </Select>
+              </div>
+
+              {/* Month Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Month</label>
+                <Select
+                  placeholder="All Months"
+                  value={filterMonth}
+                  onChange={setFilterMonth}
+                  className="w-full"
+                  size="large"
                   allowClear
-                />
+                  getPopupContainer={(trigger) => trigger.parentNode}
+                  dropdownStyle={{ zIndex: 9999 }}
+                >
+                  {MONTH_NAMES.map((month, index) => (
+                    <Option key={index + 1} value={index + 1}>{month}</Option>
+                  ))}
+                </Select>
+              </div>
+
+              {/* Date Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Date</label>
+                <Select
+                  placeholder="All Dates"
+                  value={filterDay}
+                  onChange={setFilterDay}
+                  className="w-full"
+                  size="large"
+                  allowClear
+                  getPopupContainer={(trigger) => trigger.parentNode}
+                  dropdownStyle={{ zIndex: 9999 }}
+                >
+                  {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
+                    <Option key={day} value={day}>{day}</Option>
+                  ))}
+                </Select>
               </div>
 
               {/* Clear Button */}
@@ -488,9 +740,10 @@ function UserReports() {
                 <label className="text-sm font-medium text-gray-700 opacity-0">Actions</label>
                 <Button
                   onClick={() => {
-                    setFilterSubject('all');
                     setFilterVerdict('all');
-                    setDateRange(null);
+                    setFilterYear(new Date().getFullYear());
+                    setFilterMonth(null);
+                    setFilterDay(null);
                   }}
                   size="large"
                   className="w-full"
@@ -502,34 +755,43 @@ function UserReports() {
             </div>
 
             {/* Active Filters Display */}
-            {(filterSubject !== 'all' || filterVerdict !== 'all' || dateRange) && (
+            {(filterVerdict !== 'all' || filterYear !== new Date().getFullYear() || filterMonth !== null || filterDay !== null) && (
               <div className="flex flex-wrap gap-2 pt-3 border-t border-gray-100">
                 <span className="text-sm font-medium text-gray-700">Active filters:</span>
-                {filterSubject !== 'all' && (
-                  <Tag
-                    closable
-                    onClose={() => setFilterSubject('all')}
-                    className="bg-blue-50 border-blue-200 text-blue-700"
-                  >
-                    {filterSubject}
-                  </Tag>
-                )}
                 {filterVerdict !== 'all' && (
                   <Tag
                     closable
                     onClose={() => setFilterVerdict('all')}
                     className={filterVerdict === 'Pass' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'}
                   >
-                    {filterVerdict}
+                    Result: {filterVerdict}
                   </Tag>
                 )}
-                {dateRange && (
+                {filterYear !== new Date().getFullYear() && (
                   <Tag
                     closable
-                    onClose={() => setDateRange(null)}
+                    onClose={() => setFilterYear(new Date().getFullYear())}
+                    className="bg-indigo-50 border-indigo-200 text-indigo-700"
+                  >
+                    Year: {filterYear}
+                  </Tag>
+                )}
+                {filterMonth !== null && (
+                  <Tag
+                    closable
+                    onClose={() => setFilterMonth(null)}
                     className="bg-purple-50 border-purple-200 text-purple-700"
                   >
-                    {dateRange[0].format('DD/MM/YY')} - {dateRange[1].format('DD/MM/YY')}
+                    Month: {moment().month(filterMonth - 1).format('MMMM')}
+                  </Tag>
+                )}
+                {filterDay !== null && (
+                  <Tag
+                    closable
+                    onClose={() => setFilterDay(null)}
+                    className="bg-orange-50 border-orange-200 text-orange-700"
+                  >
+                    Date: {filterDay}
                   </Tag>
                 )}
               </div>

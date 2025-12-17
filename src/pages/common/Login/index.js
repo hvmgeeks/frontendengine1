@@ -8,15 +8,32 @@ import { loginUser } from "../../../apicalls/users";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
 import { SetUser } from "../../../redux/usersSlice";
 import { saveCredentials, getCredentials, clearCredentials, hasStoredCredentials } from "../../../utils/secureStorage";
+import { storeAuthData, getAuthData, isAuthenticated } from "../../../utils/offlineAuth";
+import { initializeAutoCache } from "../../../utils/autoCacheAssets";
 
 function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
   const [form] = Form.useForm();
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true); // Default to checked
   const [autoLoginAttempted, setAutoLoginAttempted] = useState(false);
   const autoLoginInProgress = useRef(false);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+  // Monitor online/offline status
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   // Auto-login with saved credentials on component mount
   useEffect(() => {
@@ -41,9 +58,9 @@ function Login() {
           const user = JSON.parse(existingUser);
           dispatch(SetUser(user));
           if (user.isAdmin) {
-            navigate("/admin/dashboard");
+            navigate("/admin/dashboard", { replace: true });
           } else {
-            navigate("/user/hub");
+            navigate("/user/hub", { replace: true });
           }
         } catch (error) {
           console.error('Error parsing existing user:', error);
@@ -81,9 +98,9 @@ function Login() {
 
               // Navigate based on user role
               if (response.response?.isAdmin) {
-                navigate("/admin/dashboard");
+                navigate("/admin/dashboard", { replace: true });
               } else {
-                navigate("/user/hub");
+                navigate("/user/hub", { replace: true });
               }
             } else {
               console.log('⚠️ Auto-login failed:', response.message);
@@ -105,7 +122,8 @@ function Login() {
     };
 
     attemptAutoLogin();
-  }, [form, dispatch, navigate, location.state, autoLoginAttempted]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount to prevent redirect loops
 
   // Handle pre-filled data from registration
   useEffect(() => {
@@ -134,6 +152,72 @@ function Login() {
 
   const onFinish = async (values) => {
     try {
+      // Check if offline
+      const isOnline = navigator.onLine;
+
+      if (!isOnline) {
+        console.log('📡 Offline mode detected - attempting offline login...');
+
+        // Try offline login with stored credentials
+        const credentials = getCredentials();
+        console.log('🔍 Stored credentials check:', credentials ? 'Found' : 'Not found');
+
+        if (!credentials) {
+          console.log('❌ No stored credentials found');
+          console.log('🔍 Checking localStorage for rememberMe:', localStorage.getItem('rememberMe'));
+          console.log('🔍 Checking localStorage for brainwave_remember_me:', localStorage.getItem('brainwave_remember_me'));
+          message.error('Cannot login offline. No saved credentials found. Please login online with "Remember Me" checked first.');
+          return;
+        }
+
+        console.log('🔍 Comparing credentials...');
+        console.log('Stored email:', credentials.email);
+        console.log('Entered email:', values.email);
+
+        // Verify credentials match (case-insensitive email comparison)
+        const emailMatch = credentials.email.toLowerCase() === values.email.toLowerCase();
+        const passwordMatch = credentials.password === values.password;
+
+        console.log('Email match:', emailMatch);
+        console.log('Password match:', passwordMatch);
+
+        if (emailMatch && passwordMatch) {
+          console.log('✅ Offline login successful - credentials match!');
+
+          // Get stored auth data
+          const authData = await getAuthData();
+          console.log('🔍 Auth data from storage:', authData);
+
+          if (authData.token && authData.user) {
+            // Set user in Redux
+            dispatch(SetUser(authData.user));
+
+            // Ensure data is in localStorage
+            localStorage.setItem('token', authData.token);
+            localStorage.setItem('user', JSON.stringify(authData.user));
+
+            message.success('📡 Offline login successful! Limited features available.');
+
+            // Navigate based on user role
+            if (authData.user.isAdmin) {
+              navigate("/admin/dashboard");
+            } else {
+              navigate("/user/hub");
+            }
+            return;
+          } else {
+            console.log('❌ No cached session found');
+            message.error('Cannot login offline. No cached session found. Please login online first.');
+            return;
+          }
+        } else {
+          console.log('❌ Credentials do not match');
+          message.error('Invalid credentials. Cannot verify offline.');
+          return;
+        }
+      }
+
+      // Online login
       dispatch(ShowLoading());
       const response = await loginUser(values);
       dispatch(HideLoading());
@@ -146,17 +230,19 @@ function Login() {
         console.log('User to store:', response.response);
         console.log('Payment status:', response.paymentStatus);
 
-        localStorage.setItem("token", response.data);
-        console.log('✅ Token stored in localStorage');
+        // Store auth data in both localStorage and IndexedDB for offline access
+        await storeAuthData(response.data, response.response, rememberMe);
+        console.log('✅ Auth data stored in localStorage and IndexedDB');
 
-        // Store user data in localStorage for consistency
+        // IMPORTANT: Set user data in Redux immediately to prevent redirect issues
         if (response.response) {
-          localStorage.setItem("user", JSON.stringify(response.response));
-          console.log('✅ User data stored in localStorage');
-
-          // IMPORTANT: Set user data in Redux immediately to prevent redirect issues
           dispatch(SetUser(response.response));
           console.log('✅ User data set in Redux');
+
+          // Auto-cache profile picture and sounds for offline access
+          initializeAutoCache(response.response).catch(err => {
+            console.warn('⚠️ Auto-cache failed:', err);
+          });
         }
 
         // Handle "Remember Me" functionality with secure storage
@@ -164,12 +250,14 @@ function Login() {
           const saved = saveCredentials(values.email, values.password);
           if (saved) {
             console.log('✅ User credentials saved securely for auto-login');
+            localStorage.setItem('rememberMe', 'true');
           } else {
             console.error('❌ Failed to save credentials');
           }
         } else {
           // Remove saved credentials if "Remember Me" is unchecked
           clearCredentials();
+          localStorage.removeItem('rememberMe');
           console.log('🗑️ Credentials cleared (Remember Me unchecked)');
         }
 
@@ -263,6 +351,30 @@ function Login() {
           <img src={Logo} alt="BrainWave Logo" className="login-logo" />
           <h1 className="login-title">Welcome Back</h1>
           <p className="login-subtitle">Sign in to your account to continue learning</p>
+
+          {/* Offline Mode Indicator */}
+          {isOffline && (
+            <div style={{
+              marginTop: '12px',
+              padding: '10px 16px',
+              backgroundColor: '#fff7e6',
+              border: '1px solid #ffd591',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <span style={{ fontSize: '16px' }}>📡</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: '600', color: '#d46b08', fontSize: '13px' }}>
+                  Offline Mode
+                </div>
+                <div style={{ fontSize: '12px', color: '#ad6800', marginTop: '2px' }}>
+                  You can login with saved credentials only
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <Form form={form} layout="vertical" onFinish={onFinish} className="login-form">

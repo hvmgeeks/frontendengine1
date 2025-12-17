@@ -181,7 +181,7 @@ const AILoginModal = ({
             />
           </Form.Item>
 
-          <Form.Item name="rememberMe" valuePropName="checked">
+          <Form.Item name="rememberMe" valuePropName="checked" initialValue={true}>
             <Checkbox>
               Keep me logged in for 30 days
             </Checkbox>

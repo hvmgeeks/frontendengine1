@@ -139,16 +139,22 @@ const EnhancedQuizResult = ({
             <ResultIcon className="w-10 h-10 text-white" />
           </motion.div>
           
-          <motion.h1 
+          <motion.h1
             variants={itemVariants}
-            className={`text-3xl font-bold ${styling.textColor} mb-2`}
+            className={`font-bold ${styling.textColor} mb-2`}
+            style={{
+              fontSize: window.innerWidth <= 320 ? '32px' : window.innerWidth <= 375 ? '36px' : window.innerWidth <= 425 ? '40px' : window.innerWidth <= 768 ? '44px' : '48px'
+            }}
           >
             {isPassed ? 'Congratulations!' : 'Keep Trying!'}
           </motion.h1>
-          
-          <motion.p 
+
+          <motion.p
             variants={itemVariants}
-            className="text-gray-600 text-lg"
+            className="text-gray-600"
+            style={{
+              fontSize: window.innerWidth <= 320 ? '16px' : window.innerWidth <= 768 ? '18px' : '20px'
+            }}
           >
             {examData.name} - {examData.subject}
           </motion.p>

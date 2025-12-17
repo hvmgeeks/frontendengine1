@@ -331,56 +331,45 @@
     font-size: 1.125rem;
 }
 
-/* Action Buttons */
+/* Action Buttons - Twitter/X Style */
 .question-actions {
     display: flex;
-    gap: 0.75rem;
+    gap: 0.5rem;
     flex-wrap: wrap;
+    align-items: center;
 }
 
 .action-btn {
-    border-radius: 8px;
-    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
     font-weight: 500;
-    font-size: 1.05rem;
-    transition: all 0.3s ease;
-    border: none;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    border: 1px solid #e5e7eb;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    background: white;
 }
 
 .reply-btn {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
+    color: #3b82f6;
+    border-color: #e5e7eb;
 }
 
 .reply-btn:hover {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
-.view-btn {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    color: white;
-}
-
-.view-btn:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    background: #eff6ff;
+    border-color: #3b82f6;
 }
 
 .delete-btn {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    color: white;
+    color: #ef4444;
+    border-color: #e5e7eb;
 }
 
 .delete-btn:hover {
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    background: #fef2f2;
+    border-color: #ef4444;
 }
 
 /* Replies Section */
@@ -395,13 +384,21 @@
 }
 
 .replies-count {
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    color: #6b7280;
-    background: #f3f4f6;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    display: inline-block;
+    color: #3b82f6;
+    background: white;
+    padding: 0.375rem 0.875rem;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s ease;
+}
+
+.replies-count:hover {
+    background: #f9fafb;
 }
 
 .modern-reply {
@@ -441,10 +438,21 @@
 /* Reply Delete Button */
 .reply-delete-btn {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 0.5rem;
+    right: 0.5rem;
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: all 0.2s ease;
+    border-radius: 6px !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.75rem !important;
+    color: #ef4444 !important;
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+.reply-delete-btn:hover {
+    background: #fef2f2 !important;
+    border-color: #ef4444 !important;
 }
 
 .modern-reply:hover .reply-delete-btn {
@@ -574,18 +582,14 @@
     border-color: #9ca3af;
 }
 
-/* Pagination */
+/* Pagination - ULTRA SIMPLE - JUST NUMBERS */
 .forum-pagination {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 2rem;
-    background: white;
-    border-radius: 16px;
-    margin: 2rem auto;
-    max-width: 900px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    border: 1px solid #e2e8f0;
+    padding: 0;
+    background: none;
+    margin: 1rem auto;
 }
 
 .pagination-info {
@@ -609,39 +613,35 @@
 
 .pagination-controls {
     display: flex;
-    gap: 0;
+    gap: 1rem;
     align-items: center;
-    flex-wrap: nowrap;
-    justify-content: center;
-    overflow-x: auto;
+    background: none;
 }
 
 .pagination-btn {
-    background: transparent;
-    border: none;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
+    background: none !important;
+    border: none !important;
+    color: #ff0000 !important;
+    padding: 0 !important;
+    margin: 0;
     cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 1rem;
-    font-weight: 500;
-    min-width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    transition: color 0.2s ease;
+    font-size: 1rem !important;
+    font-weight: 400 !important;
+    min-width: auto;
+    height: auto;
+    border-radius: 0 !important;
 }
 
 .pagination-btn:hover:not(:disabled):not(.active) {
-    background: rgba(255, 255, 255, 0.1);
-    transform: scale(1.05);
+    color: #ff0000 !important;
+    opacity: 0.7;
 }
 
 .pagination-btn.active {
-    background: #ff0000 !important;
-    color: white !important;
+    color: #ff0000 !important;
     font-weight: 700 !important;
+    text-decoration: underline;
 }
 
 .pagination-btn:disabled {
@@ -735,20 +735,18 @@
 
     .pagination-controls {
         display: flex;
-        gap: 0;
-        flex-wrap: nowrap;
-        justify-content: center;
-        align-items: center;
-        overflow-x: auto;
+        gap: 0.75rem;
+        background: none;
     }
 
     .pagination-btn {
-        min-width: 32px;
-        height: 36px;
-        padding: 0.4rem 0.5rem;
-        font-size: 0.75rem;
-        flex-shrink: 0;
-        border-radius: 4px;
+        min-width: auto;
+        height: auto;
+        padding: 0;
+        font-size: 0.9rem;
+        background: none !important;
+        border: none !important;
+        color: #ff0000 !important;
     }
 
     .form-actions,
