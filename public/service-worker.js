@@ -1,15 +1,19 @@
 /* eslint-disable no-restricted-globals */
 // Service Worker for Brainwave PWA
-// Version 2.0.0 - Auto Cache Clear Enabled
+// Version 2.0.1 - Enhanced PWA Support
 
 // IMPORTANT: Change this version number to force cache clear on all clients
-const SW_VERSION = '2.0.0';
+const SW_VERSION = '2.0.1';
 const CACHE_NAME = `brainwave-v${SW_VERSION}`;
 const RUNTIME_CACHE = `brainwave-runtime-v${SW_VERSION}`;
 const VIDEO_CACHE = `brainwave-videos-v${SW_VERSION}`;
 const API_CACHE = `brainwave-api-v${SW_VERSION}`;
 const QUIZ_CACHE = `brainwave-quiz-v${SW_VERSION}`;
 const AUTH_CACHE = `brainwave-auth-v${SW_VERSION}`;
+
+// Detect if running as installed PWA
+const isPWA = self.clients && self.clients.matchAll ? true : false;
+console.log('[Service Worker] Running as:', isPWA ? 'Installed PWA' : 'Browser');
 
 // Assets to cache on install
 const STATIC_ASSETS = [
@@ -29,7 +33,9 @@ const STATIC_ASSETS = [
 
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
-  console.log('[Service Worker] Installing...');
+  console.log('[Service Worker] Installing version:', SW_VERSION);
+  console.log('[Service Worker] Install triggered from:', isPWA ? 'PWA' : 'Browser');
+
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -41,13 +47,18 @@ self.addEventListener('install', (event) => {
             return Promise.resolve();
           });
       })
-      .then(() => self.skipWaiting())
+      .then(() => {
+        console.log('[Service Worker] Skip waiting and take control');
+        return self.skipWaiting();
+      })
   );
 });
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('[Service Worker] Activating...');
+  console.log('[Service Worker] Activating version:', SW_VERSION);
+  console.log('[Service Worker] Activation triggered from:', isPWA ? 'PWA' : 'Browser');
+
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -63,7 +74,12 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    }).then(() => self.clients.claim())
+    }).then(() => {
+      console.log('[Service Worker] Claiming clients for immediate control');
+      return self.clients.claim();
+    }).then(() => {
+      console.log('[Service Worker] Successfully activated and controlling all clients');
+    })
   );
 });
 
@@ -258,8 +274,16 @@ async function quizStrategy(request, cacheName) {
   }
 }
 
-// Message handler for video downloads
+// Message handler for video downloads and PWA communication
 self.addEventListener('message', (event) => {
+  console.log('[Service Worker] Received message:', event.data);
+
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.log('[Service Worker] Skip waiting requested');
+    self.skipWaiting();
+    return;
+  }
+
   if (event.data && event.data.type === 'CACHE_VIDEO') {
     const { url, title } = event.data;
     cacheVideo(url, title);

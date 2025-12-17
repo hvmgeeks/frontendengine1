@@ -23,6 +23,8 @@ const spinnerStyle = `
   }
   .ocr-mode-active {
     cursor: crosshair !important;
+    touch-action: none !important;
+    -webkit-overflow-scrolling: auto !important;
   }
   .ocr-mode-active * {
     user-select: none !important;
@@ -31,6 +33,7 @@ const spinnerStyle = `
     -ms-user-select: none !important;
     -webkit-touch-callout: none !important;
     cursor: crosshair !important;
+    touch-action: none !important;
   }
   .ocr-mode-active .textLayer {
     display: none !important;
@@ -200,6 +203,36 @@ const PDFModal = ({ modalIsOpen, closeModal, documentUrl }) => {
     setCurrentDraw({ x, y, width: 0, height: 0, pageIndex });
   };
 
+  // Handle touch start - start drawing selection box (for mobile)
+  const handleTouchStart = (event, pageIndex) => {
+    if (!ocrMode || isOCRProcessing) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const canvas = canvasRefs.current[pageIndex];
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+
+    // Calculate scale factor between displayed size and actual canvas size
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    // Get touch position relative to displayed canvas
+    const touch = event.touches[0];
+    const displayX = touch.clientX - rect.left;
+    const displayY = touch.clientY - rect.top;
+
+    // Convert to actual canvas coordinates
+    const x = displayX * scaleX;
+    const y = displayY * scaleY;
+
+    setIsDrawing(true);
+    setDrawStart({ x, y, pageIndex, scaleX, scaleY });
+    setCurrentDraw({ x, y, width: 0, height: 0, pageIndex });
+  };
+
   // Handle mouse move - update selection box
   const handleMouseMove = (event, pageIndex) => {
     if (!isDrawing || !drawStart || drawStart.pageIndex !== pageIndex) return;
@@ -219,6 +252,39 @@ const PDFModal = ({ modalIsOpen, closeModal, documentUrl }) => {
     // Get mouse position relative to displayed canvas
     const displayX = event.clientX - rect.left;
     const displayY = event.clientY - rect.top;
+
+    // Convert to actual canvas coordinates
+    const currentX = displayX * scaleX;
+    const currentY = displayY * scaleY;
+
+    const x = Math.min(drawStart.x, currentX);
+    const y = Math.min(drawStart.y, currentY);
+    const width = Math.abs(currentX - drawStart.x);
+    const height = Math.abs(currentY - drawStart.y);
+
+    setCurrentDraw({ x, y, width, height, pageIndex });
+  };
+
+  // Handle touch move - update selection box (for mobile)
+  const handleTouchMove = (event, pageIndex) => {
+    if (!isDrawing || !drawStart || drawStart.pageIndex !== pageIndex) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const canvas = canvasRefs.current[pageIndex];
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+
+    // Use the same scale factors from drawStart
+    const scaleX = drawStart.scaleX || (canvas.width / rect.width);
+    const scaleY = drawStart.scaleY || (canvas.height / rect.height);
+
+    // Get touch position relative to displayed canvas
+    const touch = event.touches[0];
+    const displayX = touch.clientX - rect.left;
+    const displayY = touch.clientY - rect.top;
 
     // Convert to actual canvas coordinates
     const currentX = displayX * scaleX;
@@ -268,6 +334,130 @@ const PDFModal = ({ modalIsOpen, closeModal, documentUrl }) => {
     // Minimum size check (at least 50x50 pixels)
     if (width < 50 || height < 50) {
       // Only show error if user actually dragged (not just a click)
+      if (width > 5 || height > 5) {
+        alert(isKiswahili
+          ? 'Eneo ni dogo sana. Buruta eneo kubwa zaidi la angalau swali moja.'
+          : 'Selection too small. Please drag a larger area covering at least one question.');
+      }
+      return;
+    }
+
+    // Show OCR box
+    setOcrBox({ pageIndex, x, y, width, height });
+    setIsOCRProcessing(true);
+    setOcrProgress(20);
+
+    try {
+      // Extract the region from canvas as HIGH-QUALITY IMAGE
+      const tempCanvas = document.createElement('canvas');
+      const ctx = tempCanvas.getContext('2d', { alpha: false });
+
+      // CRITICAL: Use 2x resolution for better quality and text clarity
+      const scale = 2;
+      tempCanvas.width = width * scale;
+      tempCanvas.height = height * scale;
+
+      // Enable high-quality image rendering
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      // Draw with 2x scale for better quality
+      ctx.drawImage(
+        canvas,
+        x, y, width, height,
+        0, 0, width * scale, height * scale
+      );
+
+      setOcrProgress(40);
+
+      // Convert canvas to data URL for preview (maximum quality)
+      const previewDataUrl = tempCanvas.toDataURL('image/png', 1.0);
+
+      // Convert canvas to blob with maximum quality
+      const blob = await new Promise(resolve =>
+        tempCanvas.toBlob(resolve, 'image/png', 1.0)
+      );
+
+      setOcrProgress(60);
+
+      // Upload image to S3 (exactly like Floating AI does)
+      const formData = new FormData();
+      formData.append('image', blob, 'question-screenshot.png');
+
+      console.log('📤 Uploading screenshot to S3...');
+      const uploadResponse = await axios.post('/api/chatgpt/image/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      setOcrProgress(80);
+
+      if (!uploadResponse.data.success) {
+        throw new Error('Image upload failed');
+      }
+
+      const imageUrl = uploadResponse.data.data?.url || uploadResponse.data.url;
+      console.log('✅ Image uploaded:', imageUrl);
+
+      setOcrProgress(100);
+
+      // Store preview data and show confirmation modal
+      setPreviewImageUrl(imageUrl);
+      setPreviewImageData(previewDataUrl);
+      setShowPreviewModal(true);
+
+      // Hide OCR processing indicators
+      setIsOCRProcessing(false);
+      setOcrProgress(0);
+      setTimeout(() => setOcrBox(null), 500);
+
+    } catch (error) {
+      console.error('❌ Image Upload Error:', error);
+      alert(isKiswahili
+        ? 'Hitilafu katika kusoma picha. Jaribu tena.'
+        : 'Error reading image. Please try again.');
+      setIsOCRProcessing(false);
+      setOcrProgress(0);
+      setTimeout(() => setOcrBox(null), 500);
+    }
+  };
+
+  // Handle touch end - perform OCR on selected area (for mobile)
+  const handleTouchEnd = async (event, pageIndex) => {
+    if (!isDrawing || !drawStart || drawStart.pageIndex !== pageIndex) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const canvas = canvasRefs.current[pageIndex];
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+
+    // Use the same scale factors from drawStart
+    const scaleX = drawStart.scaleX || (canvas.width / rect.width);
+    const scaleY = drawStart.scaleY || (canvas.height / rect.height);
+
+    // Get touch position relative to displayed canvas
+    const touch = event.changedTouches[0];
+    const displayX = touch.clientX - rect.left;
+    const displayY = touch.clientY - rect.top;
+
+    // Convert to actual canvas coordinates
+    const currentX = displayX * scaleX;
+    const currentY = displayY * scaleY;
+
+    const x = Math.min(drawStart.x, currentX);
+    const y = Math.min(drawStart.y, currentY);
+    const width = Math.abs(currentX - drawStart.x);
+    const height = Math.abs(currentY - drawStart.y);
+
+    setIsDrawing(false);
+    setDrawStart(null);
+    setCurrentDraw(null);
+
+    // Minimum size check (at least 50x50 pixels)
+    if (width < 50 || height < 50) {
+      // Only show error if user actually dragged (not just a tap)
       if (width > 5 || height > 5) {
         alert(isKiswahili
           ? 'Eneo ni dogo sana. Buruta eneo kubwa zaidi la angalau swali moja.'
@@ -710,8 +900,15 @@ Answer in proper English.`
       const context = canvas.getContext("2d");
       canvas.height = scaledViewport.height;
       canvas.width = scaledViewport.width;
-      canvas.style.width = '100%';
-      canvas.style.height = 'auto';
+
+      // Allow canvas to exceed container width when zoomed for proper scrolling
+      if (zoomLevel > 1.0) {
+        canvas.style.width = `${scaledViewport.width}px`;
+        canvas.style.height = `${scaledViewport.height}px`;
+      } else {
+        canvas.style.width = '100%';
+        canvas.style.height = 'auto';
+      }
 
       const renderContext = {
         canvasContext: context,
@@ -826,6 +1023,30 @@ Answer in proper English.`
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoomLevel]);
 
+  // Prevent scrolling when in OCR mode and drawing (especially important for mobile)
+  useEffect(() => {
+    if (ocrMode && isDrawing && containerRef.current) {
+      // Store current scroll position
+      const scrollTop = containerRef.current.scrollTop;
+      const scrollLeft = containerRef.current.scrollLeft;
+
+      // Prevent scroll by restoring position if it changes
+      const preventScroll = () => {
+        if (containerRef.current) {
+          containerRef.current.scrollTop = scrollTop;
+          containerRef.current.scrollLeft = scrollLeft;
+        }
+      };
+
+      const container = containerRef.current;
+      container.addEventListener('scroll', preventScroll, { passive: false });
+
+      return () => {
+        container.removeEventListener('scroll', preventScroll);
+      };
+    }
+  }, [ocrMode, isDrawing]);
+
   return (
     <ReactModal
       isOpen={modalIsOpen}
@@ -910,15 +1131,16 @@ Answer in proper English.`
       }}>
         <button
           onClick={() => {
-            const newZoom = Math.max(0.5, zoomLevel - 0.25);
+            const minZoom = window.innerWidth <= 768 ? 0.75 : 0.5; // Higher min zoom for mobile
+            const newZoom = Math.max(minZoom, zoomLevel - 0.25);
             setZoomLevel(newZoom);
           }}
-          disabled={zoomLevel <= 0.5}
+          disabled={zoomLevel <= (window.innerWidth <= 768 ? 0.75 : 0.5)}
           style={{
-            background: zoomLevel <= 0.5 ? "rgba(100, 100, 100, 0.3)" : "rgba(59, 130, 246, 0.9)",
+            background: zoomLevel <= (window.innerWidth <= 768 ? 0.75 : 0.5) ? "rgba(100, 100, 100, 0.3)" : "rgba(59, 130, 246, 0.9)",
             border: "none",
             fontSize: window.innerWidth <= 768 ? "18px" : "20px",
-            cursor: zoomLevel <= 0.5 ? "not-allowed" : "pointer",
+            cursor: zoomLevel <= (window.innerWidth <= 768 ? 0.75 : 0.5) ? "not-allowed" : "pointer",
             color: "white",
             borderRadius: "6px",
             width: window.innerWidth <= 768 ? "36px" : "40px",
@@ -948,15 +1170,16 @@ Answer in proper English.`
 
         <button
           onClick={() => {
-            const newZoom = Math.min(3.0, zoomLevel + 0.25);
+            const maxZoom = window.innerWidth <= 768 ? 5.0 : 3.0; // Higher max zoom for mobile
+            const newZoom = Math.min(maxZoom, zoomLevel + 0.25);
             setZoomLevel(newZoom);
           }}
-          disabled={zoomLevel >= 3.0}
+          disabled={zoomLevel >= (window.innerWidth <= 768 ? 5.0 : 3.0)}
           style={{
-            background: zoomLevel >= 3.0 ? "rgba(100, 100, 100, 0.3)" : "rgba(59, 130, 246, 0.9)",
+            background: zoomLevel >= (window.innerWidth <= 768 ? 5.0 : 3.0) ? "rgba(100, 100, 100, 0.3)" : "rgba(59, 130, 246, 0.9)",
             border: "none",
             fontSize: window.innerWidth <= 768 ? "18px" : "20px",
-            cursor: zoomLevel >= 3.0 ? "not-allowed" : "pointer",
+            cursor: zoomLevel >= (window.innerWidth <= 768 ? 5.0 : 3.0) ? "not-allowed" : "pointer",
             color: "white",
             borderRadius: "6px",
             width: window.innerWidth <= 768 ? "36px" : "40px",
@@ -1094,14 +1317,15 @@ Answer in proper English.`
               ? (window.innerWidth <= 1024 ? '1 1 55%' : '1 1 60%')
               : '1 1 100%',
             height: '100%',
-            overflow: 'auto',
+            overflow: ocrMode && isDrawing ? 'hidden' : 'auto', // Disable scroll when drawing selection
             padding: window.innerWidth <= 768 ? '12px' : (window.innerWidth <= 1024 ? '16px' : '20px'),
             scrollbarWidth: 'thin',
             scrollBehavior: 'smooth',
             background: '#f8f9fa',
             transition: 'flex 0.3s ease',
             position: 'relative',
-            WebkitOverflowScrolling: 'touch'
+            WebkitOverflowScrolling: ocrMode && isDrawing ? 'auto' : 'touch',
+            touchAction: ocrMode ? 'none' : 'auto' // Prevent default touch actions in OCR mode
           }}
         >
         {/* OCR Mode Indicator */}
@@ -1342,7 +1566,8 @@ Answer in proper English.`
                   WebkitUserSelect: ocrMode ? 'none' : 'auto',
                   MozUserSelect: ocrMode ? 'none' : 'auto',
                   msUserSelect: ocrMode ? 'none' : 'auto',
-                  WebkitTouchCallout: ocrMode ? 'none' : 'default'
+                  WebkitTouchCallout: ocrMode ? 'none' : 'default',
+                  touchAction: ocrMode ? 'none' : 'auto' // Prevent touch scrolling in OCR mode
                 }}
                 onMouseDown={(e) => {
                   if (ocrMode) {
@@ -1368,6 +1593,24 @@ Answer in proper English.`
                     setIsDrawing(false);
                     setDrawStart(null);
                     setCurrentDraw(null);
+                  }
+                }}
+                onTouchStart={(e) => {
+                  if (ocrMode) {
+                    e.preventDefault();
+                    handleTouchStart(e, index);
+                  }
+                }}
+                onTouchMove={(e) => {
+                  if (ocrMode) {
+                    e.preventDefault();
+                    handleTouchMove(e, index);
+                  }
+                }}
+                onTouchEnd={(e) => {
+                  if (ocrMode) {
+                    e.preventDefault();
+                    handleTouchEnd(e, index);
                   }
                 }}
                 onDragStart={(e) => ocrMode && e.preventDefault()}

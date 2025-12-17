@@ -43,10 +43,17 @@ root.render(
 // Register Service Worker for PWA and offline support
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
+    // Use absolute path with proper scope for both browser and installed PWA
+    const swUrl = `${window.location.origin}/service-worker.js`;
+
     navigator.serviceWorker
-      .register('/service-worker.js')
+      .register(swUrl, {
+        scope: '/',
+        updateViaCache: 'none' // Always check for updates
+      })
       .then((registration) => {
         console.log('✅ Service Worker registered successfully:', registration.scope);
+        console.log('📱 PWA Mode:', window.matchMedia('(display-mode: standalone)').matches ? 'Installed App' : 'Browser');
 
         // Check for updates every hour
         setInterval(() => {
@@ -70,6 +77,7 @@ if ('serviceWorker' in navigator) {
       })
       .catch((error) => {
         console.error('❌ Service Worker registration failed:', error);
+        console.error('Error details:', error.message);
       });
   });
 

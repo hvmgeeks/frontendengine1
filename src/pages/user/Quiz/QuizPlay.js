@@ -1018,15 +1018,8 @@ const QuizPlay = () => {
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
           {/* Quiz Content Layout */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
-            {/* Back Button and Quiz Title */}
+            {/* Quiz Title - Back button removed */}
             <div className="flex items-center gap-2 sm:gap-3">
-              <button
-                onClick={handleBackClick}
-                className="flex-shrink-0 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 group"
-                title="Back to quiz list"
-              >
-                <TbArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600 group-hover:text-gray-900" />
-              </button>
               <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 truncate">
                 {quiz.name}
               </h1>

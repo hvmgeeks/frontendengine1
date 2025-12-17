@@ -1062,8 +1062,8 @@ const Quiz = () => {
                           background: 'rgba(255, 255, 255, 0.25)',
                           color: 'white'
                         } : {
-                          background: 'rgba(251, 146, 60, 0.3)',
-                          color: '#ea580c',
+                          background: 'rgba(59, 130, 246, 0.3)',
+                          color: 'white',
                           fontWeight: '700'
                         }}
                       >
